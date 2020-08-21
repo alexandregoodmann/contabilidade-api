@@ -3,12 +3,12 @@ package br.com.goodmann.contabilidadeapi.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "pessoa")
-public class Pessoa {
+@Document(collection = "banco")
+public class Banco {
 
 	@Id
 	private String id;
-	private String nome;
+	private String banco;
 
 	public String getId() {
 		return id;
@@ -18,12 +18,12 @@ public class Pessoa {
 		this.id = id;
 	}
 
-	public String getNome() {
-		return nome;
+	public String getBanco() {
+		return banco;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setBanco(String banco) {
+		this.banco = banco;
 	}
 
 }
