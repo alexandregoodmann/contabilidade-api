@@ -8,7 +8,16 @@ public class Banco {
 
 	@Id
 	private String id;
+	private Integer codigo;
 	private String banco;
+
+	public Integer getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(Integer codigo) {
+		this.codigo = codigo;
+	}
 
 	public String getId() {
 		return id;
