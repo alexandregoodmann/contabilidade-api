@@ -9,8 +9,7 @@ public class Conta {
 	@Id
 	private String id;
 	private String conta;
-	private Banco banco;
-	private Pessoa pessoa;
+	private String banco;
 
 	public String getId() {
 		return id;
@@ -28,20 +27,12 @@ public class Conta {
 		this.conta = conta;
 	}
 
-	public Banco getBanco() {
+	public String getBanco() {
 		return banco;
 	}
 
-	public void setBanco(Banco banco) {
+	public void setBanco(String banco) {
 		this.banco = banco;
-	}
-
-	public Pessoa getPessoa() {
-		return pessoa;
-	}
-
-	public void setPessoa(Pessoa pessoa) {
-		this.pessoa = pessoa;
 	}
 
 }
