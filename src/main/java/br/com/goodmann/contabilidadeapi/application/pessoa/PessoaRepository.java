@@ -1,8 +1,6 @@
-package br.com.goodmann.contabilidadeapi.repository;
+package br.com.goodmann.contabilidadeapi.application.pessoa;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import br.com.goodmann.contabilidadeapi.model.Pessoa;
 
 public interface PessoaRepository extends MongoRepository<Pessoa, String> {
 

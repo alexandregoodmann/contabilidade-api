@@ -1,8 +1,6 @@
-package br.com.goodmann.contabilidadeapi.repository;
+package br.com.goodmann.contabilidadeapi.application.banco;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import br.com.goodmann.contabilidadeapi.model.Banco;
 
 public interface BancoRepository extends MongoRepository<Banco, String> {
 

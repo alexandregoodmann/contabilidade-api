@@ -1,8 +1,6 @@
-package br.com.goodmann.contabilidadeapi.repository;
+package br.com.goodmann.contabilidadeapi.application.categoria;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import br.com.goodmann.contabilidadeapi.model.Categoria;
 
 public interface CategoriaRepository extends MongoRepository<Categoria, String> {
 

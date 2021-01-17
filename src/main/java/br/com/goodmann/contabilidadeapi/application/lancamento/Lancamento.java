@@ -1,10 +1,13 @@
-package br.com.goodmann.contabilidadeapi.model;
+package br.com.goodmann.contabilidadeapi.application.lancamento;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import br.com.goodmann.contabilidadeapi.application.categoria.Categoria;
+import br.com.goodmann.contabilidadeapi.application.conta.Conta;
 
 @Document(collection = "lancamento")
 public class Lancamento {

@@ -1,4 +1,4 @@
-package br.com.goodmann.contabilidadeapi.model;
+package br.com.goodmann.contabilidadeapi.application.conta;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
