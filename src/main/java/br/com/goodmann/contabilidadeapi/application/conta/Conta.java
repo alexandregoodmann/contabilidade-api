@@ -3,13 +3,15 @@ package br.com.goodmann.contabilidadeapi.application.conta;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import br.com.goodmann.contabilidadeapi.application.banco.Banco;
+
 @Document(collection = "conta")
 public class Conta {
 
 	@Id
 	private String id;
 	private String conta;
-	private String banco;
+	private Banco banco;
 
 	public String getId() {
 		return id;
@@ -27,11 +29,11 @@ public class Conta {
 		this.conta = conta;
 	}
 
-	public String getBanco() {
+	public Banco getBanco() {
 		return banco;
 	}
 
-	public void setBanco(String banco) {
+	public void setBanco(Banco banco) {
 		this.banco = banco;
 	}
 
