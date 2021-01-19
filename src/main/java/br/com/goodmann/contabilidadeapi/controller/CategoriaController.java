@@ -9,5 +9,4 @@ import br.com.goodmann.contabilidadeapi.core.BaseController;
 @RestController
 @RequestMapping(value = "v1/categorias")
 public class CategoriaController extends BaseController<Categoria, String> {
-
 }

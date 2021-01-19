@@ -1,8 +1,10 @@
 package br.com.goodmann.contabilidadeapi.core;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,36 +19,36 @@ import org.springframework.web.bind.annotation.RequestBody;
 public abstract class BaseController<T, ID> {
 
 	@Autowired
-	private BaseService<T, ID> service;
+	private MongoRepository<T, ID> repo;
 
 	@PostMapping
 	public ResponseEntity<T> create(@RequestBody T model) {
-		return new ResponseEntity<T>(service.save(model), HttpStatus.CREATED);
+		return new ResponseEntity<T>(repo.insert(model), HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<T> update(@PathVariable(required = true, name = "id") ID id, @RequestBody T model) {
-		return new ResponseEntity<T>(service.save(model), HttpStatus.OK);
+		return new ResponseEntity<T>(repo.save(model), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable(required = true, name = "id") ID id) {
-		this.service.delete(id);
+		this.repo.deleteById(id);
 		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<T> findById(@PathVariable(required = true, name = "id") ID id) {
-		return new ResponseEntity<T>(this.service.findById(id), HttpStatus.OK);
+		Optional<T> opt = this.repo.findById(id);
+		if (opt.isPresent())
+			return new ResponseEntity<T>(opt.get(), HttpStatus.OK);
+		else
+			return new ResponseEntity<T>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping
 	public ResponseEntity<List<T>> findAll() {
-		return new ResponseEntity<List<T>>(this.service.findAll(), HttpStatus.OK);
-	}
-
-	public void setService(BaseService<T, ID> service) {
-		this.service = service;
+		return new ResponseEntity<List<T>>(this.repo.findAll(), HttpStatus.OK);
 	}
 
 }
