@@ -1,5 +1,7 @@
 package br.com.goodmann.contabilidadeapi.application.conta;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +13,7 @@ public class Conta {
 	@Id
 	private String id;
 	private String conta;
+	private BigDecimal saldo;
 	private Banco banco;
 
 	public String getId() {
@@ -37,4 +40,13 @@ public class Conta {
 		this.banco = banco;
 	}
 
+	public BigDecimal getSaldo() {
+		return saldo;
+	}
+
+	public void setSaldo(BigDecimal saldo) {
+		this.saldo = saldo;
+	}
+
+	
 }
