@@ -10,12 +10,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Lancamento {
 
 	@Id
+
 	private String id;
+
 	private Conta conta;
-	private Categoria cagetoria;
+
+	private Categoria categoria;
+
 	private Date data;
+
 	private Date efetuado;
+
 	private String descricao;
+
 	private BigDecimal valor;
 
 	public String getId() {
@@ -34,12 +41,12 @@ public class Lancamento {
 		this.conta = conta;
 	}
 
-	public Categoria getCagetoria() {
-		return cagetoria;
+	public Categoria getCategoria() {
+		return categoria;
 	}
 
-	public void setCagetoria(Categoria cagetoria) {
-		this.cagetoria = cagetoria;
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
 	}
 
 	public Date getData() {
