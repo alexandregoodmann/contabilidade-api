@@ -81,4 +81,10 @@ public class Lancamento {
 		this.valor = valor;
 	}
 
+	@Override
+	public String toString() {
+		return "Lancamento [id=" + id + ", conta=" + conta + ", categoria=" + categoria + ", data=" + data
+				+ ", efetuado=" + efetuado + ", descricao=" + descricao + ", valor=" + valor + "]";
+	}
+
 }
