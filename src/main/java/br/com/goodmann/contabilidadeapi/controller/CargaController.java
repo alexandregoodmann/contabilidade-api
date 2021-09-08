@@ -25,46 +25,34 @@ import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 @RequestMapping(value = "v1/carga")
 public class CargaController {
 
+	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+
 	@Autowired
 	private ContaRepository contaRepository;
 
 	@Autowired
 	LancamentoRepository lancamentoRepository;
 
-	@PostMapping("/c6")
-	public void create(@RequestBody CargaJson model) {
+	@PostMapping
+	public void create(@RequestBody CargaJson model) throws ParseException {
 
-		Optional<Conta> c6 = this.contaRepository.findById("600f098e662c464963eedd5b");
+		Optional<Conta> conta = this.contaRepository.findById(model.getIdConta());
 		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
 
-		model.getLinhas().forEach(linha -> {
-			try {
-				Lancamento lanc = this.parseLancamento(c6.get(), linha);
-				lancamentos.add(lanc);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
-
+		for (String linha : model.getLinhas()) {
+			Lancamento lanc = this.parseLancamento(linha);
+			lanc.setConta(conta.get());
+			lancamentos.add(lanc);
+		}
 		this.lancamentoRepository.saveAll(lancamentos);
 	}
 
-	private Lancamento parseLancamento(Conta conta, String linha) throws ParseException {
-
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
-
-		int index = linha.indexOf("R$");
-		String sData = linha.substring(0, 10);
-		String descricao = linha.substring(11, index);
-		String valor = linha.substring(index + 3).replaceAll("/.", "").replaceAll(",", ".");
-
+	private Lancamento parseLancamento(String linha) throws ParseException {
+		String[] vet = linha.split(";");
 		Lancamento lanc = new Lancamento();
-		lanc.setConta(conta);
-		lanc.setData(sdf.parse(sData));
-		lanc.setDescricao(descricao);
-		lanc.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
-
+		lanc.setData(sdf.parse(vet[0]));
+		lanc.setDescricao(vet[1]);
+		lanc.setValor(BigDecimal.valueOf(Double.valueOf(vet[2])));
 		return lanc;
 	}
 
