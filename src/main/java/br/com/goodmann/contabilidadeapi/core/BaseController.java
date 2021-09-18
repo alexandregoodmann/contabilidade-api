@@ -26,8 +26,9 @@ public abstract class BaseController<T, ID> {
 		return new ResponseEntity<T>(repo.save(model), HttpStatus.CREATED);
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<T> update(@PathVariable(required = true, name = "id") ID id, @RequestBody T model) {
+	@PutMapping
+	public ResponseEntity<T> update(@RequestBody T model) {
+		System.out.println(model);
 		return new ResponseEntity<T>(repo.save(model), HttpStatus.OK);
 	}
 
