@@ -16,4 +16,5 @@ public class Conta {
 	private String descricao;
 	private String label;
 	private Banco banco;
+	private String corLabel;
 }
