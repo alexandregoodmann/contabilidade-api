@@ -3,7 +3,9 @@ package br.com.goodmann.contabilidadeapi.controller;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +52,8 @@ public class CargaController {
 	private Lancamento parseLancamento(String linha) throws ParseException {
 		String[] vet = linha.split(";");
 		Lancamento lanc = new Lancamento();
-		lanc.setData(sdf.parse(vet[0]));
+		Date date = sdf.parse(vet[0]);
+		lanc.setData(LocalDate.of(date.getYear(), date.getMonth(), date.getDay()));
 		lanc.setDescricao(vet[1]);
 		lanc.setValor(BigDecimal.valueOf(Double.valueOf(vet[2])));
 		return lanc;
