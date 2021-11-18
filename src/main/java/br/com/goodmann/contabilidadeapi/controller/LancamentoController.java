@@ -1,5 +1,6 @@
 package br.com.goodmann.contabilidadeapi.controller;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.goodmann.contabilidadeapi.json.CargaJson;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
+import br.com.goodmann.contabilidadeapi.service.LancamentoService;
 
 @CrossOrigin
 @RestController
@@ -23,7 +26,15 @@ import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 public class LancamentoController extends BaseController<Lancamento, String> {
 
 	@Autowired
-	private LancamentoRepository lancamentoRepo;
+	private LancamentoService lancamentoService;
+
+	@Autowired
+	private LancamentoRepository lancamentoRepository;
+
+	@PostMapping("/carga")
+	public void cargaArquivo(@RequestBody CargaJson model) throws ParseException {
+		this.lancamentoService.cargaArquivo(model);
+	}
 
 	@Override
 	@PostMapping
@@ -42,6 +53,6 @@ public class LancamentoController extends BaseController<Lancamento, String> {
 
 	@GetMapping("/findByPeriod")
 	public List<Lancamento> findByPeriod() {
-		return this.lancamentoRepo.findByPeriod(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 10, 30));
+		return this.lancamentoRepository.findByPeriod(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 10, 30));
 	}
 }
