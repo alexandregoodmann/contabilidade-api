@@ -1,7 +1,6 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -16,8 +15,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.json.CargaJson;
+import br.com.goodmann.contabilidadeapi.controller.CargaJson;
 import br.com.goodmann.contabilidadeapi.model.Categoria;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -41,25 +41,25 @@ public class LancamentoService {
 
 	private Map<String, Categoria> categorias;
 
-	public void cargaArquivo(CargaJson model) {
+	public void cargaArquivo(CargaJson carga) {
 
-		if (model.getIdConta() == null)
+		if (carga.getIdConta() == null || "".equals(carga.getIdConta()))
 			throw new RuntimeException("Você precisa informar o ID da conta");
 
-		Optional<Conta> conta = this.contaRepository.findById(model.getIdConta());
+		Optional<Conta> conta = this.contaRepository.findById(carga.getIdConta());
 		if (!conta.isPresent())
 			throw new RuntimeException("Não foi encontrada a conta para o ID informado");
 
 		categorias = new HashMap<String, Categoria>();
 		this.categoriaRepository.findAll().forEach(cat -> {
-			categorias.put(cat.getDescricao(), cat);
+			categorias.put(cat.getDescricao().toUpperCase(), cat);
 		});
 
 		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
 
 		int index = 1;
 		try {
-			for (String linha : model.getLinhas()) {
+			for (String linha : carga.getLinhas()) {
 				Lancamento lanc = this.parseLancamento(index, linha);
 				lanc.setConta(conta.get());
 				lancamentos.add(lanc);
@@ -88,15 +88,14 @@ public class LancamentoService {
 	}
 
 	private Categoria setCategoria(int index, String descricao) {
-		Categoria cat = this.categorias.get(descricao);
+		Categoria cat = this.categorias.get(descricao.toUpperCase());
 		if (cat == null)
 			throw new RuntimeException("A categoria " + descricao + " não foi encontrada. Linha: " + index);
 		return cat;
 	}
 
-	public List<String> leitor(String path) throws IOException {
-		FileInputStream stream = new FileInputStream(path);
-		InputStreamReader reader = new InputStreamReader(stream);
+	public List<String> lerArquivo(MultipartFile file) throws IOException {
+		InputStreamReader reader = new InputStreamReader(file.getInputStream());
 		BufferedReader br = new BufferedReader(reader);
 		String linha = br.readLine();
 		List<String> lista = new ArrayList<String>();

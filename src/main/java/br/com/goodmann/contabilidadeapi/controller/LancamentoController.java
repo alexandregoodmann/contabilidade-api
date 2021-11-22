@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.goodmann.contabilidadeapi.json.CargaJson;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.service.LancamentoService;
@@ -32,8 +31,8 @@ public class LancamentoController extends BaseController<Lancamento, String> {
 	private LancamentoRepository lancamentoRepository;
 
 	@PostMapping("/carga")
-	public void cargaArquivo(@RequestBody CargaJson model) throws ParseException {
-		this.lancamentoService.cargaArquivo(model);
+	public void cargaArquivo(@RequestBody CargaJson carga) throws ParseException {
+		this.lancamentoService.cargaArquivo(carga);
 	}
 
 	@Override
