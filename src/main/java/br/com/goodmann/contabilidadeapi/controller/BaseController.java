@@ -1,4 +1,4 @@
-package br.com.goodmann.contabilidadeapi.core;
+package br.com.goodmann.contabilidadeapi.controller;
 
 import java.util.List;
 import java.util.Optional;
