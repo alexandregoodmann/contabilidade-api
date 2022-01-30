@@ -1,7 +1,6 @@
 package br.com.goodmann.contabilidadeapi.controller;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -52,6 +51,8 @@ public class LancamentoController extends BaseController<Lancamento, String> {
 
 	@GetMapping("/findByPeriod")
 	public List<Lancamento> findByPeriod() {
-		return this.lancamentoRepository.findByPeriod(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 10, 30));
+		// return this.lancamentoRepository.findByPeriod(LocalDate.of(2021, 10, 1),
+		// LocalDate.of(2021, 10, 30));
+		throw new NullPointerException();
 	}
 }
