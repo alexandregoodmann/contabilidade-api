@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class CargaJson {
 	
-	private String idConta;
+	private Integer idConta;
 	private List<String> linhas;
 
 }
