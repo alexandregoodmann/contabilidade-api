@@ -21,7 +21,7 @@ import br.com.goodmann.contabilidadeapi.service.LancamentoService;
 @CrossOrigin
 @RestController
 @RequestMapping(value = "v1/lancamentos")
-public class LancamentoController extends BaseController<Lancamento, String> {
+public class LancamentoController extends BaseController<Lancamento, Integer> {
 
 	@Autowired
 	private LancamentoService lancamentoService;

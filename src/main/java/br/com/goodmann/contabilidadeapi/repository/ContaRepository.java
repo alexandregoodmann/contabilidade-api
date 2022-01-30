@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.goodmann.contabilidadeapi.model.Conta;
 
-public interface ContaRepository extends JpaRepository<Conta, String> {
+public interface ContaRepository extends JpaRepository<Conta, Integer> {
 
 }

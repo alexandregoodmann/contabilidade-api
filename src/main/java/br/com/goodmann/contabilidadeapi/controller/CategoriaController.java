@@ -7,6 +7,6 @@ import br.com.goodmann.contabilidadeapi.model.Categoria;
 
 @RestController
 @RequestMapping(value = "v1/categorias")
-public class CategoriaController extends BaseController<Categoria, String> {
+public class CategoriaController extends BaseController<Categoria, Integer> {
 
 }

@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.goodmann.contabilidadeapi.model.Pessoa;
 
-public interface PessoaRepository extends JpaRepository<Pessoa, String> {
+public interface PessoaRepository extends JpaRepository<Pessoa, Integer> {
 
 }

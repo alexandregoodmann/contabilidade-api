@@ -7,6 +7,6 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 
 @RestController
 @RequestMapping(value = "v1/contas")
-public class ContaController extends BaseController<Conta, String> {
+public class ContaController extends BaseController<Conta, Integer> {
 
 }
