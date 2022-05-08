@@ -18,14 +18,18 @@ public class Lancamento {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	
+
 	@ManyToOne
 	private Conta conta;
-	
+
+	@ManyToOne
+	private Planilha planilha;
+
 	@ManyToOne
 	private Categoria categoria;
+
 	private LocalDate data;
 	private String descricao;
 	private BigDecimal valor;
-	private Integer repetir;
+	private TipoLancamento tipo;
 }
