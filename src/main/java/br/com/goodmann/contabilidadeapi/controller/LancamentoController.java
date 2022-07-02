@@ -3,7 +3,6 @@ package br.com.goodmann.contabilidadeapi.controller;
 import java.text.ParseException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +23,6 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 	@PostMapping("/carga")
 	public void cargaArquivo(@RequestBody CargaJson carga) throws ParseException {
 		this.lancamentoService.cargaArquivo(carga);
-	}
-
-	@Override
-	@PostMapping
-	public ResponseEntity<Lancamento> create(@RequestBody Lancamento model) {
-		return super.create(model);
 	}
 
 }

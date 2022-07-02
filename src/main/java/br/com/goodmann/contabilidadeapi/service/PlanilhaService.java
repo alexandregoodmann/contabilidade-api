@@ -35,4 +35,8 @@ public class PlanilhaService {
 		return planilha;
 	}
 
+	public List<Lancamento> getLancamentos(Integer idPlanilha) {
+		return this.lancamentoRepository.getLancamentos(idPlanilha);
+	}
+
 }
