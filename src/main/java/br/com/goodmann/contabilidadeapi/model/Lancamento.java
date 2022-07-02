@@ -10,9 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
+@ToString
 public class Lancamento {
 
 	@Id
@@ -31,5 +33,5 @@ public class Lancamento {
 	private LocalDate data;
 	private String descricao;
 	private BigDecimal valor;
-	private TipoLancamento tipo;
+	private Boolean fixo;
 }

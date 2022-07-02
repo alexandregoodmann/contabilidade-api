@@ -14,7 +14,8 @@ public class Planilha {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	private String mes;
-	private Integer ano;
+	private String descricao;
+	private Short mes;
+	private Short ano;
 
 }
