@@ -27,6 +27,9 @@ public class Lancamento {
 	private Conta conta;
 
 	@ManyToOne
+	private Planilha planilha;
+
+	@ManyToOne
 	private Categoria categoria;
 
 	private LocalDate data;
