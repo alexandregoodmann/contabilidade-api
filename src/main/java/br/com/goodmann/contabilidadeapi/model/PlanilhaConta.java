@@ -9,11 +9,11 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Pessoa {
+public class PlanilhaConta {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	private String nome;
-
+	private Integer idConta;
+	private Integer idPlanilha;
 }
