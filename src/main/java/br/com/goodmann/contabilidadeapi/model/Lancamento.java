@@ -36,4 +36,5 @@ public class Lancamento {
 	private String descricao;
 	private BigDecimal valor;
 	private Boolean fixo;
+	private Boolean concluido;
 }
