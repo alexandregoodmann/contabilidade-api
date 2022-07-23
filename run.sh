@@ -1,2 +1,5 @@
 clear
-sudo mvn spring-boot:run
+sudo mvn clean package -DskipTests=true
+sleep 5
+
+docker-compose up
