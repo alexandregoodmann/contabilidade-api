@@ -1,7 +1,7 @@
 package br.com.goodmann.contabilidadeapi.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,8 +32,9 @@ public class Lancamento {
 	@ManyToOne
 	private Categoria categoria;
 
-	private LocalDate data;
+	private Date data;
 	private String descricao;
 	private BigDecimal valor;
 	private Boolean fixo;
+	private Boolean concluido;
 }

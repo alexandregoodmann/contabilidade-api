@@ -1,7 +1,8 @@
 package br.com.goodmann.contabilidadeapi.service;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +22,27 @@ public class PlanilhaService {
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
 
+	@Transactional
 	public Planilha create(Planilha model) {
+
 		Planilha planilha = this.planilhaRepository.save(model);
-		List<Lancamento> fixos = new ArrayList<Lancamento>(this.lancamentoRepository.findAllFixos());
-		fixos.forEach(fixo -> {
-			Lancamento novo = new Lancamento();
-			BeanUtils.copyProperties(fixo, novo);
-			novo.setId(null);
-			novo.setPlanilha(planilha);
-			novo.setFixo(false);
-			this.lancamentoRepository.save(novo);
+		this.lancamentoRepository.findAllFixos().forEach(fixo -> {
+			Lancamento lanc = new Lancamento();
+			BeanUtils.copyProperties(fixo, lanc);
+			lanc.setId(null);
+			lanc.setFixo(null);
+			lanc.setPlanilha(planilha);
+			this.lancamentoRepository.save(lanc);
 		});
+
 		return planilha;
+	}
+
+	public List<Planilha> findAll() {
+		return this.planilhaRepository.findAll();
 	}
 
 	public List<Lancamento> getLancamentos(Integer idPlanilha) {
 		return this.lancamentoRepository.getLancamentos(idPlanilha);
 	}
-
 }

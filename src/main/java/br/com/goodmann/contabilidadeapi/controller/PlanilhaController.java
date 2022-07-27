@@ -31,8 +31,14 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 		return new ResponseEntity<Planilha>(this.planilhaService.create(model), HttpStatus.CREATED);
 	}
 
+	@Override
+	@GetMapping
+	public ResponseEntity<List<Planilha>> findAll() {
+		return new ResponseEntity<List<Planilha>>(this.planilhaService.findAll(), HttpStatus.OK);
+	}
+
 	@GetMapping("/{id}/lancamentos")
-	public ResponseEntity<List<Lancamento>> findLancamentos(@PathVariable(required = true, name = "id") Integer id) {
+	public ResponseEntity<List<Lancamento>> getLancamentos(@PathVariable(required = true, name = "id") Integer id) {
 		return new ResponseEntity<List<Lancamento>>(this.planilhaService.getLancamentos(id), HttpStatus.OK);
 	}
 
