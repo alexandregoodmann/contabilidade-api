@@ -23,7 +23,9 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 	private ArquivoService arquivoService;
 
 	@PostMapping("/uploadFile")
-	public void uploadFile(@RequestParam("idConta") Integer idConta, @RequestParam("file") MultipartFile file) throws IOException, ParseException {
+	public void uploadFile(@RequestParam("idConta") Integer idConta, @RequestParam("file") MultipartFile file)
+			throws IOException, ParseException {
 		this.arquivoService.cargaArquivoC6(idConta, file);
 	}
+
 }

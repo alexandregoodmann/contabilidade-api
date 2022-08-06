@@ -45,4 +45,16 @@ public class PlanilhaService {
 	public List<Lancamento> getLancamentos(Integer idPlanilha) {
 		return this.lancamentoRepository.getLancamentos(idPlanilha);
 	}
+
+	public Planilha findByAnoAndMes(Short ano, Short mes) {
+		Planilha planilha = this.planilhaRepository.findByAnoAndMes(ano, mes);
+		if (planilha != null) {
+			List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilha(planilha);
+			lancamentos.forEach(l -> {
+				l.setPlanilha(null);
+			});
+			planilha.setLancamentos(lancamentos);
+		}
+		return planilha;
+	}
 }

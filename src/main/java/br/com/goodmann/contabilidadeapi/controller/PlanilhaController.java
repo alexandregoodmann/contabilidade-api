@@ -42,4 +42,16 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 		return new ResponseEntity<List<Lancamento>>(this.planilhaService.getLancamentos(id), HttpStatus.OK);
 	}
 
+	@GetMapping("/{ano}/{mes}")
+	public ResponseEntity<Planilha> findByAnoAndMes(@PathVariable(required = true, name = "ano") Short ano,
+			@PathVariable(required = true, name = "mes") Short mes) {
+
+		Planilha planilha = this.planilhaService.findByAnoAndMes(ano, mes);
+
+		if (planilha == null)
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		else
+			return new ResponseEntity<Planilha>(planilha, HttpStatus.OK);
+	}
+
 }
