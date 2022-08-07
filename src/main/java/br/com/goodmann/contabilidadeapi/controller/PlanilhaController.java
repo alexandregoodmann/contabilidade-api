@@ -49,7 +49,7 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 		Planilha planilha = this.planilhaService.findByAnoAndMes(ano, mes);
 
 		if (planilha == null)
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Planilha>(new Planilha(), HttpStatus.OK);
 		else
 			return new ResponseEntity<Planilha>(planilha, HttpStatus.OK);
 	}
