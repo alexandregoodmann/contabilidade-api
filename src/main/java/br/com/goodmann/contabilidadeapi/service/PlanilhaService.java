@@ -22,22 +22,6 @@ public class PlanilhaService {
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
 
-	@Transactional
-	public Planilha create(Planilha model) {
-
-		Planilha planilha = this.planilhaRepository.save(model);
-		this.lancamentoRepository.findAllFixos().forEach(fixo -> {
-			Lancamento lanc = new Lancamento();
-			BeanUtils.copyProperties(fixo, lanc);
-			lanc.setId(null);
-			lanc.setFixo(null);
-			lanc.setPlanilha(planilha);
-			this.lancamentoRepository.save(lanc);
-		});
-
-		return planilha;
-	}
-
 	public List<Planilha> findAll() {
 		return this.planilhaRepository.findAll();
 	}

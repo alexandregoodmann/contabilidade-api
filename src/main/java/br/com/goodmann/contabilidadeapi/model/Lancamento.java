@@ -45,6 +45,5 @@ public class Lancamento {
 	@NotNull
 	private BigDecimal valor;
 
-	private Boolean fixo;
 	private Boolean concluido;
 }

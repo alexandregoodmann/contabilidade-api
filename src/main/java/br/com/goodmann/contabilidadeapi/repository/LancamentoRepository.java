@@ -10,9 +10,6 @@ import br.com.goodmann.contabilidadeapi.model.Planilha;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Integer> {
 
-	@Query("from Lancamento l where l.fixo = true")
-	List<Lancamento> findAllFixos();
-
 	@Query("from Lancamento l join l.planilha p where p.id=:idPlanilha")
 	List<Lancamento> getLancamentos(Integer idPlanilha);
 
