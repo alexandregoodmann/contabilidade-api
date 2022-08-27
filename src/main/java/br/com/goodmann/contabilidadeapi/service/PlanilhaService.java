@@ -1,13 +1,14 @@
 package br.com.goodmann.contabilidadeapi.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.transaction.Transactional;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
@@ -40,5 +41,23 @@ public class PlanilhaService {
 			planilha.setLancamentos(lancamentos);
 		}
 		return planilha;
+	}
+
+	public List<PlanilhasAnoDTO> getMapaPlanilhas() {
+
+		List<PlanilhasAnoDTO> mapa = new ArrayList<PlanilhasAnoDTO>();
+		Set<Short> anos = new HashSet<Short>();
+		List<Planilha> planilhas = this.planilhaRepository.findAll();
+
+		planilhas.forEach(p -> {
+			anos.add(p.getAno());
+		});
+
+		anos.forEach(a -> {
+			List<Planilha> plans = planilhas.stream().filter(o -> a.equals(o.getAno())).toList();
+			mapa.add(new PlanilhasAnoDTO(a, plans));
+		});
+
+		return mapa;
 	}
 }
