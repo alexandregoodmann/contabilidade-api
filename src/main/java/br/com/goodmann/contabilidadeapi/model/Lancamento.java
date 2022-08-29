@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,18 +24,26 @@ public class Lancamento {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
+	@NotNull
 	@ManyToOne
 	private Conta conta;
 
+	@NotNull
 	@ManyToOne
 	private Planilha planilha;
 
+	@NotNull
 	@ManyToOne
 	private Categoria categoria;
 
+	@NotNull
 	private Date data;
+
+	@NotNull
 	private String descricao;
+
+	@NotNull
 	private BigDecimal valor;
-	private Boolean fixo;
+
 	private Boolean concluido;
 }

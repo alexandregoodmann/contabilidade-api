@@ -11,4 +11,6 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 
 	@Query("from Planilha p order by p.ano desc, p.mes asc")
 	List<Planilha> findAll();
+
+	Planilha findByAnoAndMes(Short ano, Short mes);
 }

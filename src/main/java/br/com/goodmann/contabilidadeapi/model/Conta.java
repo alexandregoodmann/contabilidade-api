@@ -18,5 +18,4 @@ public class Conta {
 	private Integer id;
 	private String banco;
 	private String descricao;
-	private Boolean cargaArquivo;
 }
