@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class PlanilhaService {
 		});
 
 		anos.forEach(a -> {
-			List<Planilha> plans = planilhas.stream().filter(o -> a.equals(o.getAno())).toList();
+			List<Planilha> plans = planilhas.stream().filter(o -> a.equals(o.getAno())).collect(Collectors.toList());
 			mapa.add(new PlanilhasAnoDTO(a, plans));
 		});
 

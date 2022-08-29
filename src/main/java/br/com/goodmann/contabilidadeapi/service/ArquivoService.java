@@ -44,18 +44,21 @@ public class ArquivoService {
 		});
 	}
 
+	//FIXME CORRIGIR METODO
 	private List<ArquivoDTO> lerArquivoC6(MultipartFile multipartFile) throws IOException, ParseException {
 
 		List<ArquivoDTO> lista = new ArrayList<ArquivoDTO>();
 		InputStream inputStream = multipartFile.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
-		List<String> lines = reader.lines().toList();
+		
+		List<String> lines = null;//reader.lines().toList();
 		for (String line : lines) {
 			String[] vet = line.split(";");
 			ArquivoDTO dto = new ArquivoDTO(this.sdf.parse(vet[0]), vet[1], new BigDecimal(vet[2]));
 			lista.add(dto);
 		}
+		
 		reader.close();
 		return lista;
 	}
