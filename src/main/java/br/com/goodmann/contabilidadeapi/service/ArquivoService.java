@@ -8,18 +8,18 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.dto.ArquivoDTO;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
-import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
+import br.com.goodmann.contabilidadeapi.model.MesesAbreviadosEnum;
+import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
 public class ArquivoService {
@@ -28,38 +28,55 @@ public class ArquivoService {
 	private LancamentoRepository lancamentoRepository;
 
 	@Autowired
-	private ContaRepository contaRepository;
+	private PlanilhaRepository planilhaRepository;
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-	public void cargaArquivoC6(Integer idConta, MultipartFile multipartFile) throws IOException, ParseException {
-		this.lerArquivoC6(multipartFile).forEach(dto -> {
-			Lancamento lanc = new Lancamento();
-			Conta conta = new Conta();
-			conta.setId(idConta);
-			lanc.setConta(conta);
-			lanc.setData(dto.getDataLancamento());
-			lanc.setDescricao(dto.getItem());
-			lanc.setValor(dto.getValor());
-		});
-	}
+	public void lerArquivoC6(Integer idConta, Integer idPlanilha, MultipartFile multipartFile) throws IOException {
 
-	//FIXME CORRIGIR METODO
-	private List<ArquivoDTO> lerArquivoC6(MultipartFile multipartFile) throws IOException, ParseException {
+		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
+		Conta conta = new Conta(idConta);
 
-		List<ArquivoDTO> lista = new ArrayList<ArquivoDTO>();
 		InputStream inputStream = multipartFile.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
-		
-		List<String> lines = null;//reader.lines().toList();
-		for (String line : lines) {
-			String[] vet = line.split(";");
-			ArquivoDTO dto = new ArquivoDTO(this.sdf.parse(vet[0]), vet[1], new BigDecimal(vet[2]));
-			lista.add(dto);
-		}
-		
+		reader.lines().forEach(line -> {
+
+			line = line.replaceAll("\\.", "").replaceAll("\\,", ".");
+			String dia = line.substring(0, 2);
+			String mes = "";
+
+			int i = MesesAbreviadosEnum.valueOf(line.substring(3, 6).toUpperCase()).ordinal() + 1;
+			if (i < 10)
+				mes = "0" + i;
+			else
+				mes = String.valueOf(i);
+
+			Date data;
+
+			try {
+				data = this.sdf.parse(dia + "/" + mes + "/" + planilha.getAno());
+			} catch (ParseException e) {
+				throw new RuntimeException(e.getMessage());
+			}
+
+			String[] vet = line.split(" ");
+			String valor = (vet[vet.length - 1]);
+
+			String descricao = line.substring(7).replace(valor, "");
+
+			Lancamento lancamento = new Lancamento();
+			lancamento.setConta(conta);
+			lancamento.setPlanilha(planilha);
+			lancamento.setDescricao(descricao);
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
+			lancamento.setData(data);
+
+			this.lancamentoRepository.save(lancamento);
+
+		});
+
 		reader.close();
-		return lista;
 	}
+
 }

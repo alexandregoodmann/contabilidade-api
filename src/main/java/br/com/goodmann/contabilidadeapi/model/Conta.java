@@ -8,9 +8,11 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Conta {
 
 	@Id
@@ -24,4 +26,8 @@ public class Conta {
 	@NotNull
 	@Column(name = "descricao", length = 50, nullable = false)
 	private String descricao;
+
+	public Conta(Integer idConta) {
+		this.id = idConta;
+	}
 }

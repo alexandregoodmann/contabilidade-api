@@ -32,9 +32,8 @@ public class Lancamento {
 	@JoinColumn(name = "idPlanilha", nullable = false)
 	private Planilha planilha;
 
-	@NotNull
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "idCategoria", nullable = false)
+	@JoinColumn(name = "idCategoria")
 	private Categoria categoria;
 
 	@NotNull
