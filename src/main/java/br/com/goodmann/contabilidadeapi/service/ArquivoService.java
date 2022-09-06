@@ -69,7 +69,7 @@ public class ArquivoService {
 			lancamento.setConta(conta);
 			lancamento.setPlanilha(planilha);
 			lancamento.setDescricao(descricao);
-			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)*(-1)));
 			lancamento.setData(data);
 
 			this.lancamentoRepository.save(lancamento);

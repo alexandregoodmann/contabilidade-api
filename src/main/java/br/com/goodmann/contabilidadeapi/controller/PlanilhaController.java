@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.goodmann.contabilidadeapi.dto.ContaDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
@@ -45,6 +46,11 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 			return new ResponseEntity<Planilha>(new Planilha(), HttpStatus.OK);
 		else
 			return new ResponseEntity<Planilha>(planilha, HttpStatus.OK);
+	}
+
+	@GetMapping("/{id}/extrato")
+	public List<ContaDTO> getExtrato(@PathVariable(required = true, name = "id") Integer id) {
+		return this.planilhaService.getExtrato(id);
 	}
 
 	@GetMapping("/mapa")
