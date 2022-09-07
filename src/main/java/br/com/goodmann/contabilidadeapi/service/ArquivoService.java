@@ -8,7 +8,11 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,16 +35,24 @@ public class ArquivoService {
 	private PlanilhaRepository planilhaRepository;
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	private SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
 
-	public void lerArquivoC6(Integer idConta, Integer idPlanilha, MultipartFile multipartFile) throws IOException {
+	private List<String> readLines(MultipartFile multipartFile) throws IOException {
+		InputStream inputStream = multipartFile.getInputStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+		List<String> lista = new ArrayList<String>(reader.lines().collect(Collectors.toList()));
+		reader.close();
+		return lista;
+	}
 
+	public Map<String, Object> cargaArquivoC6(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+			throws ParseException, IOException {
+
+		List<String> lines = this.readLines(multipartFile);
 		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
 		Conta conta = new Conta(idConta);
 
-		InputStream inputStream = multipartFile.getInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-
-		reader.lines().forEach(line -> {
+		for (String line : lines) {
 
 			line = line.replaceAll("\\.", "").replaceAll("\\,", ".");
 			String dia = line.substring(0, 2);
@@ -51,14 +63,7 @@ public class ArquivoService {
 				mes = "0" + i;
 			else
 				mes = String.valueOf(i);
-
-			Date data;
-
-			try {
-				data = this.sdf.parse(dia + "/" + mes + "/" + planilha.getAno());
-			} catch (ParseException e) {
-				throw new RuntimeException(e.getMessage());
-			}
+			String data = dia + "/" + mes + "/" + planilha.getAno();
 
 			String[] vet = line.split(" ");
 			String valor = (vet[vet.length - 1]);
@@ -69,14 +74,61 @@ public class ArquivoService {
 			lancamento.setConta(conta);
 			lancamento.setPlanilha(planilha);
 			lancamento.setDescricao(descricao);
-			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)*(-1)));
-			lancamento.setData(data);
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor) * (-1)));
+			lancamento.setData(this.sdf.parse(data));
 
 			this.lancamentoRepository.save(lancamento);
 
-		});
+		}
 
-		reader.close();
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("idConta", idConta);
+		mapa.put("idPlanilha", idPlanilha);
+		mapa.put("qtdLancamentos", lines.size());
+
+		return mapa;
+
+	}
+
+	public Map<String, Object> cargaArquivoBradesco(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+			throws ParseException, IOException {
+
+		List<String> lines = this.readLines(multipartFile);
+		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
+		Conta conta = new Conta(idConta);
+		int count = 0;
+		for (int i = 3; i < lines.size(); i += 2) {
+
+			if (lines.get(i).contains(";Total;"))
+				break;
+
+			String line = lines.get(i) + lines.get(i + 1);
+			String[] vet = line.split(";");
+
+			Lancamento lancamento = new Lancamento();
+			lancamento.setConta(conta);
+			lancamento.setPlanilha(planilha);
+
+			String descricao = vet.length == 7 ? vet[6] : vet[7];
+			lancamento.setDescricao(descricao);
+
+			String sValor = vet[3].isEmpty() ? vet[4] : vet[3];
+			Double valor = Double.valueOf(sValor.replaceAll("\\.", "").replaceAll("\\,", "\\.").replaceAll("\\\"", ""));
+			lancamento.setValor(BigDecimal.valueOf(valor));
+
+			lancamento.setData(this.sdf2.parse(vet[0]));
+			this.lancamentoRepository.save(lancamento);
+
+			count++;
+		}
+
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("idConta", idConta);
+		mapa.put("idPlanilha", idPlanilha);
+		mapa.put("qtdLancamentos", count);
+
+		return mapa;
+
 	}
 
 }

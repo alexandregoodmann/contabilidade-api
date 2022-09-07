@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.ArquivoService;
 
 @SpringBootTest
-public class ArquivoServiceTest {
+public class CargaArquivoBradescoTest {
 
 	@Autowired
 	private ArquivoService arquivoService;
@@ -34,20 +35,20 @@ public class ArquivoServiceTest {
 	private PlanilhaRepository planilhaRepository;
 
 	@Test
-	public void readFileTest() throws IOException, ParseException {
+	public void cargaArquivoC6Test() throws IOException, ParseException {
 
 		File file = new File(
-				"/home/alexandre/projetos/contabilidade-api/src/main/resources/cargaArquivo/fatura-c6-julho.txt");
+				"/home/alexandre/projetos/contabilidade-api/src/main/resources/cargaArquivo/Bradesco_07092022_124002.csv");
 		InputStream stream;
 		stream = new FileInputStream(file);
-		MultipartFile multipartFileToSend = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE,
-				stream);
-		
+		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+
 		Conta conta = this.contaRepository.findAll().get(0);
 		Planilha planilha = this.planilhaRepository.findAll().get(0);
-		
-		this.arquivoService.lerArquivoC6(conta.getId(), planilha.getId(), multipartFileToSend);
-		
-		assertTrue(true);
+
+		Map<String, Object> mapa = this.arquivoService.cargaArquivoBradesco(conta.getId(), planilha.getId(), mFile);
+
+		int qtd = (int) mapa.get("qtdLancamentos");
+		assertTrue(qtd == 14);
 	}
 }

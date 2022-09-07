@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContaDTO extends Conta {
+public class ExtratoDTO extends Conta {
 
 	private BigDecimal total = BigDecimal.ZERO;
 

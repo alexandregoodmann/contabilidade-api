@@ -13,9 +13,11 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
+@ToString
 public class Lancamento {
 
 	@Id
@@ -32,8 +34,8 @@ public class Lancamento {
 	@JoinColumn(name = "idPlanilha", nullable = false)
 	private Planilha planilha;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "idCategoria")
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "idCategoria", nullable = true)
 	private Categoria categoria;
 
 	@NotNull

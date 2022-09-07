@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.goodmann.contabilidadeapi.dto.ContaDTO;
+import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Conta;
@@ -68,7 +68,7 @@ public class PlanilhaService {
 		return mapa;
 	}
 
-	public List<ContaDTO> getExtrato(Integer idPlanilha) {
+	public List<ExtratoDTO> getExtrato(Integer idPlanilha) {
 
 		Map<Conta, List<Lancamento>> mapa = new HashMap<Conta, List<Lancamento>>();
 
@@ -84,11 +84,11 @@ public class PlanilhaService {
 			}
 		});
 
-		List<ContaDTO> contas = new ArrayList<ContaDTO>();
+		List<ExtratoDTO> contas = new ArrayList<ExtratoDTO>();
 
 		mapa.forEach((conta, lancamentos) -> {
 
-			ContaDTO contaDTO = new ContaDTO();
+			ExtratoDTO contaDTO = new ExtratoDTO();
 			BeanUtils.copyProperties(conta, contaDTO);
 
 			lancamentos.forEach(l -> {

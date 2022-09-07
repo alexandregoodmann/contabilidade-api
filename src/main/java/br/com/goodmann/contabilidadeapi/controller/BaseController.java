@@ -40,9 +40,13 @@ public abstract class BaseController<T, ID> {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<T> findById(@PathVariable(required = true, name = "id") ID id) {
-		Optional<T> model = this.repo.findById(id);
-		if (model.isPresent()) {
-			return new ResponseEntity<T>(model.get(), HttpStatus.OK);
+		try {
+			Optional<T> model = this.repo.findById(id);
+			if (model.isPresent()) {
+				return new ResponseEntity<T>(model.get(), HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 	}
