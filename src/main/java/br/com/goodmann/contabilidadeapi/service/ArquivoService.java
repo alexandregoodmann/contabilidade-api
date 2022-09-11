@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,12 +61,16 @@ public class ArquivoService {
 		if (!conta.isPresent())
 			throw new NotFoundException("O idconta não foi encontrado: " + idConta);
 
-		if (conta.get().getCarga()==null)
-			throw new NotFoundException("Para o idConta informado não é possível fazer carga de lançamentos: " + idConta);
+		if (conta.get().getCarga() == null)
+			throw new NotFoundException(
+					"Para o idConta informado não é possível fazer carga de lançamentos: " + idConta);
 
 		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
+
 		if (!planilha.isPresent())
 			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
+
+		this.deleteAllLancamentos(conta.get(), planilha.get());
 
 		switch (conta.get().getCarga()) {
 		case BRADESCO:
@@ -78,6 +83,15 @@ public class ArquivoService {
 		}
 
 		return mapa;
+	}
+
+	private void deleteAllLancamentos(Conta conta, Planilha planilha) {
+		Lancamento l = new Lancamento();
+		l.setConta(conta);
+		l.setPlanilha(planilha);
+		Example<Lancamento> example = Example.of(l);
+		List<Lancamento> list = this.lancamentoRepository.findAll(example);
+		this.lancamentoRepository.deleteAll(list);
 	}
 
 	private Map<String, Object> cargaArquivoC6(Conta conta, Planilha planilha, MultipartFile multipartFile)
