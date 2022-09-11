@@ -2,6 +2,8 @@ package br.com.goodmann.contabilidadeapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,8 +29,8 @@ public class Conta {
 	@Column(name = "descricao", length = 50, nullable = false)
 	private String descricao;
 
-	public Conta(Integer idConta) {
-		this.id = idConta;
-	}
+	@Enumerated(EnumType.STRING)
+	@Column(name = "carga", nullable = true)
+	private CargaEnum carga;
 
 }

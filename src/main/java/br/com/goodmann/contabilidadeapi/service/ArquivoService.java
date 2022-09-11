@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,19 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.MesesAbreviadosEnum;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
+import javassist.NotFoundException;
 
 @Service
 public class ArquivoService {
 
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
+
+	@Autowired
+	private ContaRepository contaRepository;
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
@@ -45,12 +51,39 @@ public class ArquivoService {
 		return lista;
 	}
 
-	public Map<String, Object> cargaArquivoC6(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+	public Map<String, Object> cargaArquivo(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+			throws NotFoundException, ParseException, IOException {
+
+		Map<String, Object> mapa = null;
+
+		Optional<Conta> conta = this.contaRepository.findById(idConta);
+		if (!conta.isPresent())
+			throw new NotFoundException("O idconta não foi encontrado: " + idConta);
+
+		if (conta.get().getCarga()==null)
+			throw new NotFoundException("Para o idConta informado não é possível fazer carga de lançamentos: " + idConta);
+
+		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
+		if (!planilha.isPresent())
+			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
+
+		switch (conta.get().getCarga()) {
+		case BRADESCO:
+			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
+			break;
+
+		case C6:
+			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
+			break;
+		}
+
+		return mapa;
+	}
+
+	private Map<String, Object> cargaArquivoC6(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
 		List<String> lines = this.readLines(multipartFile);
-		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
-		Conta conta = new Conta(idConta);
 
 		for (String line : lines) {
 
@@ -82,20 +115,18 @@ public class ArquivoService {
 		}
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
-		mapa.put("idConta", idConta);
-		mapa.put("idPlanilha", idPlanilha);
+		mapa.put("idConta", conta.getId());
+		mapa.put("idPlanilha", planilha.getId());
 		mapa.put("qtdLancamentos", lines.size());
 
 		return mapa;
 
 	}
 
-	public Map<String, Object> cargaArquivoBradesco(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
 		List<String> lines = this.readLines(multipartFile);
-		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
-		Conta conta = new Conta(idConta);
 		int count = 0;
 		for (int i = 3; i < lines.size(); i += 2) {
 
@@ -123,8 +154,8 @@ public class ArquivoService {
 		}
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
-		mapa.put("idConta", idConta);
-		mapa.put("idPlanilha", idPlanilha);
+		mapa.put("idConta", conta.getId());
+		mapa.put("idPlanilha", planilha.getId());
 		mapa.put("qtdLancamentos", count);
 
 		return mapa;
