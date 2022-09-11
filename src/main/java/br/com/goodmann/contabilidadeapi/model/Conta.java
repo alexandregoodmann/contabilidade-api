@@ -33,4 +33,8 @@ public class Conta {
 	@Column(name = "carga", nullable = true)
 	private CargaEnum carga;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "tipo", nullable = true)
+	private TipoContaEnum tipo;
+
 }
