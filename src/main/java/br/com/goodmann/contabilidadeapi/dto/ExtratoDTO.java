@@ -15,6 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExtratoDTO extends Conta {
+	
+	private Boolean marcado;
 
 	private BigDecimal total = BigDecimal.ZERO;
 
