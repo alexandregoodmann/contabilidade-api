@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @CrossOrigin
 public abstract class BaseController<T, ID> {
@@ -29,7 +28,6 @@ public abstract class BaseController<T, ID> {
 
 	@PutMapping
 	public ResponseEntity<T> update(@RequestBody T model) {
-		System.out.println(model);
 		return new ResponseEntity<T>(repo.save(model), HttpStatus.OK);
 	}
 
