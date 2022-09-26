@@ -18,5 +18,6 @@ jobs:
     - name: Build App
       run: mvn clean install -DskipTests=true
       
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Docker-compose
+      run: docker-compose up
+      
