@@ -7,17 +7,17 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     
-    - name: Build App
-      run: mvn clean install -DskipTests=true
-      
-    - name: Docker-compose
-      run: docker-compose up
-      
+    - name: Compile and Test
+      run: mvn clean install
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3   
+    - name: Build Docker Container
+      run: docker run -d -p 8081:8081 --name contabilidade-api      
