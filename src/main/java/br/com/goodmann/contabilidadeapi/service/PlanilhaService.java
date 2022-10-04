@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
+import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
 import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
@@ -104,4 +106,13 @@ public class PlanilhaService {
 
 		return contas;
 	}
+
+	public List<AnaliseDTO> getAnalisePlanilha(@Param("idPlanilha") Integer idPlanilha) {
+		return this.planilhaRepository.getAnalisePlanilha(idPlanilha);
+	}
+	
+	public List<AnaliseDTO> getAnaliseAno(@Param("ano") Integer ano) {
+		return this.planilhaRepository.getAnaliseAno(ano);
+	}
+
 }
