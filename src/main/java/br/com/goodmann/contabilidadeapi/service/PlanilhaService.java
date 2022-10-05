@@ -93,12 +93,16 @@ public class PlanilhaService {
 			ExtratoDTO contaDTO = new ExtratoDTO();
 			BeanUtils.copyProperties(conta, contaDTO);
 
-			lancamentos.forEach(l -> {
-				String categoria = l.getCategoria() == null ? null : l.getCategoria().getDescricao();
-				LancamentoDTO lancamentoDTO = new LancamentoDTO(l.getId(), categoria, l.getData(), l.getDescricao(),
-						l.getValor(), l.getConcluido());
+			lancamentos.forEach(lancamento -> {
+				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
+				LancamentoDTO lancamentoDTO = new LancamentoDTO(lancamento.getId(), categoria, lancamento.getData(),
+						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido());
 				contaDTO.getLancamentos().add(lancamentoDTO);
-				contaDTO.setTotal(contaDTO.getTotal().add(l.getValor()));
+
+				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
+
+				if (lancamento.getConcluido() != null && lancamento.getConcluido() == true)
+					contaDTO.setSaldoEfetivado(contaDTO.getSaldoEfetivado().add(lancamento.getValor()));
 			});
 
 			contas.add(contaDTO);
@@ -110,7 +114,7 @@ public class PlanilhaService {
 	public List<AnaliseDTO> getAnalisePlanilha(@Param("idPlanilha") Integer idPlanilha) {
 		return this.planilhaRepository.getAnalisePlanilha(idPlanilha);
 	}
-	
+
 	public List<AnaliseDTO> getAnaliseAno(@Param("ano") Integer ano) {
 		return this.planilhaRepository.getAnaliseAno(ano);
 	}

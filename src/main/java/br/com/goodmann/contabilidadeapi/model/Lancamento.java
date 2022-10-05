@@ -50,5 +50,7 @@ public class Lancamento {
 	@Column(name = "valor", nullable = false)
 	private BigDecimal valor;
 
+	private Boolean fixo;
+
 	private Boolean concluido;
 }
