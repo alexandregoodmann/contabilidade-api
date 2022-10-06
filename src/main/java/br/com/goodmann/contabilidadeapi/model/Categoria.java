@@ -20,4 +20,6 @@ public class Categoria {
 	@NotNull
 	@Column(length = 50, nullable = false)
 	private String descricao;
+	
+	private Boolean analisar;
 }
