@@ -21,7 +21,12 @@ public class PlanilhaTest {
 
 	@Test
 	public void getAnaliseAno() {
-		assertTrue(this.planilhaRepository.getAnaliseAno(2022).size() > 0);
+		assertTrue(this.planilhaRepository.getAnaliseCategoriaAno(2022).size() > 0);
+	}
+
+	@Test
+	public void getAnaliseSaldoAno() {
+		assertTrue(this.planilhaRepository.getAnaliseSaldoAno(2022).size() > 0);
 	}
 
 }

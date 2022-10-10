@@ -116,7 +116,7 @@ public class PlanilhaService {
 	}
 
 	public List<AnaliseDTO> getAnaliseAno(@Param("ano") Integer ano) {
-		return this.planilhaRepository.getAnaliseAno(ano);
+		return this.planilhaRepository.getAnaliseCategoriaAno(ano);
 	}
 
 }
