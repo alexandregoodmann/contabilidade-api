@@ -19,7 +19,7 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 
 	@Query(value = "select c.descricao, count(*) as qtd, sum(l.valor)*(-1) as valor "
 			+ "	from lancamento l join categoria c on l.id_categoria = c.id where l.id_planilha=:idPlanilha "
-			+ "	and c.analisar = 1 group by c.descricao order by valor", nativeQuery = true)
+			+ "	and c.analisar = 1 and l.concluido = 1 group by c.descricao order by valor", nativeQuery = true)
 	public List<AnaliseDTO> getAnalisePlanilha(@Param("idPlanilha") Integer idPlanilha);
 
 	@Query(value = "select p.mes, c.descricao, count(*) as qtd, sum(l.valor)*(-1) as valor from lancamento l "

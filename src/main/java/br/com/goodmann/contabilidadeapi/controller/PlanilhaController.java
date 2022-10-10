@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
+import br.com.goodmann.contabilidadeapi.dto.AnaliseSaldoDTO;
 import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -67,6 +68,11 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 	@GetMapping("/{ano}/analiseano")
 	public List<AnaliseDTO> getAnaliseAno(@PathVariable(required = true, name = "ano") Integer ano) {
 		return this.planilhaService.getAnaliseAno(ano);
+	}
+
+	@GetMapping("/{ano}/saldo")
+	public List<AnaliseSaldoDTO> getAnaliseSaldoAno(@PathVariable(required = true, name = "ano") Integer ano) {
+		return this.planilhaService.getAnaliseSaldoAno(ano);
 	}
 
 }

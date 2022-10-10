@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
+import br.com.goodmann.contabilidadeapi.dto.AnaliseSaldoDTO;
 import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
@@ -96,7 +97,8 @@ public class PlanilhaService {
 			lancamentos.forEach(lancamento -> {
 				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
 				LancamentoDTO lancamentoDTO = new LancamentoDTO(lancamento.getId(), categoria, lancamento.getData(),
-						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido());
+						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido(),
+						lancamento.getCategoria().getAnalisar());
 				contaDTO.getLancamentos().add(lancamentoDTO);
 
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
@@ -117,6 +119,10 @@ public class PlanilhaService {
 
 	public List<AnaliseDTO> getAnaliseAno(@Param("ano") Integer ano) {
 		return this.planilhaRepository.getAnaliseCategoriaAno(ano);
+	}
+
+	public List<AnaliseSaldoDTO> getAnaliseSaldoAno(@Param("ano") Integer ano) {
+		return this.planilhaRepository.getAnaliseSaldoAno(ano);
 	}
 
 }
