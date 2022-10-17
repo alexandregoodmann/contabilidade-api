@@ -15,18 +15,19 @@ public class PlanilhaTest {
 	private PlanilhaRepository planilhaRepository;
 
 	@Test
-	public void getAnalisePlanilha() {
-		assertTrue(this.planilhaRepository.getAnalisePlanilha(1).size() > 0);
-	}
-
-	@Test
 	public void getAnaliseAno() {
-		assertTrue(this.planilhaRepository.getAnaliseCategoriaAno(2022).size() > 0);
+		this.planilhaRepository.getAnaliseAno(2022).forEach(e -> {
+			System.out.println(e);
+		});
+		assertTrue(this.planilhaRepository.getAnaliseAno(2022).size() > 0);
 	}
 
 	@Test
-	public void getAnaliseSaldoAno() {
-		assertTrue(this.planilhaRepository.getAnaliseSaldoAno(2022).size() > 0);
-	}
+	public void test2() {
+		this.planilhaRepository.getAnaliseAnoMes(2022, 10).forEach(e -> {
+			System.out.println(e);
+		});
+		assertTrue(this.planilhaRepository.getAnaliseAnoMes(2022, 10).size() > 0);
 
+	}
 }
