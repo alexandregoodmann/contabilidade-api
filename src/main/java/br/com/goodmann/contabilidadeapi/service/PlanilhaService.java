@@ -95,10 +95,10 @@ public class PlanilhaService {
 			BeanUtils.copyProperties(conta, contaDTO);
 
 			lancamentos.forEach(lancamento -> {
+
 				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
 				LancamentoDTO lancamentoDTO = new LancamentoDTO(lancamento.getId(), categoria, lancamento.getData(),
-						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido(),
-						lancamento.getCategoria().getAnalisar());
+						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido());
 				contaDTO.getLancamentos().add(lancamentoDTO);
 
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
