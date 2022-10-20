@@ -15,12 +15,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExtratoDTO extends Conta {
-
 	private Boolean marcado;
-
 	private BigDecimal saldoPrevisto = BigDecimal.ZERO;
 	private BigDecimal saldoEfetivado = BigDecimal.ZERO;
-
 	private List<LancamentoDTO> lancamentos = new ArrayList<LancamentoDTO>();
 
 }

@@ -49,6 +49,11 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 		this.lancamentoService.concluir(dto.getList());
 	}
 
+	@PostMapping("/fixo")
+	public void fixo(@RequestBody ListDTO<Integer> dto) {
+		this.lancamentoService.fixo(dto.getList());
+	}
+
 	@PostMapping("/categorizar")
 	public void categorizar(@RequestBody CategorizarDTO dto) throws NoSuchObjectException {
 		this.lancamentoService.categorizar(dto.getList(), dto.getIdCategoria());

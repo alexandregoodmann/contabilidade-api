@@ -94,10 +94,17 @@ public class PlanilhaService {
 			lancamentos.forEach(lancamento -> {
 
 				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
-				LancamentoDTO lancamentoDTO = new LancamentoDTO(lancamento.getId(), categoria, lancamento.getData(),
-						lancamento.getDescricao(), lancamento.getValor(), lancamento.getConcluido());
+				
+				LancamentoDTO lancamentoDTO = new LancamentoDTO();
+				lancamentoDTO.setCategoria(categoria);
+				lancamentoDTO.setConcluido(lancamento.getConcluido());
+				lancamentoDTO.setData(lancamento.getData());
+				lancamentoDTO.setDescricao(lancamento.getDescricao());
+				lancamentoDTO.setFixo(lancamento.getFixo());
+				lancamentoDTO.setId(lancamento.getId());
+				lancamentoDTO.setValor(lancamento.getValor());
+				
 				contaDTO.getLancamentos().add(lancamentoDTO);
-
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
 
 				if (lancamento.getConcluido() != null && lancamento.getConcluido() == true)
