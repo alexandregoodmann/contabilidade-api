@@ -162,7 +162,7 @@ public class ArquivoService {
 			lancamento.setValor(BigDecimal.valueOf(valor));
 
 			lancamento.setData(this.sdf2.parse(vet[0]));
-			this.lancamentoRepository.save(lancamento);
+			//this.lancamentoRepository.save(lancamento);
 
 			count++;
 		}
