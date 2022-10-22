@@ -70,14 +70,13 @@ public class ArquivoService {
 		if (!planilha.isPresent())
 			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
 
-		this.deleteAllLancamentos(conta.get(), planilha.get());
-
 		switch (conta.get().getCarga()) {
 		case BRADESCO:
 			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
 			break;
 
 		case C6:
+			this.deleteAllLancamentos(conta.get(), planilha.get());
 			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
 			break;
 		}
@@ -140,8 +139,12 @@ public class ArquivoService {
 	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
+		List<String> bradesco = this.lancamentoRepository.getNumerosBradesco(planilha.getId()).stream()
+				.map(n -> n.getNumeroBradesco()).collect(Collectors.toList());
+
 		List<String> lines = this.readLines(multipartFile);
 		int count = 0;
+
 		for (int i = 3; i < lines.size(); i += 2) {
 
 			if (lines.get(i).contains(";Total;"))
@@ -150,10 +153,12 @@ public class ArquivoService {
 			String line = lines.get(i) + lines.get(i + 1);
 			String[] vet = line.split(";");
 
+			if (vet.length >= 3 && bradesco.contains(vet[2]))
+				continue;
+
 			Lancamento lancamento = new Lancamento();
 			lancamento.setConta(conta);
 			lancamento.setPlanilha(planilha);
-
 			String descricao = vet.length == 7 ? vet[6] : vet[7];
 			lancamento.setDescricao(descricao);
 
@@ -162,7 +167,9 @@ public class ArquivoService {
 			lancamento.setValor(BigDecimal.valueOf(valor));
 
 			lancamento.setData(this.sdf2.parse(vet[0]));
-			//this.lancamentoRepository.save(lancamento);
+			lancamento.setNumeroBradesco(vet[2]);
+
+			this.lancamentoRepository.save(lancamento);
 
 			count++;
 		}

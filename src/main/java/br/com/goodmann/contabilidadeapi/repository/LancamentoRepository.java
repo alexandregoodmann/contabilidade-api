@@ -18,4 +18,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 
 	List<Lancamento> findAllByContaAndPlanilha(Conta conta, Planilha planilha);
 
+	@Query("from Lancamento l join l.planilha p where p.id=:idPlanilha and l.numeroBradesco is not null")
+	List<Lancamento> getNumerosBradesco(Integer idPlanilha);
+
 }
