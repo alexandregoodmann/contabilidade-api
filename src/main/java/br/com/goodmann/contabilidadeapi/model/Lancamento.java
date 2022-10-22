@@ -53,4 +53,8 @@ public class Lancamento {
 	private Boolean fixo;
 
 	private Boolean concluido;
+
+	@Column(name = "numero_bradesco")
+	private String numeroBradesco;
+
 }
