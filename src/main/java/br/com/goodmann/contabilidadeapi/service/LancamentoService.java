@@ -50,6 +50,13 @@ public class LancamentoService {
 			this.lancamentoRepository.save(lancamento);
 		});
 	}
+	
+	public void fixo(List<Integer> ids) {
+		this.lancamentoRepository.findAllById(ids).forEach(lancamento -> {
+			lancamento.setFixo(true);
+			this.lancamentoRepository.save(lancamento);
+		});
+	}
 
 	public void categorizar(@NotEmpty List<Integer> ids, @NotNull Integer idCategoria) throws NoSuchObjectException {
 
