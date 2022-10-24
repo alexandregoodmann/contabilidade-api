@@ -1,0 +1,5 @@
+#BACKUP
+docker exec da7fb4fd6d47 /usr/bin/mysqldump -u root --password=example --no-tablespaces contabilidade-dev > backup.sql
+
+#RESTORE
+docker exec -i da7fb4fd6d47 mysql -u root --password=example contabilidade-dev < backup.sql

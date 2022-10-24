@@ -1,0 +1,57 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql
+    container_name: contabilidade-db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
+            
+  adminer:
+    image: adminer
+    container_name: contabilidade-adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+              
+  backendserver:
+    image: contabilidade/contabilidade-api
+    container_name: contabilidade-api
+    build: ./contabilidade-api/
+    ports:
+           - "8081"
+    depends_on:
+           - "db"
+    restart: always
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
+        
+  frontend:
+    image: contabilidade/contabilidade-web2
+    container_name: contabilidade-web2
+    build: ./contabilidade-web2
+    ports: 
+      - "80:80"
+    depends_on:
+      - "backendserver"
+    restart: always
+    
+volumes:
+  my-datavolume:      
+  
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
