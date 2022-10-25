@@ -1,5 +1,6 @@
 package br.com.goodmann.contabilidadeapi.service;
 
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,12 +12,14 @@ import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
+import br.com.goodmann.contabilidadeapi.model.MesesEnum;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
@@ -29,6 +32,12 @@ public class PlanilhaService {
 
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
+
+	@org.springframework.data.annotation.Transient
+	public void delete(Integer idPlanilha) {
+		this.lancamentoRepository.deleteAll(this.lancamentoRepository.getLancamentos(idPlanilha));
+		this.planilhaRepository.deleteById(idPlanilha);
+	}
 
 	public List<Planilha> findAll() {
 		return this.planilhaRepository.findAll();
@@ -94,7 +103,7 @@ public class PlanilhaService {
 			lancamentos.forEach(lancamento -> {
 
 				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
-				
+
 				LancamentoDTO lancamentoDTO = new LancamentoDTO();
 				lancamentoDTO.setCategoria(categoria);
 				lancamentoDTO.setConcluido(lancamento.getConcluido());
@@ -103,7 +112,7 @@ public class PlanilhaService {
 				lancamentoDTO.setFixo(lancamento.getFixo());
 				lancamentoDTO.setId(lancamento.getId());
 				lancamentoDTO.setValor(lancamento.getValor());
-				
+
 				contaDTO.getLancamentos().add(lancamentoDTO);
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
 
@@ -115,6 +124,33 @@ public class PlanilhaService {
 		});
 
 		return contas;
+	}
+
+	private Planilha proximaPlanilha(Integer idPlanilha) {
+		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
+		Planilha model = new Planilha();
+		if (planilha.getMes() == 12) {
+			model.setMes((short) 1);
+			model.setAno((short) (planilha.getAno() + 1));
+		} else {
+			model.setMes((short) (planilha.getMes() + 1));
+			model.setAno(planilha.getAno());
+		}
+		model.setDescricao(StringUtils.capitalize(MesesEnum.values()[model.getMes() - 1].toString()));
+		return this.planilhaRepository.save(model);
+	}
+
+	@Transient
+	public void duplicarPlanilha(Integer idPlanilha) {
+		Planilha proxima = this.proximaPlanilha(idPlanilha);
+		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
+			Lancamento model = new Lancamento();
+			BeanUtils.copyProperties(lancamento, model, "id");
+			model.setPlanilha(proxima);
+			model.setConcluido(false);
+			model.getData().setMonth(proxima.getMes());
+			this.lancamentoRepository.save(model);
+		});
 	}
 
 }

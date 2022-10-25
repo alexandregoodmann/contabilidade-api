@@ -32,9 +32,8 @@ public abstract class BaseController<T, ID> {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable(required = true, name = "id") ID id) {
+	public void delete(@PathVariable(required = true, name = "id") ID id) {
 		this.repo.deleteById(id);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/{id}")

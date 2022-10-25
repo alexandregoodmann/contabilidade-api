@@ -11,9 +11,11 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
+@ToString
 public class Planilha {
 
 	@Id
