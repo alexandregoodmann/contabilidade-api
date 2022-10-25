@@ -16,7 +16,7 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 			+ "l inner join conta c on c.id = l.id_conta inner join categoria c2 on c2.id = l.id_categoria inner "
 			+ "join planilha p on p.id = l.id_planilha where p.ano=:ano";
 
-	@Query("from Planilha p order by p.ano desc, p.mes asc")
+	@Query("from Planilha p order by p.ano, p.mes")
 	List<Planilha> findAll();
 
 	Planilha findByAnoAndMes(Short ano, Short mes);

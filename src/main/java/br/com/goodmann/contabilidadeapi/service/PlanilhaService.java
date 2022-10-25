@@ -136,7 +136,7 @@ public class PlanilhaService {
 			model.setMes((short) (planilha.getMes() + 1));
 			model.setAno(planilha.getAno());
 		}
-		model.setDescricao(StringUtils.capitalize(MesesEnum.values()[model.getMes() - 1].toString()));
+		model.setDescricao(StringUtils.capitalize(MesesEnum.values()[model.getMes() - 1].toString().toLowerCase()));
 		return this.planilhaRepository.save(model);
 	}
 
