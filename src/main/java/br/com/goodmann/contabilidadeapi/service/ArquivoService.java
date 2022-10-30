@@ -44,7 +44,7 @@ public class ArquivoService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
 
-	private List<String> readLines(MultipartFile multipartFile) throws IOException {
+	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 		List<String> lista = new ArrayList<String>(reader.lines().collect(Collectors.toList()));
@@ -61,25 +61,17 @@ public class ArquivoService {
 		if (!conta.isPresent())
 			throw new NotFoundException("O idconta não foi encontrado: " + idConta);
 
-		if (conta.get().getCarga() == null)
-			throw new NotFoundException(
-					"Para o idConta informado não é possível fazer carga de lançamentos: " + idConta);
-
 		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
 
 		if (!planilha.isPresent())
 			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
-
-		switch (conta.get().getCarga()) {
-		case BRADESCO:
-			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
-			break;
-
-		case C6:
-			this.deleteAllLancamentos(conta.get(), planilha.get());
-			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
-			break;
-		}
+		/*
+		 * switch (conta.get().getCarga()) { case BRADESCO: mapa =
+		 * this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile); break;
+		 * 
+		 * case C6: this.deleteAllLancamentos(conta.get(), planilha.get()); mapa =
+		 * this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile); break; }
+		 */
 
 		return mapa;
 	}

@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.model.CargaEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
@@ -36,7 +35,7 @@ public class CargaArquivoTest {
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
-	
+
 	// @Test
 	public void cargaArquivoC6Test() throws IOException, ParseException, NotFoundException {
 
@@ -49,7 +48,6 @@ public class CargaArquivoTest {
 
 		// Exemplo de conta
 		Conta conta = new Conta();
-		conta.setCarga(CargaEnum.C6);
 		Example<Conta> example = Example.of(conta);
 		conta = this.contaRepository.findOne(example).get();
 
@@ -77,7 +75,6 @@ public class CargaArquivoTest {
 
 		// Exemplo de conta
 		Conta conta = new Conta();
-		conta.setCarga(CargaEnum.BRADESCO);
 		Example<Conta> example = Example.of(conta);
 		conta = this.contaRepository.findOne(example).get();
 
