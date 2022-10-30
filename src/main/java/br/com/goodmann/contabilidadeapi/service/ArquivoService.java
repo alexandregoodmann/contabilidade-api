@@ -65,13 +65,19 @@ public class ArquivoService {
 
 		if (!planilha.isPresent())
 			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
-		/*
-		 * switch (conta.get().getCarga()) { case BRADESCO: mapa =
-		 * this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile); break;
-		 * 
-		 * case C6: this.deleteAllLancamentos(conta.get(), planilha.get()); mapa =
-		 * this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile); break; }
-		 */
+
+		if (!conta.get().getBanco().getCarga())
+			throw new NotFoundException("Este banco não possui carga de arquivo");
+
+		// carga c6
+		if ("336".equals(conta.get().getBanco().getCodigo())) {
+			this.deleteAllLancamentos(conta.get(), planilha.get());
+			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
+		}
+
+		if ("237".equals(conta.get().getBanco().getCodigo())) {
+			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
+		}
 
 		return mapa;
 	}
