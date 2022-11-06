@@ -1,7 +1,7 @@
 package br.com.goodmann.contabilidadeapi.service;
 
-import java.beans.Transient;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
@@ -20,8 +22,10 @@ import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
+import br.com.goodmann.contabilidadeapi.model.LimiteGastos;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
+import br.com.goodmann.contabilidadeapi.repository.LimiteGastosRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
@@ -33,8 +37,13 @@ public class PlanilhaService {
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
 
-	@org.springframework.data.annotation.Transient
+	@Autowired
+	private LimiteGastosRepository gastosRepository;
+
+	@Transactional
 	public void delete(Integer idPlanilha) {
+		this.gastosRepository.deleteAll(
+				this.gastosRepository.findAllByPlanilha(this.planilhaRepository.findById(idPlanilha).orElseThrow()));
 		this.lancamentoRepository.deleteAll(this.lancamentoRepository.getLancamentos(idPlanilha));
 		this.planilhaRepository.deleteById(idPlanilha);
 	}
@@ -126,30 +135,47 @@ public class PlanilhaService {
 		return contas;
 	}
 
-	private Planilha proximaPlanilha(Integer idPlanilha) {
-		Planilha planilha = this.planilhaRepository.findById(idPlanilha).get();
+	private Planilha proximaPlanilha(Planilha atual) {
+
 		Planilha model = new Planilha();
-		if (planilha.getMes() == 12) {
+		if (atual.getMes() == 12) {
 			model.setMes((short) 1);
-			model.setAno((short) (planilha.getAno() + 1));
+			model.setAno((short) (atual.getAno() + 1));
 		} else {
-			model.setMes((short) (planilha.getMes() + 1));
-			model.setAno(planilha.getAno());
+			model.setMes((short) (atual.getMes() + 1));
+			model.setAno(atual.getAno());
 		}
 		model.setDescricao(StringUtils.capitalize(MesesEnum.values()[model.getMes() - 1].toString().toLowerCase()));
 		return this.planilhaRepository.save(model);
 	}
 
-	@Transient
+	@Transactional
 	public void duplicarPlanilha(Integer idPlanilha) {
-		Planilha proxima = this.proximaPlanilha(idPlanilha);
+
+		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
+		Planilha proxima = this.proximaPlanilha(atual);
+		this.duplicarLimites(atual, proxima);
+
 		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
-			Lancamento model = new Lancamento();
-			BeanUtils.copyProperties(lancamento, model, "id");
+			if (!"Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())) {
+				Lancamento model = new Lancamento();
+				BeanUtils.copyProperties(lancamento, model, "id");
+				model.setPlanilha(proxima);
+				model.setConcluido(false);
+				Date d = DateUtils.addMonths(model.getData(), 1);
+				model.setData(d);
+				this.lancamentoRepository.save(model);
+			}
+		});
+	}
+
+	public void duplicarLimites(Planilha atual, Planilha proxima) {
+		this.gastosRepository.findAllByPlanilha(atual).forEach(limite -> {
+			LimiteGastos model = new LimiteGastos();
+			model.setCategoria(limite.getCategoria());
+			model.setLimite(limite.getLimite());
 			model.setPlanilha(proxima);
-			model.setConcluido(false);
-			model.getData().setMonth(proxima.getMes());
-			this.lancamentoRepository.save(model);
+			this.gastosRepository.save(model);
 		});
 	}
 
