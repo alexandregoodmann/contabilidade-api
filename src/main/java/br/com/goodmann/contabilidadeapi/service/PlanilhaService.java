@@ -1,5 +1,7 @@
 package br.com.goodmann.contabilidadeapi.service;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +22,12 @@ import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesEnum;
+import br.com.goodmann.contabilidadeapi.model.Categoria;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LimiteGastos;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.repository.CategoriaRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.LimiteGastosRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
@@ -39,6 +43,9 @@ public class PlanilhaService {
 
 	@Autowired
 	private LimiteGastosRepository gastosRepository;
+
+	@Autowired
+	private CategoriaRepository categoriaRepository;
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
@@ -150,14 +157,28 @@ public class PlanilhaService {
 	}
 
 	@Transactional
-	public void duplicarPlanilha(Integer idPlanilha) {
+	public void duplicarPlanilha(Integer idPlanilha) throws ParseException {
 
 		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
 		Planilha proxima = this.proximaPlanilha(atual);
 		this.duplicarLimites(atual, proxima);
 
-		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
-			if (!"Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())) {
+		Map<Conta, BigDecimal> saldos = new HashMap<Conta, BigDecimal>();
+		List<Lancamento> lancamentos = this.lancamentoRepository.getLancamentos(idPlanilha);
+
+		lancamentos.forEach(lancamento -> {
+
+			if (!"C6 Cartão".equalsIgnoreCase(lancamento.getConta().getDescricao())) {
+				if (!saldos.containsKey(lancamento.getConta())) {
+					saldos.put(lancamento.getConta(), lancamento.getValor());
+				} else {
+					BigDecimal saldo = saldos.get(lancamento.getConta());
+					saldos.put(lancamento.getConta(), saldo.add(lancamento.getValor()));
+				}
+			}
+
+			if (!"Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())
+					&& lancamento.getFixo() != null && lancamento.getFixo() == true) {
 				Lancamento model = new Lancamento();
 				BeanUtils.copyProperties(lancamento, model, "id");
 				model.setPlanilha(proxima);
@@ -166,6 +187,19 @@ public class PlanilhaService {
 				model.setData(d);
 				this.lancamentoRepository.save(model);
 			}
+		});
+
+		Date data = DateUtils.parseDate("01/" + proxima.getMes() + "/" + proxima.getAno(), "dd/MM/yyyy");
+		Categoria categoria = this.categoriaRepository.findByDescricao("Saldo Anterior");
+		saldos.forEach((k, v) -> {
+			Lancamento model = new Lancamento();
+			model.setCategoria(categoria);
+			model.setConta(k);
+			model.setPlanilha(proxima);
+			model.setData(data);
+			model.setDescricao("Saldo Anterior");
+			model.setValor(v);
+			this.lancamentoRepository.save(model);
 		});
 	}
 

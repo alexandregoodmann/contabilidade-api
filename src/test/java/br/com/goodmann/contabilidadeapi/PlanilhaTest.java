@@ -2,11 +2,11 @@ package br.com.goodmann.contabilidadeapi;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.jupiter.api.Test;
+import java.text.ParseException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
@@ -37,16 +37,11 @@ public class PlanilhaTest {
 	}
 
 	// @Test
-	public void duplicar() {
+	public void duplicar() throws ParseException {
 		this.planilhaService.duplicarPlanilha(132);
 		this.planilhaRepository.findAll().forEach(e -> {
 			System.out.println(e.toString());
 		});
 	}
 
-	//@Test
-	public void duplicarLimite() {
-		Planilha p = this.planilhaRepository.findByAnoAndMes(Short.valueOf("2022"), Short.valueOf("11"));
-		this.planilhaService.duplicarLimites(p);
-	}
 }

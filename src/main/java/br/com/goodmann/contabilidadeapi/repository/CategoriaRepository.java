@@ -9,4 +9,6 @@ import br.com.goodmann.contabilidadeapi.model.Categoria;
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
 
 	List<Categoria> findByOrderByDescricaoAsc();
+
+	Categoria findByDescricao(String descricao);
 }

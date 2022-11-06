@@ -1,5 +1,6 @@
 package br.com.goodmann.contabilidadeapi.controller;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 	}
 
 	@PostMapping("/{id}/duplicar")
-	public void duplicarPlanilha(@PathVariable(required = true, name = "id") Integer id) {
+	public void duplicarPlanilha(@PathVariable(required = true, name = "id") Integer id) throws ParseException {
 		this.planilhaService.duplicarPlanilha(id);
 	}
 
