@@ -6,8 +6,13 @@ import java.text.ParseException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +36,25 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 
 	@Autowired
 	private LancamentoService lancamentoService;
+
+	@Override
+	@PostMapping
+	public ResponseEntity<Lancamento> create(@RequestBody Lancamento model) {
+		return new ResponseEntity<Lancamento>(this.lancamentoService.save(model), HttpStatus.CREATED);
+	}
+
+	@Override
+	@PutMapping
+	public ResponseEntity<Lancamento> update(@RequestBody Lancamento model) {
+		return new ResponseEntity<Lancamento>(this.lancamentoService.save(model), HttpStatus.OK);
+	}
+
+	@Override
+	@DeleteMapping("/{id}")
+	public void delete(@PathVariable(required = true, name = "id") Integer id) {
+		this.lancamentoService.delete(id);
+	}
+
 
 	@PostMapping("/uploadFile")
 	public Map<String, Object> uploadFile(@RequestParam("idConta") Integer idConta,

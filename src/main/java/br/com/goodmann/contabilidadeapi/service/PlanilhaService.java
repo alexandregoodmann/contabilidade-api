@@ -1,6 +1,5 @@
 package br.com.goodmann.contabilidadeapi.service;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,12 +21,10 @@ import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesEnum;
-import br.com.goodmann.contabilidadeapi.model.Categoria;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LimiteGastos;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
-import br.com.goodmann.contabilidadeapi.repository.CategoriaRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.LimiteGastosRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
@@ -43,9 +40,6 @@ public class PlanilhaService {
 
 	@Autowired
 	private LimiteGastosRepository gastosRepository;
-
-	@Autowired
-	private CategoriaRepository categoriaRepository;
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
@@ -94,9 +88,7 @@ public class PlanilhaService {
 	}
 
 	public List<ExtratoDTO> getExtrato(Integer idPlanilha) {
-
 		Map<Conta, List<Lancamento>> mapa = new HashMap<Conta, List<Lancamento>>();
-
 		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
 			List<Lancamento> temp = new ArrayList<Lancamento>();
 			if (!mapa.containsKey(lancamento.getConta())) {
@@ -110,16 +102,11 @@ public class PlanilhaService {
 		});
 
 		List<ExtratoDTO> contas = new ArrayList<ExtratoDTO>();
-
 		mapa.forEach((conta, lancamentos) -> {
-
 			ExtratoDTO contaDTO = new ExtratoDTO();
 			BeanUtils.copyProperties(conta, contaDTO);
-
 			lancamentos.forEach(lancamento -> {
-
 				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
-
 				LancamentoDTO lancamentoDTO = new LancamentoDTO();
 				lancamentoDTO.setCategoria(categoria);
 				lancamentoDTO.setConcluido(lancamento.getConcluido());
@@ -128,21 +115,17 @@ public class PlanilhaService {
 				lancamentoDTO.setFixo(lancamento.getFixo());
 				lancamentoDTO.setId(lancamento.getId());
 				lancamentoDTO.setValor(lancamento.getValor());
-
 				contaDTO.getLancamentos().add(lancamentoDTO);
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
-
 				if (lancamento.getConcluido() != null && lancamento.getConcluido() == true)
 					contaDTO.setSaldoEfetivado(contaDTO.getSaldoEfetivado().add(lancamento.getValor()));
 			});
-
 			contas.add(contaDTO);
 		});
-
 		return contas;
 	}
 
-	private Planilha proximaPlanilha(Planilha atual) {
+	private Planilha criarProximaPlanilha(Planilha atual) {
 
 		Planilha model = new Planilha();
 		if (atual.getMes() == 12) {
@@ -160,23 +143,11 @@ public class PlanilhaService {
 	public void duplicarPlanilha(Integer idPlanilha) throws ParseException {
 
 		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
-		Planilha proxima = this.proximaPlanilha(atual);
-		this.duplicarLimites(atual, proxima);
+		Planilha proxima = this.criarProximaPlanilha(atual);
 
-		Map<Conta, BigDecimal> saldos = new HashMap<Conta, BigDecimal>();
-		List<Lancamento> lancamentos = this.lancamentoRepository.getLancamentos(idPlanilha);
+		List<Lancamento> lancamentosPlanilhaAtual = this.lancamentoRepository.getLancamentos(idPlanilha);
 
-		lancamentos.forEach(lancamento -> {
-
-			if (!"C6 Cartão".equalsIgnoreCase(lancamento.getConta().getDescricao())) {
-				if (!saldos.containsKey(lancamento.getConta())) {
-					saldos.put(lancamento.getConta(), lancamento.getValor());
-				} else {
-					BigDecimal saldo = saldos.get(lancamento.getConta());
-					saldos.put(lancamento.getConta(), saldo.add(lancamento.getValor()));
-				}
-			}
-
+		lancamentosPlanilhaAtual.forEach(lancamento -> {
 			if (!"Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())
 					&& lancamento.getFixo() != null && lancamento.getFixo() == true) {
 				Lancamento model = new Lancamento();
@@ -189,18 +160,7 @@ public class PlanilhaService {
 			}
 		});
 
-		Date data = DateUtils.parseDate("01/" + proxima.getMes() + "/" + proxima.getAno(), "dd/MM/yyyy");
-		Categoria categoria = this.categoriaRepository.findByDescricao("Saldo Anterior");
-		saldos.forEach((k, v) -> {
-			Lancamento model = new Lancamento();
-			model.setCategoria(categoria);
-			model.setConta(k);
-			model.setPlanilha(proxima);
-			model.setData(data);
-			model.setDescricao("Saldo Anterior");
-			model.setValor(v);
-			this.lancamentoRepository.save(model);
-		});
+		this.duplicarLimites(atual, proxima);
 	}
 
 	public void duplicarLimites(Planilha atual, Planilha proxima) {

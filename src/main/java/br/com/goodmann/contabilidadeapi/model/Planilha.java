@@ -1,5 +1,6 @@
 package br.com.goodmann.contabilidadeapi.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -9,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.ToString;
@@ -36,4 +39,8 @@ public class Planilha {
 
 	@Transient
 	List<Lancamento> lancamentos;
+
+	@JsonIgnore
+	@Transient
+	LocalDate criacao;
 }

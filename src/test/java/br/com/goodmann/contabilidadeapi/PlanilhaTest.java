@@ -3,10 +3,15 @@ package br.com.goodmann.contabilidadeapi;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
@@ -44,4 +49,16 @@ public class PlanilhaTest {
 		});
 	}
 
+	//@Test
+	public void getPlanilhasFuturas() {
+		List<Planilha> planilhas = this.planilhaRepository.getPlanilhasFuturas((short) 2022);
+		planilhas.forEach(p -> {
+			LocalDate criacao = LocalDate.of(p.getAno(), p.getMes(), 1);
+			p.setCriacao(criacao);
+		});
+		LocalDate hoje = LocalDate.of(2022, 11, 1);
+		List<Planilha> filtrada = planilhas.stream().filter(o -> o.getCriacao().isAfter(hoje))
+				.collect(Collectors.toList());
+		filtrada.forEach(System.out::println);
+	}
 }

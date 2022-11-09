@@ -21,4 +21,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 	@Query("from Lancamento l join l.planilha p where p.id=:idPlanilha and l.numeroBradesco is not null")
 	List<Lancamento> getNumerosBradesco(Integer idPlanilha);
 
+	@Query("from Lancamento l join l.planilha p inner join l.conta c where p.id=:idPlanilha and c.id=:idConta and l.descricao = 'Saldo Anterior'")
+	Lancamento getLancamentoSaldo(Integer idPlanilha, Integer idConta);
+
 }

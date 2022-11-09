@@ -27,4 +27,7 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 	@Query(value = SQL_ANALISE + " and p.mes=:mes", nativeQuery = true)
 	List<AnaliseDTO> getAnaliseAnoMes(@Param("ano") Integer ano, @Param("mes") Integer mes);
 
+	@Query("from Planilha p where p.ano>=:ano order by p.ano, p.mes")
+	List<Planilha> getPlanilhasFuturas(@Param("ano") Short ano);
+
 }
