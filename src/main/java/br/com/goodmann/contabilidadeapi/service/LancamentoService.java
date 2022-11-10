@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.model.Categoria;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
@@ -100,7 +102,7 @@ public class LancamentoService {
 			LocalDate criacao = LocalDate.of(p.getAno(), p.getMes(), 1);
 			p.setCriacao(criacao);
 		});
-		LocalDate mesAnterior = LocalDate.of(planilha.getAno(), planilha.getMes() - 1, 1);
+		LocalDate mesAnterior = LocalDate.of(planilha.getAno(), planilha.getMes(), 1).minusMonths(1);
 		return planilhas.stream().filter(o -> o.getCriacao().isAfter(mesAnterior)).collect(Collectors.toList());
 	}
 
@@ -113,10 +115,20 @@ public class LancamentoService {
 					Planilha proxima = planilhas.get(i + 1);
 					BigDecimal saldoAtual = this.lancamentoRepository.findAllByContaAndPlanilha(conta, atual).stream()
 							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-					Lancamento lancamentoSaldoProxima = this.lancamentoRepository.getLancamentoSaldo(proxima.getId(),
-							conta.getId());
-					lancamentoSaldoProxima.setValor(saldoAtual);
-					this.lancamentoRepository.save(lancamentoSaldoProxima);
+					this.lancamentoRepository.getLancamentoSaldo(proxima, conta).ifPresentOrElse(e -> {
+						e.setValor(saldoAtual);
+						this.lancamentoRepository.save(e);
+					}, () -> {
+						Categoria categoria = this.categoriaRepository.findByDescricao("Saldo Anterior");
+						Lancamento model = new Lancamento();
+						model.setCategoria(categoria);
+						model.setConta(conta);
+						model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+						model.setDescricao("Saldo Anterior");
+						model.setPlanilha(proxima);
+						model.setValor(saldoAtual);
+						this.lancamentoRepository.save(model);
+					});
 				}
 			}
 		}

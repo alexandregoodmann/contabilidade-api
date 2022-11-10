@@ -1,6 +1,7 @@
 package br.com.goodmann.contabilidadeapi.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 	@Query("from Lancamento l join l.planilha p where p.id=:idPlanilha and l.numeroBradesco is not null")
 	List<Lancamento> getNumerosBradesco(Integer idPlanilha);
 
-	@Query("from Lancamento l join l.planilha p inner join l.conta c where p.id=:idPlanilha and c.id=:idConta and l.descricao = 'Saldo Anterior'")
-	Lancamento getLancamentoSaldo(Integer idPlanilha, Integer idConta);
+	@Query("from Lancamento l where l.planilha=:planilha and l.conta=:conta and l.descricao = 'Saldo Anterior'")
+	Optional<Lancamento> getLancamentoSaldo(Planilha planilha, Conta conta);
 
 }

@@ -36,6 +36,9 @@ public class ArquivoService {
 	private LancamentoRepository lancamentoRepository;
 
 	@Autowired
+	private LancamentoService lancamentoService;
+
+	@Autowired
 	private ContaRepository contaRepository;
 
 	@Autowired
@@ -75,8 +78,10 @@ public class ArquivoService {
 			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
 		}
 
+		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
 			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
+			this.lancamentoService.atualizarSaldo(planilha.get(), conta.get());
 		}
 
 		return mapa;

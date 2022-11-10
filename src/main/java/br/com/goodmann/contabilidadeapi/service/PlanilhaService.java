@@ -1,6 +1,7 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +38,9 @@ public class PlanilhaService {
 
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
+
+	@Autowired
+	private LancamentoService lancamentoService;
 
 	@Autowired
 	private LimiteGastosRepository gastosRepository;
@@ -126,30 +130,24 @@ public class PlanilhaService {
 	}
 
 	private Planilha criarProximaPlanilha(Planilha atual) {
-
+		LocalDate data = LocalDate.of(atual.getAno(), atual.getMes(), 1).plusMonths(1);
 		Planilha model = new Planilha();
-		if (atual.getMes() == 12) {
-			model.setMes((short) 1);
-			model.setAno((short) (atual.getAno() + 1));
-		} else {
-			model.setMes((short) (atual.getMes() + 1));
-			model.setAno(atual.getAno());
-		}
+		model.setAno((short) data.getYear());
+		model.setMes((short) data.getMonth().getValue());
 		model.setDescricao(StringUtils.capitalize(MesesEnum.values()[model.getMes() - 1].toString().toLowerCase()));
 		return this.planilhaRepository.save(model);
 	}
 
 	@Transactional
 	public void duplicarPlanilha(Integer idPlanilha) throws ParseException {
-
 		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
 		Planilha proxima = this.criarProximaPlanilha(atual);
+		Set<Conta> contas = new HashSet<Conta>();
 
-		List<Lancamento> lancamentosPlanilhaAtual = this.lancamentoRepository.getLancamentos(idPlanilha);
-
-		lancamentosPlanilhaAtual.forEach(lancamento -> {
-			if (!"Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())
-					&& lancamento.getFixo() != null && lancamento.getFixo() == true) {
+		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
+			if (Boolean.TRUE.equals(lancamento.getFixo())
+					|| "Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())) {
+				contas.add(lancamento.getConta());
 				Lancamento model = new Lancamento();
 				BeanUtils.copyProperties(lancamento, model, "id");
 				model.setPlanilha(proxima);
@@ -159,11 +157,13 @@ public class PlanilhaService {
 				this.lancamentoRepository.save(model);
 			}
 		});
-
 		this.duplicarLimites(atual, proxima);
+		contas.forEach(conta -> {
+			this.lancamentoService.atualizarSaldo(atual, conta);
+		});
 	}
 
-	public void duplicarLimites(Planilha atual, Planilha proxima) {
+	private void duplicarLimites(Planilha atual, Planilha proxima) {
 		this.gastosRepository.findAllByPlanilha(atual).forEach(limite -> {
 			LimiteGastos model = new LimiteGastos();
 			model.setCategoria(limite.getCategoria());
