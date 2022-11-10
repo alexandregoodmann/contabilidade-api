@@ -14,8 +14,10 @@ public interface AnaliseDTO {
 	public Integer getMes();
 
 	public String getBanco();
+	
+	public String getTipoConta();
 
-	public String getTipo();
+	public String getTipoLancamento();
 
 	public String getCategoria();
 

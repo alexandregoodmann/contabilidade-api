@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.model.Categoria;
+import br.com.goodmann.contabilidadeapi.enums.TipoConta;
+import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
@@ -107,7 +108,7 @@ public class LancamentoService {
 	}
 
 	public void atualizarSaldo(Planilha planilha, Conta conta) {
-		if (!"C6 Cartão".equalsIgnoreCase(conta.getDescricao())) {
+		if (TipoConta.CARTAO.equals(conta.getTipo())) {
 			List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
 			for (int i = 0; i < planilhas.size(); i++) {
 				if (i + 1 < planilhas.size()) {
@@ -115,20 +116,20 @@ public class LancamentoService {
 					Planilha proxima = planilhas.get(i + 1);
 					BigDecimal saldoAtual = this.lancamentoRepository.findAllByContaAndPlanilha(conta, atual).stream()
 							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-					this.lancamentoRepository.getLancamentoSaldo(proxima, conta).ifPresentOrElse(e -> {
-						e.setValor(saldoAtual);
-						this.lancamentoRepository.save(e);
-					}, () -> {
-						Categoria categoria = this.categoriaRepository.findByDescricao("Saldo Anterior");
-						Lancamento model = new Lancamento();
-						model.setCategoria(categoria);
-						model.setConta(conta);
-						model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
-						model.setDescricao("Saldo Anterior");
-						model.setPlanilha(proxima);
-						model.setValor(saldoAtual);
-						this.lancamentoRepository.save(model);
-					});
+					this.lancamentoRepository.getLancamentoSaldo(proxima, conta, TipoLancamento.SALDO)
+							.ifPresentOrElse(e -> {
+								e.setValor(saldoAtual);
+								this.lancamentoRepository.save(e);
+							}, () -> {
+								Lancamento model = new Lancamento();
+								model.setConta(conta);
+								model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+								model.setDescricao("Saldo Anterior");
+								model.setPlanilha(proxima);
+								model.setValor(saldoAtual);
+								model.setTipo(TipoLancamento.SALDO);
+								this.lancamentoRepository.save(model);
+							});
 				}
 			}
 		}
