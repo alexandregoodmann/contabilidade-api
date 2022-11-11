@@ -43,7 +43,11 @@ public class LancamentoService {
 	@Transactional
 	public Lancamento save(Lancamento model) {
 		this.lancamentoRepository.save(model);
-		this.atualizarSaldo(model.getPlanilha(), model.getConta());
+		if (TipoConta.CC.equals(model.getConta().getTipo())) {
+			this.atualizarSaldoCC(model.getPlanilha(), model.getConta());
+		} else if (TipoConta.CARTAO.equals(model.getConta().getTipo())) {
+			this.atualizaValorFatura(model.getPlanilha(), model.getConta(), model.getContaPagadora());
+		}
 		return model;
 	}
 
@@ -51,7 +55,11 @@ public class LancamentoService {
 	public void delete(Integer id) {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
 		this.lancamentoRepository.deleteById(id);
-		this.atualizarSaldo(lancamento.getPlanilha(), lancamento.getConta());
+		if (TipoConta.CC.equals(lancamento.getConta().getTipo())) {
+			this.atualizarSaldoCC(lancamento.getPlanilha(), lancamento.getConta());
+		} else if (TipoConta.CARTAO.equals(lancamento.getConta().getTipo())) {
+			this.atualizaValorFatura(lancamento.getPlanilha(), lancamento.getConta(), lancamento.getContaPagadora());
+		}
 	}
 
 	public List<String> lerArquivo(MultipartFile file) throws IOException {
@@ -107,30 +115,61 @@ public class LancamentoService {
 		return planilhas.stream().filter(o -> o.getCriacao().isAfter(mesAnterior)).collect(Collectors.toList());
 	}
 
-	public void atualizarSaldo(Planilha planilha, Conta conta) {
-		if (TipoConta.CARTAO.equals(conta.getTipo())) {
-			List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
-			for (int i = 0; i < planilhas.size(); i++) {
-				if (i + 1 < planilhas.size()) {
-					Planilha atual = planilhas.get(i);
-					Planilha proxima = planilhas.get(i + 1);
-					BigDecimal saldoAtual = this.lancamentoRepository.findAllByContaAndPlanilha(conta, atual).stream()
-							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-					this.lancamentoRepository.getLancamentoSaldo(proxima, conta, TipoLancamento.SALDO)
-							.ifPresentOrElse(e -> {
-								e.setValor(saldoAtual);
-								this.lancamentoRepository.save(e);
-							}, () -> {
-								Lancamento model = new Lancamento();
-								model.setConta(conta);
-								model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
-								model.setDescricao("Saldo Anterior");
-								model.setPlanilha(proxima);
-								model.setValor(saldoAtual);
-								model.setTipo(TipoLancamento.SALDO);
-								this.lancamentoRepository.save(model);
-							});
-				}
+	public void atualizaValorFatura(Planilha inicial, Conta cartao, Conta pagadora) {
+
+		if (!TipoConta.CARTAO.equals(cartao.getTipo()) || !TipoConta.CC.equals(pagadora.getTipo())) {
+			throw new RuntimeException("ERRO - A conta deverá ser do tipo CARTÃO e pagadora do tipo CC");
+		}
+
+		this.getPlanilhaAtualAndFuturas(inicial).forEach(planilha -> {
+			BigDecimal total = this.lancamentoRepository.findAllByPlanilhaAndConta(planilha, cartao).stream()
+					.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
+
+			this.lancamentoRepository.getByPlanilhaContaTipo(planilha, pagadora, TipoLancamento.FATURA)
+					.ifPresentOrElse(e -> {
+						e.setValor(total);
+						this.lancamentoRepository.save(e);
+					}, () -> {
+						Lancamento model = new Lancamento();
+						model.setConta(cartao);
+						model.setContaPagadora(pagadora);
+						model.setData(Date.valueOf(LocalDate.of(planilha.getAno(), planilha.getMes(), 1)));
+						model.setDescricao("Fatura " + cartao.getDescricao());
+						model.setPlanilha(planilha);
+						model.setValor(total);
+						model.setTipo(TipoLancamento.FATURA);
+						this.lancamentoRepository.save(model);
+					});
+		});
+	}
+
+	public void atualizarSaldoCC(Planilha planilha, Conta conta) {
+
+		if (!TipoConta.CC.equals(conta.getTipo())) {
+			throw new RuntimeException("ERRO - Esta operação é somente para conta do tipo CC");
+		}
+
+		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
+		for (int i = 0; i < planilhas.size(); i++) {
+			if (i + 1 < planilhas.size()) {
+				Planilha atual = planilhas.get(i);
+				Planilha proxima = planilhas.get(i + 1);
+				BigDecimal saldoAtual = this.lancamentoRepository.findAllByPlanilhaAndConta(atual, conta).stream()
+						.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
+				this.lancamentoRepository.getByPlanilhaContaTipo(proxima, conta, TipoLancamento.SALDO)
+						.ifPresentOrElse(e -> {
+							e.setValor(saldoAtual);
+							this.lancamentoRepository.save(e);
+						}, () -> {
+							Lancamento model = new Lancamento();
+							model.setConta(conta);
+							model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+							model.setDescricao("Saldo Anterior");
+							model.setPlanilha(proxima);
+							model.setValor(saldoAtual);
+							model.setTipo(TipoLancamento.SALDO);
+							this.lancamentoRepository.save(model);
+						});
 			}
 		}
 	}

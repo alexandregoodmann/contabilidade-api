@@ -22,6 +22,8 @@ import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.LancamentoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesEnum;
+import br.com.goodmann.contabilidadeapi.enums.TipoConta;
+import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LimiteGastos;
@@ -49,7 +51,7 @@ public class PlanilhaService {
 	public void delete(Integer idPlanilha) {
 		this.gastosRepository.deleteAll(
 				this.gastosRepository.findAllByPlanilha(this.planilhaRepository.findById(idPlanilha).orElseThrow()));
-		this.lancamentoRepository.deleteAll(this.lancamentoRepository.getLancamentos(idPlanilha));
+		this.lancamentoRepository.deleteAll(this.lancamentoRepository.findAllByIdPlanilha(idPlanilha));
 		this.planilhaRepository.deleteById(idPlanilha);
 	}
 
@@ -58,7 +60,7 @@ public class PlanilhaService {
 	}
 
 	public List<Lancamento> getLancamentos(Integer idPlanilha) {
-		return this.lancamentoRepository.getLancamentos(idPlanilha);
+		return this.lancamentoRepository.findAllByIdPlanilha(idPlanilha);
 	}
 
 	public Planilha findByAnoAndMes(Short ano, Short mes) {
@@ -93,7 +95,7 @@ public class PlanilhaService {
 
 	public List<ExtratoDTO> getExtrato(Integer idPlanilha) {
 		Map<Conta, List<Lancamento>> mapa = new HashMap<Conta, List<Lancamento>>();
-		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
+		this.lancamentoRepository.findAllByIdPlanilha(idPlanilha).forEach(lancamento -> {
 			List<Lancamento> temp = new ArrayList<Lancamento>();
 			if (!mapa.containsKey(lancamento.getConta())) {
 				temp.add(lancamento);
@@ -140,13 +142,14 @@ public class PlanilhaService {
 
 	@Transactional
 	public void duplicarPlanilha(Integer idPlanilha) throws ParseException {
+
 		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
 		Planilha proxima = this.criarProximaPlanilha(atual);
 		Set<Conta> contas = new HashSet<Conta>();
 
-		this.lancamentoRepository.getLancamentos(idPlanilha).forEach(lancamento -> {
-			if (Boolean.TRUE.equals(lancamento.getFixo())
-					|| "Saldo Anterior".equalsIgnoreCase(lancamento.getCategoria().getDescricao())) {
+		this.lancamentoRepository.findAllByIdPlanilha(idPlanilha).forEach(lancamento -> {
+			if (Boolean.TRUE.equals(lancamento.getFixo()) || TipoLancamento.SALDO.equals(lancamento.getTipo())
+					|| TipoLancamento.FATURA.equals(lancamento.getTipo())) {
 				contas.add(lancamento.getConta());
 				Lancamento model = new Lancamento();
 				BeanUtils.copyProperties(lancamento, model, "id");
@@ -157,9 +160,12 @@ public class PlanilhaService {
 				this.lancamentoRepository.save(model);
 			}
 		});
+
 		this.duplicarLimites(atual, proxima);
 		contas.forEach(conta -> {
-			this.lancamentoService.atualizarSaldo(atual, conta);
+			if (TipoConta.CC.equals(conta.getTipo())) {
+				this.lancamentoService.atualizarSaldoCC(atual, conta);
+			}
 		});
 	}
 

@@ -30,6 +30,10 @@ public class Lancamento {
 	@JoinColumn(name = "idConta", nullable = false)
 	private Conta conta;
 
+	@ManyToOne
+	@JoinColumn(name = "idContaPagadora")
+	private Conta contaPagadora;
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "idPlanilha", nullable = false)
 	private Planilha planilha;
