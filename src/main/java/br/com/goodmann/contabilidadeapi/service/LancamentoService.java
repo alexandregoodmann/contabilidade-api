@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +42,27 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento model) {
-		this.lancamentoRepository.save(model);
+		if (model.getId() == null && model.getRepetir() != null) {
+			this.repetir(model);
+		} else {
+			this.lancamentoRepository.save(model);
+		}
 		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
+	}
+
+	private void repetir(Lancamento model) {
+		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(model.getPlanilha());
+		int vezes = (planilhas.size() < model.getRepetir() + 1) ? planilhas.size() : model.getRepetir() + 1;
+		for (int i = 0; i < vezes; i++) {
+			if (planilhas.get(i) != null) {
+				Lancamento l = new Lancamento();
+				BeanUtils.copyProperties(model, l, "id");
+				l.setPlanilha(planilhas.get(i));
+				l.setHash(this.hash());
+				this.lancamentoRepository.save(l);
+			}
+		}
 	}
 
 	@Transactional
@@ -142,7 +161,7 @@ public class LancamentoService {
 		}
 	}
 
-	private String gerarHash() {
+	private String hash() {
 		byte[] a = new Date().toString().getBytes();
 		return a.toString().substring(3);
 	}

@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import lombok.Data;
@@ -61,4 +62,9 @@ public class Lancamento {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo", length = 50)
 	private TipoLancamento tipo;
+
+	private String hash;
+
+	@Transient
+	private Integer repetir;
 }
