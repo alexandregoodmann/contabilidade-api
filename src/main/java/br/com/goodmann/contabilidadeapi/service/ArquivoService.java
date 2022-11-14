@@ -55,18 +55,14 @@ public class ArquivoService {
 		return lista;
 	}
 
-	public Map<String, Object> cargaArquivo(Integer idConta, Integer idContaPagadora, Integer idPlanilha,
-			MultipartFile multipartFile) throws NotFoundException, ParseException, IOException {
+	public Map<String, Object> cargaArquivo(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
+			throws NotFoundException, ParseException, IOException {
 
 		Map<String, Object> mapa = null;
 
 		Optional<Conta> conta = this.contaRepository.findById(idConta);
 		if (!conta.isPresent())
 			throw new NotFoundException("O idconta não foi encontrado: " + idConta);
-
-		Optional<Conta> contaPagadora = this.contaRepository.findById(idContaPagadora);
-		if (!contaPagadora.isPresent())
-			throw new NotFoundException("O idcontaPagadora não foi encontrado: " + idContaPagadora);
 
 		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
 

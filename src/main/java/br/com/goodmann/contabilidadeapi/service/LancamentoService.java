@@ -48,7 +48,12 @@ public class LancamentoService {
 
 	@Transactional
 	public void delete(Integer id) {
+
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
+
+		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
+			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
+
 		this.lancamentoRepository.deleteById(id);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
@@ -66,7 +71,9 @@ public class LancamentoService {
 	}
 
 	public void deleteAllById(List<Integer> ids) {
-		List<Lancamento> lancamentos = this.lancamentoRepository.findAllById(ids);
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllById(ids).stream()
+				.filter(o -> !TipoLancamento.SALDO.equals(o.getTipo()) && !TipoLancamento.FATURA.equals(o.getTipo()))
+				.collect(Collectors.toList());
 		this.lancamentoRepository.deleteAll(lancamentos);
 	}
 
