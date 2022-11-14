@@ -31,8 +31,8 @@ public class Lancamento {
 	private Conta conta;
 
 	@ManyToOne
-	@JoinColumn(name = "idContaPagadora")
-	private Conta contaPagadora;
+	@JoinColumn(name = "idContaCartao")
+	private Conta cartao;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "idPlanilha", nullable = false)

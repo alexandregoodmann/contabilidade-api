@@ -147,6 +147,7 @@ public class PlanilhaService {
 		Planilha proxima = this.criarProximaPlanilha(atual);
 		Set<Conta> contas = new HashSet<Conta>();
 
+		// duplica os lançamentos
 		this.lancamentoRepository.findAllByIdPlanilha(idPlanilha).forEach(lancamento -> {
 			if (Boolean.TRUE.equals(lancamento.getFixo()) || TipoLancamento.SALDO.equals(lancamento.getTipo())
 					|| TipoLancamento.FATURA.equals(lancamento.getTipo())) {
@@ -161,12 +162,14 @@ public class PlanilhaService {
 			}
 		});
 
+		// duplica os limites de gastos para categorias
 		this.duplicarLimites(atual, proxima);
-		contas.forEach(conta -> {
-			if (TipoConta.CC.equals(conta.getTipo())) {
-				this.lancamentoService.atualizarSaldoCC(atual, conta);
-			}
+
+		// atualiza o lançamento saldoAnterior
+		contas.stream().filter(o -> TipoConta.CC.equals(o.getTipo())).forEach(conta -> {
+			this.lancamentoService.atualizaSaldo(atual, conta);
 		});
+
 	}
 
 	private void duplicarLimites(Planilha atual, Planilha proxima) {

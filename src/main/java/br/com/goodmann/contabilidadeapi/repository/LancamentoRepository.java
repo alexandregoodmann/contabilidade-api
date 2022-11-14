@@ -1,7 +1,6 @@
 package br.com.goodmann.contabilidadeapi.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +23,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 	List<Lancamento> findAllNumeroBradesco(Integer idPlanilha);
 
 	@Query("from Lancamento l where l.planilha=:planilha and l.conta=:conta and l.tipo=:tipo")
-	Optional<Lancamento> getByPlanilhaContaTipo(Planilha planilha, Conta conta, TipoLancamento tipo);
+	List<Lancamento> findByPlanilhaContaTipo(Planilha planilha, Conta conta, TipoLancamento tipo);
+
+	List<Lancamento> findByPlanilhaAndTipo(Planilha planilha, TipoLancamento tipo);
 
 }

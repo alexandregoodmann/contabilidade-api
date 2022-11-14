@@ -80,13 +80,12 @@ public class ArquivoService {
 		if ("336".equals(conta.get().getBanco().getCodigo())) {
 			this.deleteAllLancamentos(conta.get(), planilha.get());
 			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
-			this.lancamentoService.atualizaValorFatura(planilha.get(), conta.get(), contaPagadora.get());
 		}
 
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
 			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
-			this.lancamentoService.atualizarSaldoCC(planilha.get(), conta.get());
+			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
 		}
 
 		return mapa;
