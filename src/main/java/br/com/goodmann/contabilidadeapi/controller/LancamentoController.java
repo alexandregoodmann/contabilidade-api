@@ -55,12 +55,11 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 		this.lancamentoService.delete(id);
 	}
 
-
 	@PostMapping("/uploadFile")
 	public Map<String, Object> uploadFile(@RequestParam("idConta") Integer idConta,
-			@RequestParam("idPlanilha") Integer idPlanilha, @RequestParam("file") MultipartFile file)
-			throws IOException, ParseException, NotFoundException {
-		return this.arquivoService.cargaArquivo(idConta, idPlanilha, file);
+			@RequestParam("idContaPagadora") Integer idContaPagadora, @RequestParam("idPlanilha") Integer idPlanilha,
+			@RequestParam("file") MultipartFile file) throws IOException, ParseException, NotFoundException {
+		return this.arquivoService.cargaArquivo(idConta, idContaPagadora, idPlanilha, file);
 	}
 
 	@PostMapping("/deleteall")

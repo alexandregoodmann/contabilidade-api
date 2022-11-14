@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -43,7 +42,7 @@ public class LancamentoService {
 	@Transactional
 	public Lancamento save(Lancamento model) {
 		this.lancamentoRepository.save(model);
-		this.atualizarSaldo(model.getPlanilha(), model.getConta());
+		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
 	}
 
@@ -51,7 +50,7 @@ public class LancamentoService {
 	public void delete(Integer id) {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
 		this.lancamentoRepository.deleteById(id);
-		this.atualizarSaldo(lancamento.getPlanilha(), lancamento.getConta());
+		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
 
 	public List<String> lerArquivo(MultipartFile file) throws IOException {
@@ -107,30 +106,31 @@ public class LancamentoService {
 		return planilhas.stream().filter(o -> o.getCriacao().isAfter(mesAnterior)).collect(Collectors.toList());
 	}
 
-	public void atualizarSaldo(Planilha planilha, Conta conta) {
-		if (TipoConta.CARTAO.equals(conta.getTipo())) {
-			List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
-			for (int i = 0; i < planilhas.size(); i++) {
-				if (i + 1 < planilhas.size()) {
-					Planilha atual = planilhas.get(i);
-					Planilha proxima = planilhas.get(i + 1);
-					BigDecimal saldoAtual = this.lancamentoRepository.findAllByContaAndPlanilha(conta, atual).stream()
-							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-					this.lancamentoRepository.getLancamentoSaldo(proxima, conta, TipoLancamento.SALDO)
-							.ifPresentOrElse(e -> {
-								e.setValor(saldoAtual);
-								this.lancamentoRepository.save(e);
-							}, () -> {
-								Lancamento model = new Lancamento();
-								model.setConta(conta);
-								model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
-								model.setDescricao("Saldo Anterior");
-								model.setPlanilha(proxima);
-								model.setValor(saldoAtual);
-								model.setTipo(TipoLancamento.SALDO);
-								this.lancamentoRepository.save(model);
-							});
-				}
+	public void atualizaSaldo(Planilha planilha, Conta conta) {
+
+		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
+		for (int i = 0; i < planilhas.size(); i++) {
+			if (i + 1 < planilhas.size()) {
+
+				Planilha atual = planilhas.get(i);
+				Planilha proxima = planilhas.get(i + 1);
+				BigDecimal saldoAtual = this.lancamentoRepository.findAllByPlanilhaAndConta(atual, conta).stream()
+						.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
+
+				this.lancamentoRepository.findByPlanilhaContaTipo(proxima, conta, TipoLancamento.SALDO).stream()
+						.findFirst().ifPresentOrElse(e -> {
+							e.setValor(saldoAtual);
+							this.lancamentoRepository.save(e);
+						}, () -> {
+							Lancamento model = new Lancamento();
+							model.setConta(conta);
+							model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+							model.setDescricao("Saldo Anterior");
+							model.setPlanilha(proxima);
+							model.setValor(saldoAtual);
+							model.setTipo(TipoLancamento.SALDO);
+							this.lancamentoRepository.save(model);
+						});
 			}
 		}
 	}

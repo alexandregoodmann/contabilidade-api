@@ -55,14 +55,18 @@ public class ArquivoService {
 		return lista;
 	}
 
-	public Map<String, Object> cargaArquivo(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
-			throws NotFoundException, ParseException, IOException {
+	public Map<String, Object> cargaArquivo(Integer idConta, Integer idContaPagadora, Integer idPlanilha,
+			MultipartFile multipartFile) throws NotFoundException, ParseException, IOException {
 
 		Map<String, Object> mapa = null;
 
 		Optional<Conta> conta = this.contaRepository.findById(idConta);
 		if (!conta.isPresent())
 			throw new NotFoundException("O idconta não foi encontrado: " + idConta);
+
+		Optional<Conta> contaPagadora = this.contaRepository.findById(idContaPagadora);
+		if (!contaPagadora.isPresent())
+			throw new NotFoundException("O idcontaPagadora não foi encontrado: " + idContaPagadora);
 
 		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
 
@@ -81,7 +85,7 @@ public class ArquivoService {
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
 			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
-			this.lancamentoService.atualizarSaldo(planilha.get(), conta.get());
+			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
 		}
 
 		return mapa;
@@ -142,7 +146,7 @@ public class ArquivoService {
 	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
-		List<String> bradesco = this.lancamentoRepository.getNumerosBradesco(planilha.getId()).stream()
+		List<String> bradesco = this.lancamentoRepository.findAllNumeroBradesco(planilha.getId()).stream()
 				.map(n -> n.getNumeroBradesco()).collect(Collectors.toList());
 
 		List<String> lines = this.readLines(multipartFile);
