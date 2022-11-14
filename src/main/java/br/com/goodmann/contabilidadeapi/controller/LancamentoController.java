@@ -57,9 +57,9 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 
 	@PostMapping("/uploadFile")
 	public Map<String, Object> uploadFile(@RequestParam("idConta") Integer idConta,
-			@RequestParam("idContaPagadora") Integer idContaPagadora, @RequestParam("idPlanilha") Integer idPlanilha,
-			@RequestParam("file") MultipartFile file) throws IOException, ParseException, NotFoundException {
-		return this.arquivoService.cargaArquivo(idConta, idContaPagadora, idPlanilha, file);
+			@RequestParam("idPlanilha") Integer idPlanilha, @RequestParam("file") MultipartFile file)
+			throws IOException, ParseException, NotFoundException {
+		return this.arquivoService.cargaArquivo(idConta, idPlanilha, file);
 	}
 
 	@PostMapping("/deleteall")

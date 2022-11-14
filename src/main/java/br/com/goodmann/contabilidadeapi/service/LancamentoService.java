@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +48,12 @@ public class LancamentoService {
 
 	@Transactional
 	public void delete(Integer id) {
+
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
+
+		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
+			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
+
 		this.lancamentoRepository.deleteById(id);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
@@ -66,7 +71,9 @@ public class LancamentoService {
 	}
 
 	public void deleteAllById(List<Integer> ids) {
-		List<Lancamento> lancamentos = this.lancamentoRepository.findAllById(ids);
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllById(ids).stream()
+				.filter(o -> !TipoLancamento.SALDO.equals(o.getTipo()) && !TipoLancamento.FATURA.equals(o.getTipo()))
+				.collect(Collectors.toList());
 		this.lancamentoRepository.deleteAll(lancamentos);
 	}
 
@@ -124,7 +131,7 @@ public class LancamentoService {
 						}, () -> {
 							Lancamento model = new Lancamento();
 							model.setConta(conta);
-							model.setData(Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+							model.setData(java.sql.Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
 							model.setDescricao("Saldo Anterior");
 							model.setPlanilha(proxima);
 							model.setValor(saldoAtual);
@@ -135,4 +142,8 @@ public class LancamentoService {
 		}
 	}
 
+	private String gerarHash() {
+		byte[] a = new Date().toString().getBytes();
+		return a.toString().substring(3);
+	}
 }
