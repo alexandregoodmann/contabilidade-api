@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -108,10 +107,6 @@ public class LancamentoService {
 	}
 
 	public void atualizaSaldo(Planilha planilha, Conta conta) {
-
-		if (!TipoConta.CC.equals(conta.getTipo())) {
-			throw new RuntimeException("ERRO - Esta operação é somente para conta do tipo CC");
-		}
 
 		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
 		for (int i = 0; i < planilhas.size(); i++) {
