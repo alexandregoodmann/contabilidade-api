@@ -42,24 +42,41 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento model) {
-		if (model.getId() == null && model.getRepetir() != null) {
-			this.repetir(model);
-		} else {
+		// se for unico
+		if (model.getHash() == null) {
 			this.lancamentoRepository.save(model);
+		} else { // se for serie
+			if (model.getId() == null)
+				this.criarSerie(model);
+			else
+				this.editarSerie(model);
 		}
 		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
 	}
 
-	private void repetir(Lancamento model) {
+	private void editarSerie(Lancamento model) {
+		this.lancamentoRepository.findAllByHash(model.getHash()).forEach(lancamento -> {
+			lancamento.setConta(model.getConta());
+			lancamento.setCategoria(model.getCategoria());
+			lancamento.setDescricao(model.getDescricao());
+			lancamento.setValor(model.getValor());
+			lancamento.setFixo(model.getFixo());
+			lancamento.setConcluido(model.getConcluido());
+			lancamentoRepository.save(lancamento);
+		});
+	}
+
+	private void criarSerie(Lancamento model) {
 		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(model.getPlanilha());
 		int vezes = (planilhas.size() < model.getRepetir() + 1) ? planilhas.size() : model.getRepetir() + 1;
+		String hash = this.hash();
 		for (int i = 0; i < vezes; i++) {
 			if (planilhas.get(i) != null) {
 				Lancamento l = new Lancamento();
 				BeanUtils.copyProperties(model, l, "id");
 				l.setPlanilha(planilhas.get(i));
-				l.setHash(this.hash());
+				l.setHash(hash);
 				this.lancamentoRepository.save(l);
 			}
 		}
@@ -73,7 +90,14 @@ public class LancamentoService {
 		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
 			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
 
-		this.lancamentoRepository.deleteById(id);
+		if (lancamento.getHash() != null) {
+			this.lancamentoRepository.findAllByHash(lancamento.getHash()).forEach(e -> {
+				this.lancamentoRepository.deleteById(e.getId());
+			});
+		} else {
+			this.lancamentoRepository.deleteById(id);
+		}
+
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
 

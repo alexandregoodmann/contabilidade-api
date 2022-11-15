@@ -27,4 +27,6 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 
 	List<Lancamento> findByPlanilhaAndTipo(Planilha planilha, TipoLancamento tipo);
 
+	List<Lancamento> findAllByHash(String hash);
+
 }
