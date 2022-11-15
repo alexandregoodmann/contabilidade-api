@@ -42,14 +42,13 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento model) {
-		// se for unico
-		if (model.getHash() == null) {
-			this.lancamentoRepository.save(model);
-		} else { // se for serie
+		if (TipoLancamento.SERIE.equals(model.getTipo())) {
 			if (model.getId() == null)
 				this.criarSerie(model);
 			else
 				this.editarSerie(model);
+		} else {
+			this.lancamentoRepository.save(model);
 		}
 		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
