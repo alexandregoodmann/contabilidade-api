@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -156,30 +157,31 @@ public class LancamentoService {
 	}
 
 	public void atualizaSaldo(Planilha planilha, Conta conta) {
-
-		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
-		for (int i = 0; i < planilhas.size(); i++) {
-			if (i + 1 < planilhas.size()) {
-
-				Planilha atual = planilhas.get(i);
-				Planilha proxima = planilhas.get(i + 1);
-				BigDecimal saldoAtual = this.lancamentoRepository.findAllByPlanilhaAndConta(atual, conta).stream()
-						.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-
-				this.lancamentoRepository.findByPlanilhaContaTipo(proxima, conta, TipoLancamento.SALDO).stream()
-						.findFirst().ifPresentOrElse(e -> {
-							e.setValor(saldoAtual);
-							this.lancamentoRepository.save(e);
-						}, () -> {
-							Lancamento model = new Lancamento();
-							model.setConta(conta);
-							model.setData(java.sql.Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
-							model.setDescricao("Saldo Anterior");
-							model.setPlanilha(proxima);
-							model.setValor(saldoAtual);
-							model.setTipo(TipoLancamento.SALDO);
-							this.lancamentoRepository.save(model);
-						});
+		if (TipoConta.CC.equals(conta.getTipo())) {
+			List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
+			for (int i = 0; i < planilhas.size(); i++) {
+				if (i + 1 < planilhas.size()) {
+					
+					Planilha atual = planilhas.get(i);
+					Planilha proxima = planilhas.get(i + 1);
+					BigDecimal saldoAtual = this.lancamentoRepository.findAllByPlanilhaAndConta(atual, conta).stream()
+							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
+					
+					this.lancamentoRepository.findByPlanilhaContaTipo(proxima, conta, TipoLancamento.SALDO).stream()
+					.findFirst().ifPresentOrElse(e -> {
+						e.setValor(saldoAtual);
+						this.lancamentoRepository.save(e);
+					}, () -> {
+						Lancamento model = new Lancamento();
+						model.setConta(conta);
+						model.setData(java.sql.Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+						model.setDescricao("Saldo Anterior");
+						model.setPlanilha(proxima);
+						model.setValor(saldoAtual);
+						model.setTipo(TipoLancamento.SALDO);
+						this.lancamentoRepository.save(model);
+					});
+				}
 			}
 		}
 	}
