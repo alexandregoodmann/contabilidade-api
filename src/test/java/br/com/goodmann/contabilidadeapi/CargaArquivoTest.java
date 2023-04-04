@@ -1,13 +1,10 @@
 package br.com.goodmann.contabilidadeapi;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,13 +55,15 @@ public class CargaArquivoTest {
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		/*Map<String, Object> mapa = this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
-
-		int qtd = (int) mapa.get("qtdLancamentos");
-		assertTrue(qtd == 47);*/
+		/*
+		 * Map<String, Object> mapa = this.arquivoService.cargaArquivo(conta.getId(),
+		 * planilha.getId(), mFile);
+		 * 
+		 * int qtd = (int) mapa.get("qtdLancamentos"); assertTrue(qtd == 47);
+		 */
 	}
 
-	@Test
+	// @Test
 	public void cargaArquivoBradescoTest() throws IOException, ParseException, NotFoundException {
 
 		File file = new File(
@@ -85,7 +84,18 @@ public class CargaArquivoTest {
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		//this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+		// this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+	}
+
+	@Test
+	public void cargaArquivoItauTest() throws IOException, ParseException, NotFoundException {
+
+		File file = new File("/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/ITAU_MARCO_2023.TXT");
+		InputStream stream;
+		stream = new FileInputStream(file);
+		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+
+		this.arquivoService.cargaArquivo(343, 4747, mFile);
 	}
 
 }

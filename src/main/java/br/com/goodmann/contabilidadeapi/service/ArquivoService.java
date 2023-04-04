@@ -84,6 +84,11 @@ public class ArquivoService {
 			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
 		}
 
+		// itau
+		if ("479".equals(conta.get().getBanco().getCodigo())) {
+			mapa = this.cargaArquivoItau(conta.get(), planilha.get(), multipartFile);
+		}
+
 		return mapa;
 	}
 
@@ -181,6 +186,47 @@ public class ArquivoService {
 		mapa.put("idConta", conta.getId());
 		mapa.put("idPlanilha", planilha.getId());
 		mapa.put("qtdLancamentos", count);
+
+		return mapa;
+
+	}
+
+	private Map<String, Object> cargaArquivoItau(Conta conta, Planilha planilha, MultipartFile multipartFile)
+			throws IOException {
+
+		List<String> lines = this.readLines(multipartFile);
+
+		String[] vet = new String[3];
+
+		lines.forEach(line -> {
+			if (!line.contains("SALDO DO DIA")) {
+				vet[0] = line.substring(0, 10);
+				vet[1] = line.substring(11);
+				String[] vetValor = line.substring(11).split(" ");
+				String valor = vetValor[vetValor.length - 1];
+				vet[1] = vet[1].replace(valor, "");
+				valor = valor.replaceAll("\\.", "").replaceAll("\\,", ".");
+
+				Lancamento lancamento = new Lancamento();
+				lancamento.setConta(conta);
+				try {
+					lancamento.setData(this.sdf.parse(vet[0]));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				lancamento.setDescricao(vet[1]);
+				lancamento.setPlanilha(planilha);
+				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
+				
+				this.lancamentoRepository.save(lancamento);
+			}
+		});
+
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("idConta", conta.getId());
+		mapa.put("idPlanilha", planilha.getId());
+		mapa.put("qtdLancamentos", lines.size());
 
 		return mapa;
 
