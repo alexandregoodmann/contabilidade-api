@@ -90,7 +90,7 @@ public class CargaArquivoTest {
 	@Test
 	public void cargaArquivoItauTest() throws IOException, ParseException, NotFoundException {
 
-		File file = new File("/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/ITAU_MARCO_2023.TXT");
+		File file = new File("/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato_itau.txt");
 		InputStream stream;
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);

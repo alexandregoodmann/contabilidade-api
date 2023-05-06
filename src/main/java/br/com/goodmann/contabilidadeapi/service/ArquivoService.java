@@ -212,13 +212,12 @@ public class ArquivoService {
 				try {
 					lancamento.setData(this.sdf.parse(vet[0]));
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException("ERROR parsing the value: " + valor);
 				}
 				lancamento.setDescricao(vet[1]);
 				lancamento.setPlanilha(planilha);
 				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
-				
+
 				this.lancamentoRepository.save(lancamento);
 			}
 		});
