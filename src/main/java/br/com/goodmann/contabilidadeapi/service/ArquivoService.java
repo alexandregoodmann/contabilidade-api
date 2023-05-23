@@ -1,6 +1,8 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesAbreviadosEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -145,7 +149,7 @@ public class ArquivoService {
 	}
 
 	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
-			throws ParseException, IOException {
+			throws IOException {
 
 		List<String> bradesco = this.lancamentoRepository.findAllNumeroBradesco(planilha.getId()).stream()
 				.map(n -> n.getNumeroBradesco()).collect(Collectors.toList());
@@ -155,14 +159,20 @@ public class ArquivoService {
 
 		for (int i = 3; i < lines.size(); i += 2) {
 
-			if (lines.get(i).contains(";Total;"))
-				break;
-
 			String line = lines.get(i) + lines.get(i + 1);
 			String[] vet = line.split(";");
-
-			if (vet.length >= 3 && bradesco.contains(vet[2]))
+			Date data;
+			try {
+				data = this.sdf2.parse(vet[0]);
+			} catch (ParseException e) {
 				continue;
+			}
+
+			if (vet.length >= 3)
+				continue;
+
+			// if (vet.length >= 3 && bradesco.contains(vet[2]))
+			// continue;
 
 			Lancamento lancamento = new Lancamento();
 			lancamento.setConta(conta);
@@ -174,11 +184,11 @@ public class ArquivoService {
 			Double valor = Double.valueOf(sValor.replaceAll("\\.", "").replaceAll("\\,", "\\.").replaceAll("\\\"", ""));
 			lancamento.setValor(BigDecimal.valueOf(valor));
 
-			lancamento.setData(this.sdf2.parse(vet[0]));
+			lancamento.setData(data);
 			lancamento.setNumeroBradesco(vet[2]);
 
-			this.lancamentoRepository.save(lancamento);
-
+			// this.lancamentoRepository.save(lancamento);
+			System.out.println(lancamento.toString());
 			count++;
 		}
 
@@ -194,11 +204,15 @@ public class ArquivoService {
 	private Map<String, Object> cargaArquivoItau(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws IOException {
 
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaAndConta(planilha, conta);
+
 		List<String> lines = this.readLines(multipartFile);
 
 		String[] vet = new String[3];
+		int count = 0;
 
-		lines.forEach(line -> {
+		for (String line : lines) {
+
 			if (!line.contains("SALDO DO DIA")) {
 				vet[0] = line.substring(0, 10);
 				vet[1] = line.substring(11);
@@ -218,9 +232,14 @@ public class ArquivoService {
 				lancamento.setPlanilha(planilha);
 				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
 
-				this.lancamentoRepository.save(lancamento);
+				if (lancamentos.stream().filter(o -> o.getData().compareTo(lancamento.getData()) == 0
+						&& o.getValor().compareTo(lancamento.getValor()) == 0).count() == 0) {
+					this.lancamentoRepository.save(lancamento);
+					count++;
+				}
 			}
-		});
+		}
+		;
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
 		mapa.put("idConta", conta.getId());
@@ -229,6 +248,35 @@ public class ArquivoService {
 
 		return mapa;
 
+	}
+
+	public void downloadExtrato(Integer ano, Integer mes) throws IOException {
+		String fileName = String.format(
+				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato-%s-%s.csv", ano, mes);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+		this.planilhaRepository.getAnaliseAnoMes(ano, mes).stream().map(this::parse2String).forEach(t -> {
+			try {
+				writer.append(t);
+				writer.newLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		writer.close();
+	}
+
+	private String parse2String(AnaliseDTO dto) {
+
+		StringBuilder sb = new StringBuilder();
+		String dt = dto.getData().toString().substring(0, 10);
+		sb.append(dt).append(";");
+		sb.append(dto.getBanco()).append(";");
+		String categoria = (dto.getCategoria() == null ? "" : dto.getCategoria());
+		sb.append(categoria).append(";");
+		sb.append(dto.getDescricao()).append(";");
+		sb.append(dto.getValor());
+
+		return sb.toString();
 	}
 
 }

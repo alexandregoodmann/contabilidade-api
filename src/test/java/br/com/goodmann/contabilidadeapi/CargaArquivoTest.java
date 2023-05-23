@@ -63,31 +63,27 @@ public class CargaArquivoTest {
 		 */
 	}
 
-	// @Test
+	@Test
 	public void cargaArquivoBradescoTest() throws IOException, ParseException, NotFoundException {
 
 		File file = new File(
-				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/Bradesco_20102022_132743.csv");
+				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/Bradesco_15052023_223228.csv");
 		InputStream stream;
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		// Exemplo de conta
-		Conta conta = new Conta();
-		Example<Conta> example = Example.of(conta);
-		conta = this.contaRepository.findOne(example).get();
+		Conta conta = this.contaRepository.findById(338).get();
 
-		// Example de Planilha
 		Planilha planilha = new Planilha();
-		planilha.setAno((short) 2022);
-		planilha.setMes((short) 10);
+		planilha.setAno((short) 2023);
+		planilha.setMes((short) 5);
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		// this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+		this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
 	}
 
-	@Test
+	// @Test
 	public void cargaArquivoItauTest() throws IOException, ParseException, NotFoundException {
 
 		File file = new File("/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato_itau.txt");
