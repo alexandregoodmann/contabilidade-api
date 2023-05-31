@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ import javassist.NotFoundException;
 public class ArquivoService {
 
 	@Autowired
-	private LancamentoRepository lancamentoRepository;
+	protected LancamentoRepository lancamentoRepository;
 
 	@Autowired
 	private LancamentoService lancamentoService;
@@ -48,8 +47,11 @@ public class ArquivoService {
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
 
-	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	private SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
+	@Autowired
+	private BradescoService bradescoService;
+
+	protected SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	protected SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
 
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
@@ -84,7 +86,7 @@ public class ArquivoService {
 
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
-			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
+			mapa = this.bradescoService.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
 			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
 		}
 
@@ -143,59 +145,6 @@ public class ArquivoService {
 		mapa.put("idConta", conta.getId());
 		mapa.put("idPlanilha", planilha.getId());
 		mapa.put("qtdLancamentos", lines.size());
-
-		return mapa;
-
-	}
-
-	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
-			throws IOException {
-
-		List<String> bradesco = this.lancamentoRepository.findAllNumeroBradesco(planilha.getId()).stream()
-				.map(n -> n.getNumeroBradesco()).collect(Collectors.toList());
-
-		List<String> lines = this.readLines(multipartFile);
-		int count = 0;
-
-		for (int i = 3; i < lines.size(); i += 2) {
-
-			String line = lines.get(i) + lines.get(i + 1);
-			String[] vet = line.split(";");
-			Date data;
-			try {
-				data = this.sdf2.parse(vet[0]);
-			} catch (ParseException e) {
-				continue;
-			}
-
-			if (vet.length >= 3)
-				continue;
-
-			// if (vet.length >= 3 && bradesco.contains(vet[2]))
-			// continue;
-
-			Lancamento lancamento = new Lancamento();
-			lancamento.setConta(conta);
-			lancamento.setPlanilha(planilha);
-			String descricao = vet.length == 7 ? vet[6] : vet[7];
-			lancamento.setDescricao(descricao);
-
-			String sValor = vet[3].isEmpty() ? vet[4] : vet[3];
-			Double valor = Double.valueOf(sValor.replaceAll("\\.", "").replaceAll("\\,", "\\.").replaceAll("\\\"", ""));
-			lancamento.setValor(BigDecimal.valueOf(valor));
-
-			lancamento.setData(data);
-			lancamento.setNumeroBradesco(vet[2]);
-
-			// this.lancamentoRepository.save(lancamento);
-			System.out.println(lancamento.toString());
-			count++;
-		}
-
-		Map<String, Object> mapa = new HashMap<String, Object>();
-		mapa.put("idConta", conta.getId());
-		mapa.put("idPlanilha", planilha.getId());
-		mapa.put("qtdLancamentos", count);
 
 		return mapa;
 
