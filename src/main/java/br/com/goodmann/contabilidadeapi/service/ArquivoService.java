@@ -1,6 +1,8 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesAbreviadosEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
@@ -33,7 +36,7 @@ import javassist.NotFoundException;
 public class ArquivoService {
 
 	@Autowired
-	private LancamentoRepository lancamentoRepository;
+	protected LancamentoRepository lancamentoRepository;
 
 	@Autowired
 	private LancamentoService lancamentoService;
@@ -44,8 +47,11 @@ public class ArquivoService {
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
 
-	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	private SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
+	@Autowired
+	private BradescoService bradescoService;
+
+	protected SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	protected SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
 
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
@@ -80,8 +86,13 @@ public class ArquivoService {
 
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
-			mapa = this.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
+			mapa = this.bradescoService.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
 			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
+		}
+
+		// itau
+		if ("479".equals(conta.get().getBanco().getCodigo())) {
+			mapa = this.cargaArquivoItau(conta.get(), planilha.get(), multipartFile);
 		}
 
 		return mapa;
@@ -139,51 +150,82 @@ public class ArquivoService {
 
 	}
 
-	private Map<String, Object> cargaArquivoBradesco(Conta conta, Planilha planilha, MultipartFile multipartFile)
-			throws ParseException, IOException {
+	private Map<String, Object> cargaArquivoItau(Conta conta, Planilha planilha, MultipartFile multipartFile)
+			throws IOException {
 
-		List<String> bradesco = this.lancamentoRepository.findAllNumeroBradesco(planilha.getId()).stream()
-				.map(n -> n.getNumeroBradesco()).collect(Collectors.toList());
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaAndConta(planilha, conta);
 
 		List<String> lines = this.readLines(multipartFile);
+
+		String[] vet = new String[3];
 		int count = 0;
 
-		for (int i = 3; i < lines.size(); i += 2) {
+		for (String line : lines) {
 
-			if (lines.get(i).contains(";Total;"))
-				break;
+			if (!line.contains("SALDO DO DIA")) {
+				vet[0] = line.substring(0, 10);
+				vet[1] = line.substring(11);
+				String[] vetValor = line.substring(11).split(" ");
+				String valor = vetValor[vetValor.length - 1];
+				vet[1] = vet[1].replace(valor, "");
+				valor = valor.replaceAll("\\.", "").replaceAll("\\,", ".");
 
-			String line = lines.get(i) + lines.get(i + 1);
-			String[] vet = line.split(";");
+				Lancamento lancamento = new Lancamento();
+				lancamento.setConta(conta);
+				try {
+					lancamento.setData(this.sdf.parse(vet[0]));
+				} catch (ParseException e) {
+					throw new RuntimeException("ERROR parsing the value: " + valor);
+				}
+				lancamento.setDescricao(vet[1]);
+				lancamento.setPlanilha(planilha);
+				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
 
-			if (vet.length >= 3 && bradesco.contains(vet[2]))
-				continue;
-
-			Lancamento lancamento = new Lancamento();
-			lancamento.setConta(conta);
-			lancamento.setPlanilha(planilha);
-			String descricao = vet.length == 7 ? vet[6] : vet[7];
-			lancamento.setDescricao(descricao);
-
-			String sValor = vet[3].isEmpty() ? vet[4] : vet[3];
-			Double valor = Double.valueOf(sValor.replaceAll("\\.", "").replaceAll("\\,", "\\.").replaceAll("\\\"", ""));
-			lancamento.setValor(BigDecimal.valueOf(valor));
-
-			lancamento.setData(this.sdf2.parse(vet[0]));
-			lancamento.setNumeroBradesco(vet[2]);
-
-			this.lancamentoRepository.save(lancamento);
-
-			count++;
+				if (lancamentos.stream().filter(o -> o.getData().compareTo(lancamento.getData()) == 0
+						&& o.getValor().compareTo(lancamento.getValor()) == 0).count() == 0) {
+					this.lancamentoRepository.save(lancamento);
+					count++;
+				}
+			}
 		}
+		;
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
 		mapa.put("idConta", conta.getId());
 		mapa.put("idPlanilha", planilha.getId());
-		mapa.put("qtdLancamentos", count);
+		mapa.put("qtdLancamentos", lines.size());
 
 		return mapa;
 
+	}
+
+	public void downloadExtrato(Integer ano, Integer mes) throws IOException {
+		String fileName = String.format(
+				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato-%s-%s.csv", ano, mes);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+		this.planilhaRepository.getAnaliseAnoMes(ano, mes).stream().map(this::parse2String).forEach(t -> {
+			try {
+				writer.append(t);
+				writer.newLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		writer.close();
+	}
+
+	private String parse2String(AnaliseDTO dto) {
+
+		StringBuilder sb = new StringBuilder();
+		String dt = dto.getData().toString().substring(0, 10);
+		sb.append(dt).append(";");
+		sb.append(dto.getBanco()).append(";");
+		String categoria = (dto.getCategoria() == null ? "" : dto.getCategoria());
+		sb.append(categoria).append(";");
+		sb.append(dto.getDescricao()).append(";");
+		sb.append(dto.getValor());
+
+		return sb.toString();
 	}
 
 }

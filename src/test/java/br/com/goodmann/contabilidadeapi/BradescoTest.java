@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,14 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
-import br.com.goodmann.contabilidadeapi.service.ArquivoService;
+import br.com.goodmann.contabilidadeapi.service.BradescoService;
 import javassist.NotFoundException;
 
 @SpringBootTest
-public class CargaArquivoTest {
+public class BradescoTest {
 
 	@Autowired
-	private ArquivoService arquivoService;
+	private BradescoService bradescoService;
 
 	@Autowired
 	private ContaRepository contaRepository;
@@ -34,33 +35,17 @@ public class CargaArquivoTest {
 	private PlanilhaRepository planilhaRepository;
 
 	// @Test
-	public void cargaArquivoC6Test() throws IOException, ParseException, NotFoundException {
+	public void linhaTeste() throws IOException {
 
-		// arquivo para upload
 		File file = new File(
-				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/Bradesco_20072022_145023.csv");
+				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/Bradesco_15052023_223228.csv");
 		InputStream stream;
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		// Exemplo de conta
-		Conta conta = new Conta();
-		Example<Conta> example = Example.of(conta);
-		conta = this.contaRepository.findOne(example).get();
-
-		// Example de Planilha
-		Planilha planilha = new Planilha();
-		planilha.setAno((short) 2022);
-		planilha.setMes((short) 7);
-		Example<Planilha> pExample = Example.of(planilha);
-		planilha = this.planilhaRepository.findOne(pExample).get();
-
-		/*
-		 * Map<String, Object> mapa = this.arquivoService.cargaArquivo(conta.getId(),
-		 * planilha.getId(), mFile);
-		 * 
-		 * int qtd = (int) mapa.get("qtdLancamentos"); assertTrue(qtd == 47);
-		 */
+		this.bradescoService.montarLinhas(mFile).forEach(line -> {
+			System.out.println(line);
+		});
 	}
 
 	@Test
@@ -80,18 +65,8 @@ public class CargaArquivoTest {
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
-	}
-
-	// @Test
-	public void cargaArquivoItauTest() throws IOException, ParseException, NotFoundException {
-
-		File file = new File("/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato_itau.txt");
-		InputStream stream;
-		stream = new FileInputStream(file);
-		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
-
-		this.arquivoService.cargaArquivo(343, 4747, mFile);
+		Map<String, Object> mp = this.bradescoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+		System.out.println(mp.get("qtdLancamentos"));
 	}
 
 }
