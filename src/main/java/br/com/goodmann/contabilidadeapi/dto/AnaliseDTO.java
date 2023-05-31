@@ -14,7 +14,7 @@ public interface AnaliseDTO {
 	public Integer getMes();
 
 	public String getBanco();
-	
+
 	public String getTipoConta();
 
 	public String getTipoLancamento();
@@ -32,4 +32,5 @@ public interface AnaliseDTO {
 	public Boolean getFixo();
 
 	public Boolean getConcluido();
+	
 }
