@@ -2,12 +2,16 @@ package br.com.goodmann.contabilidadeapi.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +22,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +41,9 @@ import javassist.NotFoundException;
 
 @Service
 public class ArquivoService {
+
+	@Value("${file.download}")
+	private String filesPath;
 
 	@Autowired
 	protected LancamentoRepository lancamentoRepository;
@@ -199,10 +209,27 @@ public class ArquivoService {
 
 	}
 
-	public void downloadExtrato(Integer ano, Integer mes) throws IOException {
-		String fileName = String.format(
-				"/home/alexandre/projetos/contabilidade/contabilidade-api/arquivos/extrato-%s-%s.csv", ano, mes);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+	public Resource downloadExtrato(Integer ano, Integer mes) throws IOException {
+		String fileName = String.format(this.filesPath + "/extrato-%s-%s.csv", ano, mes);
+		this.arquivoExtrato(ano, mes, fileName);
+		try {
+			Path file = Paths.get(filesPath).resolve(fileName);
+			Resource resource = new UrlResource(file.toUri());
+
+			if (resource.exists() || resource.isReadable()) {
+				return resource;
+			} else {
+				throw new RuntimeException("Could not read the file!");
+			}
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("Error: " + e.getMessage());
+		}
+	}
+
+	private void arquivoExtrato(Integer ano, Integer mes, String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fw = new FileWriter(file);
+		BufferedWriter writer = new BufferedWriter(fw);
 		this.planilhaRepository.getAnaliseAnoMes(ano, mes).stream().map(this::parse2String).forEach(t -> {
 			try {
 				writer.append(t);

@@ -1,25 +1,4 @@
-2023-05-01;C6;;Saldo Anterior;124.11
-2023-05-01;Itaú;;Saldo Anterior;12572.86
 2023-04-30;Bradesco;;Saldo Anterior;6280.22
-2023-05-10;Itaú;;Fatura C6;-3715.42
-2023-05-25;Sum's Club;Supermercado;SAMS CLUB PORTO AL - 2/3 110,96;-110.96
-2023-05-25;Sum's Club;Supermercado;SAMS CLUB PORTO AL - 2/2 64,87;-64.87
-2023-05-27;Itaú;Salário;REMUNERACAO/SALARIO ;3729.47
-2023-05-16;Itaú;Saúde;PIX TRANSF STEFAN 17/04 ;-330.00
-2023-05-13;Itaú;Salário;REMUNERACAO/SALARIO ;4320.00
-2023-05-09;Itaú;Saúde;PIX TRANSF VICENTE10/04 ;-850.00
-2023-05-09;Bradesco;Casa;PIX QRS CLARO10/04 ;-84.90
-2023-05-09;Bradesco;Casa;PIX QRS TELEFONICA 10/04 ;-62.00
-2023-05-04;Itaú;Casa;PIX TRANSF MIGUEL 05/04 ;-2237.00
-2023-05-03;Bradesco;Pessoal;Oldschool;-34.90
-2023-05-19;Bradesco;Diversão;Des: Cibele Schwertner 20/04;-416.00
-2023-05-08;Itaú;;INT PAG TIT BANCO 368 SUMSCLUB;-175.83
-2023-05-04;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;38.56
-2023-05-03;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;1.19
-2023-05-03;Itaú;Diversão;PIX TRANSF 50.356.04/05 PALHOÇA;-65.00
-2023-05-02;Itaú;Educação;PIX TRANSF Pauline03/05 ;-520.00
-2023-05-02;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;10.62
-2023-05-02;Itaú;Diversão;PIX TRANSF 50.356.03/05 PALHOÇA;-65.00
 2023-05-01;Bradesco;Rendimento;Poup Facil-depos a Partir 4/5/12;10.51
 2023-05-01;Bradesco;Diversão;Pag*veredatropical;-94.60
 2023-05-01;Bradesco;Pessoal;Pag*alexandre;-590.00
@@ -29,7 +8,7 @@
 2023-05-01;Bradesco;Diversão;Maria de Lourdes;-29.00
 2023-05-01;Bradesco;Diversão;Caminho Dos Ventos;-40.42
 2023-05-01;Bradesco;Carro;Posto Hangar 275;-261.57
-2023-05-01;Bradesco;Diversão;Sacolao da Ponte;-44.49
+2023-05-01;Bradesco;Supermercado;Sacolao da Ponte;-44.49
 2023-05-02;Bradesco;Rendimento;Poup Facil-depos a Partir 4/5/12;4.64
 2023-05-02;Bradesco;Diversão;Refugio Cafe;-144.87
 2023-05-02;Bradesco;Diversão;Costelao do Gaucho;-113.15
@@ -37,14 +16,47 @@
 2023-05-02;Bradesco;Diversão;Pag*arianegoretifeli;-35.00
 2023-05-02;Bradesco;Diversão;Fornitura Central;-16.50
 2023-05-02;Bradesco;Diversão;Pao de Queijo;-24.00
-2023-05-03;Bradesco;Diversão;Menegatti Brusque;-255.38
-2023-05-03;Bradesco;Diversão;Menegatti Brusque;-7.99
+2023-05-03;Bradesco;Pessoal;Menegatti Brusque;-255.38
+2023-05-03;Bradesco;Pessoal;Menegatti Brusque;-7.99
 2023-05-04;Bradesco;Carro;Posto Canyons Bea;-217.04
 2023-05-04;Bradesco;Pessoal;Casa do Papel;-26.98
 2023-05-04;Bradesco;Diversão;Pag*chiaiapizzeriae;-102.30
-2023-05-09; Sodexo;Alimentação;Saldo Anterior;968.66
-2023-05-09; Sodexo;Alimentação;Supermercado;-36.05
-2023-05-11; Sodexo;Alimentação;Carga Valor;626.78
+2023-05-07;Bradesco;Diversão;Tenda Kilpp;-34.60
+2023-05-07;Bradesco;Supermercado;Sacolao Ribeiro;-16.50
+2023-05-07;Bradesco;Supermercado;Pag*eltondarocharoli;-22.00
+2023-05-07;Bradesco;Supermercado;Elite Carnes Dist;-29.50
+2023-05-07;Bradesco;Supermercado;Pag*leandrobandeirad;-21.00
+2023-05-07;Bradesco;Supermercado;Pag*frutylcomerciode;-5.50
+2023-05-07;Bradesco;Diversão;Queens;-22.00
+2023-05-09;Bradesco;Pessoal;Oldschool;-40.00
+2023-05-11;Bradesco;Saúde;Farmacia Sao Joao;-24.90
+2023-05-11;Bradesco;Casa;Sams;-824.64
+2023-05-14;Bradesco;Salário;Remet.alexandre Ferreira e;4800.00
+2023-05-14;Bradesco;Diversão;Rem: Rita de Cassia Glaese 15/05;270.48
+2023-05-14;Bradesco;Saúde;Panvel Filial 28;-55.87
+2023-05-14;Bradesco;Pessoal;Cobasi Poa Ipiranga;-60.00
+2023-05-14;Bradesco;Carro;Posto Aeroporto;-252.44
+2023-05-17;Bradesco;Diversão;Osso Craft Bar Bom f;-169.40
+2023-05-17;Bradesco;Alimentação;Berlinf*restaurante;-30.00
+2023-05-18;Bradesco;Rendimento;Poup Facil-depos a Partir 4/5/12;18.09
+2023-05-21;Bradesco;Diversão;Restaurante Machr;-135.06
+2023-05-21;Bradesco;Saúde;3443raia;-12.83
+2023-05-21;Bradesco;Alimentação;Ponto Gaucho Restaur;-27.30
+2023-05-21;Bradesco;Diversão;Des: Cibele Schwertner 22/05;-416.00
+2023-05-22;Bradesco;Diversão;Los Tres Comercio de;-86.79
+2023-05-23;Bradesco;Alimentação;Ponto Gaucho Restaur;-28.00
+2023-05-23;Bradesco;Diversão;a Virgem Bar;-51.00
+2023-05-24;Bradesco;Diversão;Novedois Gastro p;-78.78
+2023-05-25;Bradesco;Diversão;Pag*mariaeduardanune;-81.94
+2023-05-25;Bradesco;Diversão;Olivos - Bar e Resta;-44.55
+2023-05-28;Bradesco;Feira;Tenda Kilpp;-37.85
+2023-05-28;Bradesco;Feira;Fruteira do Ronaldo;-21.50
+2023-05-28;Bradesco;Feira;Pag*vitoriamarialope;-20.85
+2023-05-28;Bradesco;Feira;Pag*eltondarocharoli;-34.00
+2023-05-28;Bradesco;Feira;Pag*leandrobandeirad;-19.80
+2023-05-28;Bradesco;Casa;ar Sul Com Gas;-125.00
+2023-05-30;Bradesco;Salário;Salário 2;3700.00
+2023-05-01;C6;;Saldo Anterior;124.11
 2023-05-06;C6 Cartão;Casa;LOJAS COLOMBO 291 - Parcela 12/12 ;-169.08
 2023-01-31;C6 Cartão;Casa;BOURBON IPIRANGA - Parcela 3/5 ;-33.32
 2023-02-24;C6 Cartão;Pessoal;DECATHLON PRAIA DE BEL - Parcela 3/6 ;-108.90
@@ -60,3 +72,29 @@
 2023-04-01;C6 Cartão;Pessoal;DM SPOTIFY ;-19.90
 2023-04-02;C6 Cartão;Educação;AMAZON KINDLE UNLTD ;-19.90
 2023-04-24;C6 Cartão;Diversão;AIRBNB HMAST489QP ;-446.70
+2023-05-01;Itaú;;Saldo Anterior;12572.86
+2023-05-10;Itaú;;Fatura C6;-3715.42
+2023-05-16;Itaú;Saúde;PIX TRANSF STEFAN 17/04 ;-330.00
+2023-05-09;Itaú;Saúde;PIX TRANSF VICENTE10/04 ;-850.00
+2023-05-04;Itaú;Casa;PIX TRANSF MIGUEL 05/04 ;-2237.00
+2023-05-08;Itaú;;INT PAG TIT BANCO 368 SUMSCLUB;-175.83
+2023-05-04;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;38.56
+2023-05-03;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;1.19
+2023-05-03;Itaú;Diversão;PIX TRANSF 50.356.04/05 PALHOÇA;-65.00
+2023-05-02;Itaú;Educação;PIX TRANSF Pauline03/05 ;-520.00
+2023-05-02;Itaú;Rendimento;REND PAGO APLIC AUT MAIS ;10.62
+2023-05-02;Itaú;Diversão;PIX TRANSF 50.356.03/05 PALHOÇA;-65.00
+2023-05-09;Itaú;Educação;Gambona;-250.00
+2023-05-22;Itaú;Rendimento;Rendimento;12.42
+2023-05-23;Itaú;Educação;100 German Histories;-70.00
+2023-05-24;Itaú;Casa;Diego Cambrari (Lavagem Carro);-80.00
+2023-05-25;Itaú;Carro;Motorista;-100.00
+2023-05-30;Itaú;Casa;Net Claro;-84.90
+2023-05-25;Sum's Club;Supermercado;SAMS CLUB PORTO AL - 2/3 110,96;-110.96
+2023-05-25;Sum's Club;Supermercado;SAMS CLUB PORTO AL - 2/2 64,87;-64.87
+2023-05-09; Sodexo;Alimentação;Saldo Anterior;968.66
+2023-05-09; Sodexo;Alimentação;Supermercado;-36.05
+2023-05-11; Sodexo;Alimentação;Carga Valor;626.78
+2023-05-20; Sodexo;Supermercado;Zaffari Churrasco Rita;-387.23
+2023-05-20; Sodexo;Supermercado;Carvão churrasco Rita;-29.80
+2023-05-27; Sodexo;Supermercado;Zaffari;-208.76
