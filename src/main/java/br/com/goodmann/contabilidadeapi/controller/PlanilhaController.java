@@ -66,6 +66,11 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 		this.planilhaService.duplicarPlanilha(id);
 	}
 
+	@PostMapping("/processar")
+	public void processarPlanilha() throws ParseException {
+		this.planilhaService.processarPlanilhas();
+	}
+
 	@Override
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable(required = true, name = "id") Integer id) {
