@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +27,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.UtilConfiguration;
 import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
-import br.com.goodmann.contabilidadeapi.enums.MesesAbreviadosEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.model.SubLancamento;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
+import br.com.goodmann.contabilidadeapi.repository.SubLancamentoRepository;
 import javassist.NotFoundException;
 
 @Service
@@ -47,6 +50,9 @@ public class ArquivoService {
 
 	@Autowired
 	protected LancamentoRepository lancamentoRepository;
+
+	@Autowired
+	protected SubLancamentoRepository subLancamentoRepository;
 
 	@Autowired
 	private LancamentoService lancamentoService;
@@ -60,8 +66,8 @@ public class ArquivoService {
 	@Autowired
 	private BradescoService bradescoService;
 
-	protected SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	protected SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
+	@Autowired
+	protected UtilConfiguration util;
 
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
@@ -88,12 +94,6 @@ public class ArquivoService {
 		if (!conta.get().getBanco().getCarga())
 			throw new NotFoundException("Este banco não possui carga de arquivo");
 
-		// carga c6
-		if ("336".equals(conta.get().getBanco().getCodigo())) {
-			this.deleteAllLancamentos(conta.get(), planilha.get());
-			mapa = this.cargaArquivoC6(conta.get(), planilha.get(), multipartFile);
-		}
-
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
 			mapa = this.bradescoService.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
@@ -104,7 +104,7 @@ public class ArquivoService {
 		if ("479".equals(conta.get().getBanco().getCodigo())) {
 			mapa = this.cargaArquivoItau(conta.get(), planilha.get(), multipartFile);
 		}
-
+		
 		return mapa;
 	}
 
@@ -117,39 +117,50 @@ public class ArquivoService {
 		this.lancamentoRepository.deleteAll(list);
 	}
 
-	private Map<String, Object> cargaArquivoC6(Conta conta, Planilha planilha, MultipartFile multipartFile)
+	/**
+	 * Le arquivo CSV do C6, faz o lancamento principal na conta a qual pagou a
+	 * fatura e insere os sublancamentos (itens da fatura)
+	 * 
+	 * @param conta         - Conta do Lancamento principal
+	 * @param planilha      - Planilha do lancamento principal
+	 * @param multipartFile - Arquivo onde cada linha se transformara em
+	 *                      sublancamento
+	 * @return Mapa com resumo dos lancamentos
+	 * @throws ParseException
+	 * @throws IOException
+	 */
+	@Transactional
+	public Map<String, Object> cargaArquivoC6(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
 		List<String> lines = this.readLines(multipartFile);
 
-		for (String line : lines) {
+		Lancamento lancamento = new Lancamento();
+		lancamento.setConta(conta);
+		lancamento.setPlanilha(planilha);
+		lancamento.setDescricao("Fatura C6");
+		lancamento.setValor(BigDecimal.ZERO);
+		lancamento.setData(new Date());
 
-			line = line.replaceAll("\\.", "").replaceAll("\\,", ".");
-			String dia = line.substring(0, 2);
-			String mes = "";
+		this.lancamentoRepository.save(lancamento);
+		BigDecimal total = BigDecimal.ZERO;
 
-			int i = MesesAbreviadosEnum.valueOf(line.substring(3, 6).toUpperCase()).ordinal() + 1;
-			if (i < 10)
-				mes = "0" + i;
-			else
-				mes = String.valueOf(i);
-			String data = dia + "/" + mes + "/" + planilha.getAno();
+		for (int i = 1; i < lines.size(); i++) {
 
-			String[] vet = line.split(" ");
-			String valor = (vet[vet.length - 1]);
+			String[] vet = lines.get(i).split(";");
 
-			String descricao = line.substring(7).replace(valor, "");
+			SubLancamento sub = new SubLancamento();
+			sub.setLancamento(lancamento);
+			sub.setData(this.util.dateUtil().parseToDate(vet[0]));
+			sub.setDescricao(vet[4]);
+			sub.setValor(new BigDecimal(vet[8]));
+			this.subLancamentoRepository.save(sub);
 
-			Lancamento lancamento = new Lancamento();
-			lancamento.setConta(conta);
-			lancamento.setPlanilha(planilha);
-			lancamento.setDescricao(descricao);
-			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor) * (-1)));
-			lancamento.setData(this.sdf.parse(data));
-
-			this.lancamentoRepository.save(lancamento);
-
+			total = total.add(sub.getValor());
 		}
+
+		lancamento.setValor(total);
+		this.lancamentoRepository.save(lancamento);
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
 		mapa.put("idConta", conta.getId());
@@ -183,7 +194,7 @@ public class ArquivoService {
 				Lancamento lancamento = new Lancamento();
 				lancamento.setConta(conta);
 				try {
-					lancamento.setData(this.sdf.parse(vet[0]));
+					lancamento.setData(this.util.dateUtil().parseToDate(vet[0]));
 				} catch (ParseException e) {
 					throw new RuntimeException("ERROR parsing the value: " + valor);
 				}

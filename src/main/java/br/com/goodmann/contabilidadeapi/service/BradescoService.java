@@ -34,7 +34,7 @@ public class BradescoService extends ArquivoService {
 
 			String[] vet = lines.get(i).split(";");
 			try {
-				data = super.sdf2.parse(vet[0]);
+				data = super.util.dateUtil().parseToDateReduced(vet[0]);
 				ret.add(lines.get(i).concat(lines.get(i + 1)));
 			} catch (ParseException e) {
 				continue;
@@ -58,7 +58,7 @@ public class BradescoService extends ArquivoService {
 
 				Date data;
 				try {
-					data = super.sdf2.parse(vet[0]);
+					data = super.util.dateUtil().parseToDateReduced(vet[0]);
 				} catch (Exception e) {
 					continue;
 				}

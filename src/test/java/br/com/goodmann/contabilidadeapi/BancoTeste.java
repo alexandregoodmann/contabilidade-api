@@ -17,6 +17,13 @@ import br.com.goodmann.contabilidadeapi.model.Banco;
 import br.com.goodmann.contabilidadeapi.repository.BancoRepository;
 import br.com.goodmann.contabilidadeapi.service.ArquivoService;
 
+/**
+ * Usado para testar a carga de bancos registrados na base do banco central e
+ * popular a tabela de Bancos
+ * 
+ * @author root
+ *
+ */
 @SpringBootTest
 public class BancoTeste {
 

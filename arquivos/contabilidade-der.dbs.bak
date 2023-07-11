@@ -42,28 +42,6 @@
 			<column name="next_val" type="BIGINT" jt="-5" />
 			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
 		</table>
-		<table name="item_lancamento" spec="" >
-			<column name="id" type="INT" jt="4" mandatory="y" />
-			<column name="id_lancamento" type="INT" jt="4" mandatory="y" />
-			<column name="id_categoria" type="INT" jt="4" mandatory="y" />
-			<column name="data" type="DATETIME" length="6" jt="93" mandatory="y" />
-			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
-			<column name="valor" type="DECIMAL" length="19" decimal="2" jt="3" mandatory="y" />
-			<column name="hash" type="VARCHAR" length="255" jt="12" />
-			<index name="pk_item_lancamento" unique="PRIMARY_KEY" >
-				<column name="id" />
-			</index>
-			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
-				<column name="id_categoria" />
-			</index>
-			<fk name="fk_item_lancamento_categoria" to_schema="contabilidade-dev" to_table="categoria" >
-				<fk_column name="id_categoria" pk="id" />
-			</fk>
-			<fk name="fk_item_lancamento_lancamento" to_schema="contabilidade-dev" to_table="lancamento" delete_action="cascade" >
-				<fk_column name="id_lancamento" pk="id" />
-			</fk>
-			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
-		</table>
 		<table name="lancamento" row_count="982" spec="" >
 			<column name="id" type="INT" jt="4" mandatory="y" />
 			<column name="concluido" type="BOOLEAN" length="1" jt="16" />
@@ -140,6 +118,31 @@
 			</index>
 			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
 		</table>
+		<table name="sublancamento" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="data" type="DATETIME" length="6" jt="93" mandatory="y" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<column name="valor" type="DECIMAL" length="19" decimal="2" jt="3" mandatory="y" />
+			<column name="id_categoria" type="INT" jt="4" mandatory="y" />
+			<column name="hash" type="VARCHAR" length="255" jt="12" />
+			<column name="id_lancamento" type="INT" jt="4" mandatory="y" />
+			<index name="pk_sublancamento" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
+				<column name="id_categoria" />
+			</index>
+			<index name="fk_item_lancamento_lancamento" unique="NORMAL" >
+				<column name="id_lancamento" />
+			</index>
+			<fk name="fk_item_lancamento_categoria" to_schema="contabilidade-dev" to_table="categoria" >
+				<fk_column name="id_categoria" pk="id" />
+			</fk>
+			<fk name="fk_item_lancamento_lancamento_0" to_schema="contabilidade-dev" to_table="lancamento" delete_action="cascade" >
+				<fk_column name="id_lancamento" pk="id" />
+			</fk>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
 	</schema>
 	<connector name="MySql" database="MySql" driver_class="com.mysql.cj.jdbc.Driver" driver_jar="mysql-connector-j-8.0.32.jar" driver_desc="Standard" host="10.5.0.5" port="3306" instance="contabilidade-dev" user="root" passwd="ZXhhbXBsZQ==" useSystemProxy="false" />
 	<layout name="Main Layout" id="Layout-17e1" show_relation="columns" >
@@ -147,10 +150,10 @@
 		<entity schema="contabilidade-dev" name="categoria" color="BED3F4" x="48" y="432" />
 		<entity schema="contabilidade-dev" name="conta" color="BED3F4" x="304" y="80" />
 		<entity schema="contabilidade-dev" name="hibernate_sequence" color="3986C1" x="784" y="80" />
-		<entity schema="contabilidade-dev" name="item_lancamento" color="3986C1" x="352" y="320" />
 		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="80" />
 		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="288" y="576" />
 		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="544" y="416" />
+		<entity schema="contabilidade-dev" name="sublancamento" color="3986C1" x="384" y="240" />
 		<group name="lancamento" color="ECF0F7" >
 			<entity schema="contabilidade-dev" name="conta" />
 			<entity schema="contabilidade-dev" name="categoria" />
@@ -168,7 +171,7 @@
 		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="48" />
 		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="688" y="400" />
 		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="400" y="400" />
-		<script name="SQL Editor" id="Editor-22ef" language="SQL" >
+		<script name="SQL Editor" id="Editor-ef9" language="SQL" >
 			<string><![CDATA[SELECT
 	id, concluido, data, descricao, fixo, numero_bradesco, valor, id_categoria, id_conta, id_planilha, tipo, id_conta_cartao, 
 	hash
@@ -223,16 +226,16 @@ FROM
 						<var name="id" type="4" />
 						<var name="concluido" type="16" />
 						<var name="data" type="93" />
-						<var name="descricao" />
+						<var name="descricao" type="-1" />
 						<var name="fixo" type="16" />
-						<var name="numero_bradesco" />
+						<var name="numero_bradesco" type="-1" />
 						<var name="valor" type="3" />
 						<var name="id_categoria" type="4" />
 						<var name="id_conta" type="4" />
 						<var name="id_planilha" type="4" />
-						<var name="tipo" />
+						<var name="tipo" type="-1" />
 						<var name="id_conta_cartao" type="4" />
-						<var name="hash" />
+						<var name="hash" type="-1" />
 						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
 					</form_script>
 					<param name="i0" value="descricao" />
@@ -246,16 +249,16 @@ FROM
 						<var name="id" type="4" />
 						<var name="concluido" type="16" />
 						<var name="data" type="93" />
-						<var name="descricao" />
+						<var name="descricao" type="-1" />
 						<var name="fixo" type="16" />
-						<var name="numero_bradesco" />
+						<var name="numero_bradesco" type="-1" />
 						<var name="valor" type="3" />
 						<var name="id_categoria" type="4" />
 						<var name="id_conta" type="4" />
 						<var name="id_planilha" type="4" />
-						<var name="tipo" />
+						<var name="tipo" type="-1" />
 						<var name="id_conta_cartao" type="4" />
-						<var name="hash" />
+						<var name="hash" type="-1" />
 						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
 					</form_script>
 					<cell type="label" name="id" pos="0,0,0,0,c,c" />
