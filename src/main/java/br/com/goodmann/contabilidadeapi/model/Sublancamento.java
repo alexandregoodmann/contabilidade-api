@@ -10,23 +10,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@Entity
-@ToString
-public class SubLancamento {
+@Entity(name = "sublancamento")
+@Table(name = "sub_lancamento")
+public class Sublancamento {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	
+
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "idCategoria", nullable = true)
 	private Categoria categoria;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "idlancamento", nullable = false)
 	private Lancamento lancamento;

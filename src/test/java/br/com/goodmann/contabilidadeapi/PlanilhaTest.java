@@ -62,9 +62,23 @@ public class PlanilhaTest {
 		filtrada.forEach(System.out::println);
 	}
 
-	@Test
+	// @Test
 	public void processarPlanilhasTest() throws ParseException {
 		this.planilhaService.processarPlanilhas();
+	}
+
+	@Test
+	public void getExtratoTest() {
+		Planilha p = this.planilhaRepository.findByAnoAndMes(Short.valueOf("2023"), Short.valueOf("7"));
+		this.planilhaService.getExtrato(p.getId()).forEach(e -> {
+			e.getLancamentos().forEach(l -> {
+				if (l.getSublancamentos().size() > 0) {
+					System.out.println("++++++++++++++++++++++++++++++++++++++++++" + l.getSublancamentos().size());
+				} else {
+					System.out.println(">>>>>>>>>>>>>>> vazio");
+				}
+			});
+		});
 	}
 
 }

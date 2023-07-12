@@ -102,7 +102,9 @@ public class PlanilhaService {
 	}
 
 	public List<ExtratoDTO> getExtrato(Integer idPlanilha) {
+		
 		Map<Conta, List<Lancamento>> mapa = new HashMap<Conta, List<Lancamento>>();
+		
 		this.lancamentoRepository.findAllByIdPlanilha(idPlanilha).forEach(lancamento -> {
 			List<Lancamento> temp = new ArrayList<Lancamento>();
 			if (!mapa.containsKey(lancamento.getConta())) {
@@ -129,6 +131,7 @@ public class PlanilhaService {
 				lancamentoDTO.setFixo(lancamento.getFixo());
 				lancamentoDTO.setId(lancamento.getId());
 				lancamentoDTO.setValor(lancamento.getValor());
+				//lancamentoDTO.setSublancamentos(lancamento.getSublancamentos());
 				contaDTO.getLancamentos().add(lancamentoDTO);
 				contaDTO.setSaldoPrevisto(contaDTO.getSaldoPrevisto().add(lancamento.getValor()));
 				if (lancamento.getConcluido() != null && lancamento.getConcluido() == true)

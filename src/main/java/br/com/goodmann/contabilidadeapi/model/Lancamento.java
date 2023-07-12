@@ -16,11 +16,9 @@ import javax.persistence.Transient;
 
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 @Entity
-@ToString
 public class Lancamento {
 
 	@Id

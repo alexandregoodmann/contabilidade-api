@@ -118,49 +118,48 @@
 			</index>
 			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
 		</table>
-		<table name="sublancamento" spec="" >
+		<table name="sub_lancamento" spec="" >
 			<column name="id" type="INT" jt="4" mandatory="y" />
 			<column name="data" type="DATETIME" length="6" jt="93" mandatory="y" />
 			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
 			<column name="valor" type="DECIMAL" length="19" decimal="2" jt="3" mandatory="y" />
-			<column name="id_categoria" type="INT" jt="4" mandatory="y" />
-			<column name="hash" type="VARCHAR" length="255" jt="12" />
-			<column name="id_lancamento" type="INT" jt="4" mandatory="y" />
-			<index name="pk_sublancamento" unique="PRIMARY_KEY" >
+			<column name="id_categoria" type="INT" jt="4" />
+			<column name="idlancamento" type="INT" jt="4" mandatory="y" />
+			<index name="pk_sub_lancamento" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
-			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
+			<index name="FKid6bms7ggc95ueyjt4pkgb2vg" unique="NORMAL" >
 				<column name="id_categoria" />
 			</index>
-			<index name="fk_item_lancamento_lancamento" unique="NORMAL" >
-				<column name="id_lancamento" />
+			<index name="FK54u3cmtc84w0l1h7d5ptwu8pj" unique="NORMAL" >
+				<column name="idlancamento" />
 			</index>
-			<fk name="fk_item_lancamento_categoria" to_schema="contabilidade-dev" to_table="categoria" >
-				<fk_column name="id_categoria" pk="id" />
+			<fk name="fk54u3cmtc84w0l1h7d5ptwu8pj_0" to_schema="contabilidade-dev" to_table="lancamento" >
+				<fk_column name="idlancamento" pk="id" />
 			</fk>
-			<fk name="fk_item_lancamento_lancamento_0" to_schema="contabilidade-dev" to_table="lancamento" delete_action="cascade" >
-				<fk_column name="id_lancamento" pk="id" />
+			<fk name="fkid6bms7ggc95ueyjt4pkgb2vg_0" to_schema="contabilidade-dev" to_table="categoria" >
+				<fk_column name="id_categoria" pk="id" />
 			</fk>
 			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
 		</table>
 	</schema>
 	<connector name="MySql" database="MySql" driver_class="com.mysql.cj.jdbc.Driver" driver_jar="mysql-connector-j-8.0.32.jar" driver_desc="Standard" host="10.5.0.5" port="3306" instance="contabilidade-dev" user="root" passwd="ZXhhbXBsZQ==" useSystemProxy="false" />
 	<layout name="Main Layout" id="Layout-17e1" show_relation="columns" >
-		<entity schema="contabilidade-dev" name="banco" color="BED3F4" x="512" y="80" />
-		<entity schema="contabilidade-dev" name="categoria" color="BED3F4" x="48" y="432" />
-		<entity schema="contabilidade-dev" name="conta" color="BED3F4" x="304" y="80" />
-		<entity schema="contabilidade-dev" name="hibernate_sequence" color="3986C1" x="784" y="80" />
-		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="80" />
-		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="288" y="576" />
-		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="544" y="416" />
-		<entity schema="contabilidade-dev" name="sublancamento" color="3986C1" x="384" y="240" />
+		<entity schema="contabilidade-dev" name="banco" color="BED3F4" x="736" y="160" />
+		<entity schema="contabilidade-dev" name="categoria" color="BED3F4" x="112" y="560" />
+		<entity schema="contabilidade-dev" name="conta" color="BED3F4" x="576" y="160" />
+		<entity schema="contabilidade-dev" name="hibernate_sequence" color="3986C1" x="704" y="384" />
+		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="336" y="288" />
+		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="352" y="656" />
+		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="608" y="496" />
+		<entity schema="contabilidade-dev" name="sub_lancamento" color="3986C1" x="48" y="80" />
 		<group name="lancamento" color="ECF0F7" >
-			<entity schema="contabilidade-dev" name="conta" />
-			<entity schema="contabilidade-dev" name="categoria" />
-			<entity schema="contabilidade-dev" name="banco" />
 			<entity schema="contabilidade-dev" name="planilha" />
 			<entity schema="contabilidade-dev" name="limite_gastos" />
+			<entity schema="contabilidade-dev" name="banco" />
 			<entity schema="contabilidade-dev" name="lancamento" />
+			<entity schema="contabilidade-dev" name="conta" />
+			<entity schema="contabilidade-dev" name="categoria" />
 		</group>
 	</layout>
 	<layout name="~Layout with Sample Tools" id="Layout-473" show_column_type="y" show_relation="columns" >

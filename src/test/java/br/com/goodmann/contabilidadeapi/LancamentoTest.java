@@ -3,7 +3,6 @@ package br.com.goodmann.contabilidadeapi;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -38,7 +37,7 @@ public class LancamentoTest {
 		this.lancamentoRepository.save(model);
 	}
 
-	//@Test
+	// @Test
 	public void criarFatura() {
 
 		Planilha planilha = new Planilha();

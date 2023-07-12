@@ -35,11 +35,11 @@ import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
-import br.com.goodmann.contabilidadeapi.model.SubLancamento;
+import br.com.goodmann.contabilidadeapi.model.Sublancamento;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
-import br.com.goodmann.contabilidadeapi.repository.SubLancamentoRepository;
+import br.com.goodmann.contabilidadeapi.repository.SublancamentoRepository;
 import javassist.NotFoundException;
 
 @Service
@@ -52,7 +52,7 @@ public class ArquivoService {
 	protected LancamentoRepository lancamentoRepository;
 
 	@Autowired
-	protected SubLancamentoRepository subLancamentoRepository;
+	protected SublancamentoRepository subLancamentoRepository;
 
 	@Autowired
 	private LancamentoService lancamentoService;
@@ -149,7 +149,7 @@ public class ArquivoService {
 
 			String[] vet = lines.get(i).split(";");
 
-			SubLancamento sub = new SubLancamento();
+			Sublancamento sub = new Sublancamento();
 			sub.setLancamento(lancamento);
 			sub.setData(this.util.dateUtil().parseToDate(vet[0]));
 			sub.setDescricao(vet[4]);
