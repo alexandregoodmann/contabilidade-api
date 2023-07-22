@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="MySql" id="Project-8a3" database="MySql" >
+	<schema name="contabilidade-dev" >
+		<table name="banco" row_count="335" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="carga" type="BOOLEAN" length="1" jt="16" />
+			<column name="codigo" type="VARCHAR" length="255" jt="12" />
+			<column name="ispb" type="VARCHAR" length="255" jt="12" />
+			<column name="nome_extenso" type="VARCHAR" length="255" jt="12" />
+			<column name="nome_reduzido" type="VARCHAR" length="255" jt="12" />
+			<index name="pk_banco" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="categoria" row_count="10" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="analisar" type="BOOLEAN" length="1" jt="16" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<index name="pk_categoria" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="conta" row_count="6" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<column name="id_banco" type="INT" jt="4" mandatory="y" />
+			<column name="tipo" type="VARCHAR" length="50" jt="12" />
+			<index name="pk_conta" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="FKcu48crbc0neq2ledttx0p5x1a" unique="NORMAL" >
+				<column name="id_banco" />
+			</index>
+			<fk name="FKcu48crbc0neq2ledttx0p5x1a" to_schema="contabilidade-dev" to_table="banco" options="" >
+				<fk_column name="id_banco" pk="id" />
+			</fk>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="hibernate_sequence" row_count="5" spec="" >
+			<column name="next_val" type="BIGINT" jt="-5" />
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="item_lancamento" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="id_lancamento" type="INT" jt="4" mandatory="y" />
+			<column name="id_categoria" type="INT" jt="4" mandatory="y" />
+			<column name="data" type="DATETIME" length="6" jt="93" mandatory="y" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<column name="valor" type="DECIMAL" length="19" decimal="2" jt="3" mandatory="y" />
+			<column name="hash" type="VARCHAR" length="255" jt="12" />
+			<index name="pk_item_lancamento" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
+				<column name="id_categoria" />
+			</index>
+			<index name="fk_item_lancamento_lancamento" unique="NORMAL" >
+				<column name="id_lancamento" />
+			</index>
+			<fk name="fk_item_lancamento_categoria" to_schema="contabilidade-dev" to_table="categoria" >
+				<fk_column name="id_categoria" pk="id" />
+			</fk>
+			<fk name="fk_item_lancamento_lancamento" to_schema="contabilidade-dev" to_table="lancamento" delete_action="cascade" >
+				<fk_column name="id_lancamento" pk="id" />
+			</fk>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="lancamento" row_count="982" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="concluido" type="BOOLEAN" length="1" jt="16" />
+			<column name="data" type="DATETIME" length="6" jt="93" mandatory="y" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<column name="fixo" type="BOOLEAN" length="1" jt="16" />
+			<column name="numero_bradesco" type="VARCHAR" length="255" jt="12" />
+			<column name="valor" type="DECIMAL" length="19" decimal="2" jt="3" mandatory="y" />
+			<column name="id_categoria" type="INT" jt="4" />
+			<column name="id_conta" type="INT" jt="4" mandatory="y" />
+			<column name="id_planilha" type="INT" jt="4" mandatory="y" />
+			<column name="tipo" type="VARCHAR" length="50" jt="12" />
+			<column name="id_conta_cartao" type="INT" jt="4" />
+			<column name="hash" type="VARCHAR" length="255" jt="12" />
+			<index name="pk_lancamento" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
+				<column name="id_categoria" />
+			</index>
+			<index name="FKtdlpcnlxjl048mkkrxu92engo" unique="NORMAL" >
+				<column name="id_conta" />
+			</index>
+			<index name="FKi8mx6xn6npvgpuhsef253x7eo" unique="NORMAL" >
+				<column name="id_planilha" />
+			</index>
+			<index name="FK76mkkwgp6pceuxc8c7p5e3ve0" unique="NORMAL" >
+				<column name="id_conta_cartao" />
+			</index>
+			<fk name="FK76mkkwgp6pceuxc8c7p5e3ve0" to_schema="contabilidade-dev" to_table="conta" options="" >
+				<fk_column name="id_conta_cartao" pk="id" />
+			</fk>
+			<fk name="FKi8mx6xn6npvgpuhsef253x7eo" to_schema="contabilidade-dev" to_table="planilha" options="" >
+				<fk_column name="id_planilha" pk="id" />
+			</fk>
+			<fk name="FKr651pitjvnxinfpcgbd9g71sf" to_schema="contabilidade-dev" to_table="categoria" options="" >
+				<fk_column name="id_categoria" pk="id" />
+			</fk>
+			<fk name="FKtdlpcnlxjl048mkkrxu92engo" to_schema="contabilidade-dev" to_table="conta" options="" >
+				<fk_column name="id_conta" pk="id" />
+			</fk>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="limite_gastos" row_count="42" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="limite" type="DECIMAL" length="19" decimal="2" jt="3" />
+			<column name="id_categoria" type="INT" jt="4" mandatory="y" />
+			<column name="id_planilha" type="INT" jt="4" mandatory="y" />
+			<index name="pk_limite_gastos" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="FKknf6jvt4iahbqjievi6su6g45" unique="NORMAL" >
+				<column name="id_categoria" />
+			</index>
+			<index name="FKkc3ukmg5a3mpjm04bk641shy6" unique="NORMAL" >
+				<column name="id_planilha" />
+			</index>
+			<fk name="FKkc3ukmg5a3mpjm04bk641shy6" to_schema="contabilidade-dev" to_table="planilha" options="" >
+				<fk_column name="id_planilha" pk="id" />
+			</fk>
+			<fk name="FKknf6jvt4iahbqjievi6su6g45" to_schema="contabilidade-dev" to_table="categoria" options="" >
+				<fk_column name="id_categoria" pk="id" />
+			</fk>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+		<table name="planilha" row_count="13" spec="" >
+			<column name="id" type="INT" jt="4" mandatory="y" />
+			<column name="ano" type="SMALLINT" jt="5" mandatory="y" />
+			<column name="descricao" type="VARCHAR" length="50" jt="12" mandatory="y" />
+			<column name="mes" type="SMALLINT" jt="5" mandatory="y" />
+			<column name="criacao" type="DATE" jt="91" />
+			<index name="pk_planilha" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<options><![CDATA[ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci]]></options>
+		</table>
+	</schema>
+	<connector name="MySql" database="MySql" driver_class="com.mysql.cj.jdbc.Driver" driver_jar="mysql-connector-j-8.0.32.jar" driver_desc="Standard" host="10.5.0.5" port="3306" instance="contabilidade-dev" user="root" passwd="ZXhhbXBsZQ==" useSystemProxy="false" />
+	<layout name="Main Layout" id="Layout-17e1" show_relation="columns" >
+		<entity schema="contabilidade-dev" name="banco" color="BED3F4" x="512" y="80" />
+		<entity schema="contabilidade-dev" name="categoria" color="BED3F4" x="48" y="432" />
+		<entity schema="contabilidade-dev" name="conta" color="BED3F4" x="304" y="80" />
+		<entity schema="contabilidade-dev" name="hibernate_sequence" color="3986C1" x="784" y="80" />
+		<entity schema="contabilidade-dev" name="item_lancamento" color="3986C1" x="352" y="320" />
+		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="80" />
+		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="288" y="576" />
+		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="544" y="416" />
+		<group name="lancamento" color="ECF0F7" >
+			<entity schema="contabilidade-dev" name="conta" />
+			<entity schema="contabilidade-dev" name="categoria" />
+			<entity schema="contabilidade-dev" name="banco" />
+			<entity schema="contabilidade-dev" name="planilha" />
+			<entity schema="contabilidade-dev" name="limite_gastos" />
+			<entity schema="contabilidade-dev" name="lancamento" />
+		</group>
+	</layout>
+	<layout name="~Layout with Sample Tools" id="Layout-473" show_column_type="y" show_relation="columns" >
+		<entity schema="contabilidade-dev" name="banco" color="BED3F4" x="688" y="48" />
+		<entity schema="contabilidade-dev" name="categoria" color="BED3F4" x="48" y="400" />
+		<entity schema="contabilidade-dev" name="conta" color="BED3F4" x="400" y="48" />
+		<entity schema="contabilidade-dev" name="hibernate_sequence" color="3986C1" x="1056" y="48" />
+		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="48" />
+		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="688" y="400" />
+		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="400" y="400" />
+		<script name="SQL Editor" id="Editor-ef9" language="SQL" >
+			<string><![CDATA[SELECT
+	id, concluido, data, descricao, fixo, numero_bradesco, valor, id_categoria, id_conta, id_planilha, tipo, id_conta_cartao, 
+	hash
+FROM
+	`contabilidade-dev`.lancamento o;]]></string>
+		</script>
+		<browser id="Browse-847" name="Relational Data Explorer" confirm_updates="y" >
+			<browse_table schema="contabilidade-dev" entity="lancamento" x="20" y="20" width="400" height="300" >
+				<browse_table schema="contabilidade-dev" entity="conta" fk="FK76mkkwgp6pceuxc8c7p5e3ve0" x="440" y="20" width="500" height="350" record_view="y" >
+					<browse_table schema="contabilidade-dev" entity="banco" fk="FKcu48crbc0neq2ledttx0p5x1a" x="960" y="20" width="500" height="350" record_view="y" />
+				</browse_table>
+			</browse_table>
+		</browser>
+		<query id="Query-178e" name="Query Builder" >
+			<query_table schema="contabilidade-dev" name="lancamento" alias="l" x="48" y="48" >
+				<column name="id" />
+				<column name="concluido" />
+				<column name="data" />
+				<column name="descricao" />
+				<column name="fixo" />
+				<column name="numero_bradesco" />
+				<column name="valor" />
+				<column name="id_categoria" />
+				<column name="id_conta" />
+				<column name="id_planilha" />
+				<column name="tipo" />
+				<column name="id_conta_cartao" />
+				<column name="hash" />
+				<query_table schema="contabilidade-dev" name="conta" alias="c" x="304" y="48" fk="FK76mkkwgp6pceuxc8c7p5e3ve0" type="Inner Join" >
+					<column name="id" />
+					<column name="descricao" />
+					<column name="id_banco" />
+					<column name="tipo" />
+					<query_table schema="contabilidade-dev" name="banco" alias="b" x="512" y="48" fk="FKcu48crbc0neq2ledttx0p5x1a" type="Inner Join" >
+						<column name="id" />
+						<column name="carga" />
+						<column name="codigo" />
+						<column name="ispb" />
+						<column name="nome_extenso" />
+						<column name="nome_reduzido" />
+					</query_table>
+				</query_table>
+			</query_table>
+		</query>
+		<form name="Report" id="Report-1910" template="Page" css="container-fluid" view="frame" >
+			<var name="samplePageNumber" type="4" value="0" mandatory="n" />
+			<var name="sampleRecordsPerPage" type="4" value="100" mandatory="n" />
+			<body name="Body" template="Grid" pos="0,0,0,0,f,f" layout="{{-2,-2,-2,-2,-1},{-2,-2,-2,-2}}" scroll="n" html="n" >
+				<cell type="label" name="Lancamento Data" template="H3" pos="0,0,1,0,l,c" />
+				<cell type="chart" name="Pie" template="Pie" pos="0,1,4,1,l,c" max_records="20" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="id" type="4" />
+						<var name="concluido" type="16" />
+						<var name="data" type="93" />
+						<var name="descricao" />
+						<var name="fixo" type="16" />
+						<var name="numero_bradesco" />
+						<var name="valor" type="3" />
+						<var name="id_categoria" type="4" />
+						<var name="id_conta" type="4" />
+						<var name="id_planilha" type="4" />
+						<var name="tipo" />
+						<var name="id_conta_cartao" type="4" />
+						<var name="hash" />
+						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
+					</form_script>
+					<param name="i0" value="descricao" />
+					<param name="width" value="100%" />
+					<param name="v0" value="id_planilha" />
+					<param name="title" value="Sample Chart" />
+					<param name="height" value="400px" />
+				</cell>
+				<tableview name="sample" template="Table" css="table table-striped table-sm table-hover" pos="0,2,4,2,f,f" layout="{{-2,-2,-2,-2,-2,-2,-2},{-2,-2}}" scroll="n" html="n" header_rows="1" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="id" type="4" />
+						<var name="concluido" type="16" />
+						<var name="data" type="93" />
+						<var name="descricao" />
+						<var name="fixo" type="16" />
+						<var name="numero_bradesco" />
+						<var name="valor" type="3" />
+						<var name="id_categoria" type="4" />
+						<var name="id_conta" type="4" />
+						<var name="id_planilha" type="4" />
+						<var name="tipo" />
+						<var name="id_conta_cartao" type="4" />
+						<var name="hash" />
+						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
+					</form_script>
+					<cell type="label" name="id" pos="0,0,0,0,c,c" />
+					<cell type="label" name="concluido" pos="1,0,1,0,c,c" />
+					<cell type="label" name="data" pos="2,0,2,0,c,c" />
+					<cell type="label" name="descricao" pos="3,0,3,0,c,c" />
+					<cell type="label" name="fixo" pos="4,0,4,0,c,c" />
+					<cell type="label" name="numero_bradesco" pos="5,0,5,0,c,c" />
+					<cell type="label" name="Button can open other pages." pos="6,0,6,0,c,c" />
+					<cell type="label" name="${id}" template="Plain" pos="0,1,0,1,l,c" />
+					<cell type="label" name="${concluido}" template="Plain" pos="1,1,1,1,l,c" />
+					<cell type="label" name="${data}" template="Plain" pos="2,1,2,1,l,c" />
+					<cell type="label" name="${descricao}" template="Plain" pos="3,1,3,1,l,c" />
+					<cell type="label" name="${fixo}" template="Plain" pos="4,1,4,1,l,c" />
+					<cell type="label" name="${numero_bradesco}" template="Plain" pos="5,1,5,1,l,c" />
+					<cell type="button" name="More" template="Plain" css="btn btn-sm btn-secondary" pos="6,1,6,1,c,c" ref_id="Report-1910" />
+				</tableview>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="0,3,0,3,l,c" glyph="bi-chevron_double_left" ref_id="Report-1910" >
+					<var name="samplePageNumber" value="0" />
+				</cell>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="1,3,1,3,l,c" glyph="bi-chevron_left" ref_id="Report-1910" >
+					<var name="samplePageNumber" value="${Math.max(0,samplePageNumber-1)}" />
+				</cell>
+				<cell type="label" name="Page ${samplePageNumber+1}" pos="2,3,2,3,l,c" />
+				<cell type="href" name="" disabled="${!sampleHasNextPage}" pos="3,3,3,3,l,c" glyph="bi-chevron_right" ref_id="Report-1910" >
+					<var name="samplePageNumber" value="${( samplePageNumber+1 )}" />
+				</cell>
+			</body>
+		</form>
+	</layout>
+</project>

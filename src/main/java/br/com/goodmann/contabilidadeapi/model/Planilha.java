@@ -41,6 +41,5 @@ public class Planilha {
 	List<Lancamento> lancamentos;
 
 	@JsonIgnore
-	@Transient
-	LocalDate criacao;
+	private LocalDate criacao;
 }

@@ -1,8 +1,10 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +39,9 @@ import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
 public class PlanilhaService {
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
@@ -141,7 +149,7 @@ public class PlanilhaService {
 	}
 
 	@Transactional
-	public void duplicarPlanilha(Integer idPlanilha) throws ParseException {
+	public Planilha duplicarPlanilha(Integer idPlanilha) throws ParseException {
 
 		Planilha atual = this.planilhaRepository.findById(idPlanilha).get();
 		Planilha proxima = this.criarProximaPlanilha(atual);
@@ -170,6 +178,7 @@ public class PlanilhaService {
 			this.lancamentoService.atualizaSaldo(atual, conta);
 		});
 
+		return proxima;
 	}
 
 	private void duplicarLimites(Planilha atual, Planilha proxima) {
@@ -182,4 +191,31 @@ public class PlanilhaService {
 		});
 	}
 
+	@Transactional
+	public void processarPlanilhas() throws ParseException {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date hoje = new Date();
+		String data = sdf.format(hoje);
+
+		this.lancamentoRepository.deleteLancamentosByCriacaoPlanilha(data);
+		this.gastosRepository.deleteLimiteGastosCriacaoPlanilha(data);
+		this.planilhaRepository.deletePlanilhaByCriacaoPlanilha(data);
+
+		String ano = data.substring(0, 4);
+		String mes = data.substring(5, 7);
+
+		Planilha atual = this.planilhaRepository.findByAnoAndMes(Short.valueOf(ano), Short.valueOf(mes));
+
+		Integer idAtual = atual.getId();
+		for (int i = 0; i < 12; i++) {
+			Planilha proxima = duplicarPlanilha(idAtual);
+			idAtual = proxima.getId();
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println(Calendar.getInstance().get(Calendar.YEAR));
+		System.out.println(Calendar.getInstance().get(Calendar.MONTH + 1));
+	}
 }

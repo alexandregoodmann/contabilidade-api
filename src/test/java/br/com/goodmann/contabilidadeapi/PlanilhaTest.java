@@ -49,7 +49,7 @@ public class PlanilhaTest {
 		});
 	}
 
-	//@Test
+	// @Test
 	public void getPlanilhasFuturas() {
 		List<Planilha> planilhas = this.planilhaRepository.getPlanilhasFuturas((short) 2022);
 		planilhas.forEach(p -> {
@@ -61,4 +61,10 @@ public class PlanilhaTest {
 				.collect(Collectors.toList());
 		filtrada.forEach(System.out::println);
 	}
+
+	@Test
+	public void processarPlanilhasTest() throws ParseException {
+		this.planilhaService.processarPlanilhas();
+	}
+
 }
