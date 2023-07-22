@@ -226,16 +226,16 @@ FROM
 						<var name="id" type="4" />
 						<var name="concluido" type="16" />
 						<var name="data" type="93" />
-						<var name="descricao" />
+						<var name="descricao" type="-1" />
 						<var name="fixo" type="16" />
-						<var name="numero_bradesco" />
+						<var name="numero_bradesco" type="-1" />
 						<var name="valor" type="3" />
 						<var name="id_categoria" type="4" />
 						<var name="id_conta" type="4" />
 						<var name="id_planilha" type="4" />
-						<var name="tipo" />
+						<var name="tipo" type="-1" />
 						<var name="id_conta_cartao" type="4" />
-						<var name="hash" />
+						<var name="hash" type="-1" />
 						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
 					</form_script>
 					<param name="i0" value="descricao" />
@@ -249,16 +249,16 @@ FROM
 						<var name="id" type="4" />
 						<var name="concluido" type="16" />
 						<var name="data" type="93" />
-						<var name="descricao" />
+						<var name="descricao" type="-1" />
 						<var name="fixo" type="16" />
-						<var name="numero_bradesco" />
+						<var name="numero_bradesco" type="-1" />
 						<var name="valor" type="3" />
 						<var name="id_categoria" type="4" />
 						<var name="id_conta" type="4" />
 						<var name="id_planilha" type="4" />
-						<var name="tipo" />
+						<var name="tipo" type="-1" />
 						<var name="id_conta_cartao" type="4" />
-						<var name="hash" />
+						<var name="hash" type="-1" />
 						<script ><![CDATA[SELECT * FROM `contabilidade-dev`.lancamento]]></script>
 					</form_script>
 					<cell type="label" name="id" pos="0,0,0,0,c,c" />

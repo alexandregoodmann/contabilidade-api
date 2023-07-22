@@ -56,6 +56,9 @@
 			<index name="FKr651pitjvnxinfpcgbd9g71sf" unique="NORMAL" >
 				<column name="id_categoria" />
 			</index>
+			<index name="fk_item_lancamento_lancamento" unique="NORMAL" >
+				<column name="id_lancamento" />
+			</index>
 			<fk name="fk_item_lancamento_categoria" to_schema="contabilidade-dev" to_table="categoria" >
 				<fk_column name="id_categoria" pk="id" />
 			</fk>
@@ -168,7 +171,7 @@
 		<entity schema="contabilidade-dev" name="lancamento" color="BED3F4" x="48" y="48" />
 		<entity schema="contabilidade-dev" name="limite_gastos" color="BED3F4" x="688" y="400" />
 		<entity schema="contabilidade-dev" name="planilha" color="BED3F4" x="400" y="400" />
-		<script name="SQL Editor" id="Editor-22ef" language="SQL" >
+		<script name="SQL Editor" id="Editor-ef9" language="SQL" >
 			<string><![CDATA[SELECT
 	id, concluido, data, descricao, fixo, numero_bradesco, valor, id_categoria, id_conta, id_planilha, tipo, id_conta_cartao, 
 	hash
