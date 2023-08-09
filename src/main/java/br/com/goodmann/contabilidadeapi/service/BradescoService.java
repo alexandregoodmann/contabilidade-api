@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +35,7 @@ public class BradescoService extends ArquivoService {
 
 			String[] vet = lines.get(i).split(";");
 			try {
-				data = super.sdf2.parse(vet[0]);
+				data = DateUtils.parseDate(vet[0], "dd/MM/yy");
 				ret.add(lines.get(i).concat(lines.get(i + 1)));
 			} catch (ParseException e) {
 				continue;
@@ -58,7 +59,7 @@ public class BradescoService extends ArquivoService {
 
 				Date data;
 				try {
-					data = super.sdf2.parse(vet[0]);
+					data = DateUtils.parseDate(vet[0], "dd/MM/yy");
 				} catch (Exception e) {
 					continue;
 				}

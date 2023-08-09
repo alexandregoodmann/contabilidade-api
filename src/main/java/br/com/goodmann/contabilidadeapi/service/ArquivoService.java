@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.goodmann.contabilidadeapi.dto.AnaliseDTO;
-import br.com.goodmann.contabilidadeapi.enums.MesesAbreviadosEnum;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
@@ -59,9 +58,6 @@ public class ArquivoService {
 
 	@Autowired
 	private BradescoService bradescoService;
-
-	protected SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	protected SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
 
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
@@ -122,33 +118,16 @@ public class ArquivoService {
 
 		List<String> lines = this.readLines(multipartFile);
 
-		for (String line : lines) {
-
-			line = line.replaceAll("\\.", "").replaceAll("\\,", ".");
-			String dia = line.substring(0, 2);
-			String mes = "";
-
-			int i = MesesAbreviadosEnum.valueOf(line.substring(3, 6).toUpperCase()).ordinal() + 1;
-			if (i < 10)
-				mes = "0" + i;
-			else
-				mes = String.valueOf(i);
-			String data = dia + "/" + mes + "/" + planilha.getAno();
-
-			String[] vet = line.split(" ");
-			String valor = (vet[vet.length - 1]);
-
-			String descricao = line.substring(7).replace(valor, "");
-
+		for (int i = 1; i < lines.size(); i++) {
+			String[] vet = lines.get(i).split(";");
 			Lancamento lancamento = new Lancamento();
 			lancamento.setConta(conta);
 			lancamento.setPlanilha(planilha);
-			lancamento.setDescricao(descricao);
-			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor) * (-1)));
-			lancamento.setData(this.sdf.parse(data));
+			lancamento.setDescricao(vet[4]);
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(vet[8]) * (-1)));
+			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
 
 			this.lancamentoRepository.save(lancamento);
-
 		}
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
@@ -161,7 +140,7 @@ public class ArquivoService {
 	}
 
 	private Map<String, Object> cargaArquivoItau(Conta conta, Planilha planilha, MultipartFile multipartFile)
-			throws IOException {
+			throws IOException, ParseException {
 
 		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaAndConta(planilha, conta);
 
@@ -182,11 +161,7 @@ public class ArquivoService {
 
 				Lancamento lancamento = new Lancamento();
 				lancamento.setConta(conta);
-				try {
-					lancamento.setData(this.sdf.parse(vet[0]));
-				} catch (ParseException e) {
-					throw new RuntimeException("ERROR parsing the value: " + valor);
-				}
+				lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
 				lancamento.setDescricao(vet[1]);
 				lancamento.setPlanilha(planilha);
 				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
