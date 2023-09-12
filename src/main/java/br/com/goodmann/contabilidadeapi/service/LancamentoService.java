@@ -7,14 +7,12 @@ import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,61 +41,17 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento model) {
-		if (TipoLancamento.SERIE.equals(model.getTipo())) {
-			if (model.getId() == null)
-				this.criarSerie(model);
-			else
-				this.editarSerie(model);
-		} else {
-			this.lancamentoRepository.save(model);
-		}
+		this.lancamentoRepository.save(model);
 		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
 	}
 
-	private void editarSerie(Lancamento model) {
-		this.lancamentoRepository.findAllByHash(model.getHash()).forEach(lancamento -> {
-			lancamento.setConta(model.getConta());
-			lancamento.setCategoria(model.getCategoria());
-			lancamento.setDescricao(model.getDescricao());
-			lancamento.setValor(model.getValor());
-			lancamento.setFixo(model.getFixo());
-			lancamento.setConcluido(model.getConcluido());
-			lancamentoRepository.save(lancamento);
-		});
-	}
-
-	private void criarSerie(Lancamento model) {
-		List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(model.getPlanilha());
-		int vezes = (planilhas.size() < model.getRepetir() + 1) ? planilhas.size() : model.getRepetir() + 1;
-		String hash = this.hash();
-		for (int i = 0; i < vezes; i++) {
-			if (planilhas.get(i) != null) {
-				Lancamento l = new Lancamento();
-				BeanUtils.copyProperties(model, l, "id");
-				l.setPlanilha(planilhas.get(i));
-				l.setHash(hash);
-				this.lancamentoRepository.save(l);
-			}
-		}
-	}
-
 	@Transactional
 	public void delete(Integer id) {
-
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
-
 		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
 			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
-
-		if (lancamento.getHash() != null) {
-			this.lancamentoRepository.findAllByHash(lancamento.getHash()).forEach(e -> {
-				this.lancamentoRepository.deleteById(e.getId());
-			});
-		} else {
-			this.lancamentoRepository.deleteById(id);
-		}
-
+		this.lancamentoRepository.deleteById(id);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
 
@@ -161,33 +115,30 @@ public class LancamentoService {
 			List<Planilha> planilhas = this.getPlanilhaAtualAndFuturas(planilha);
 			for (int i = 0; i < planilhas.size(); i++) {
 				if (i + 1 < planilhas.size()) {
-					
+
 					Planilha atual = planilhas.get(i);
 					Planilha proxima = planilhas.get(i + 1);
 					BigDecimal saldoAtual = this.lancamentoRepository.findAllByPlanilhaAndConta(atual, conta).stream()
 							.map(e -> e.getValor()).reduce((a, b) -> a.add(b)).get();
-					
+
 					this.lancamentoRepository.findByPlanilhaContaTipo(proxima, conta, TipoLancamento.SALDO).stream()
-					.findFirst().ifPresentOrElse(e -> {
-						e.setValor(saldoAtual);
-						this.lancamentoRepository.save(e);
-					}, () -> {
-						Lancamento model = new Lancamento();
-						model.setConta(conta);
-						model.setData(java.sql.Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
-						model.setDescricao("Saldo Anterior");
-						model.setPlanilha(proxima);
-						model.setValor(saldoAtual);
-						model.setTipo(TipoLancamento.SALDO);
-						this.lancamentoRepository.save(model);
-					});
+							.findFirst().ifPresentOrElse(e -> {
+								e.setValor(saldoAtual);
+								this.lancamentoRepository.save(e);
+							}, () -> {
+								Lancamento model = new Lancamento();
+								model.setConta(conta);
+								model.setData(
+										java.sql.Date.valueOf(LocalDate.of(proxima.getAno(), proxima.getMes(), 1)));
+								model.setDescricao("Saldo Anterior");
+								model.setPlanilha(proxima);
+								model.setValor(saldoAtual);
+								model.setTipo(TipoLancamento.SALDO);
+								this.lancamentoRepository.save(model);
+							});
 				}
 			}
 		}
 	}
 
-	private String hash() {
-		byte[] a = new Date().toString().getBytes();
-		return a.toString().substring(3);
-	}
 }

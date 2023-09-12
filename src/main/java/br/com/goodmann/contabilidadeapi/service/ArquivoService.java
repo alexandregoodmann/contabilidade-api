@@ -123,9 +123,15 @@ public class ArquivoService {
 			Lancamento lancamento = new Lancamento();
 			lancamento.setConta(conta);
 			lancamento.setPlanilha(planilha);
-			lancamento.setDescricao(vet[4]);
 			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(vet[8]) * (-1)));
 			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
+
+			if (!"Única".equalsIgnoreCase(vet[5])) {
+				lancamento.setDescricao(vet[4] + " " + vet[5]);
+				lancamento.setParcelas(vet[5]);
+			} else {
+				lancamento.setDescricao(vet[4]);
+			}
 
 			this.lancamentoRepository.save(lancamento);
 		}

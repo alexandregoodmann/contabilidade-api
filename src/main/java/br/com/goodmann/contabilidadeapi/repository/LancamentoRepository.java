@@ -28,8 +28,6 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 
 	List<Lancamento> findByPlanilhaAndTipo(Planilha planilha, TipoLancamento tipo);
 
-	List<Lancamento> findAllByHash(String hash);
-
 	@Modifying
 	@Query(value = "delete from lancamento l where l.id_planilha in (select id from planilha where criacao > date(?1))", nativeQuery = true)
 	void deleteLancamentosByCriacaoPlanilha(String data);
