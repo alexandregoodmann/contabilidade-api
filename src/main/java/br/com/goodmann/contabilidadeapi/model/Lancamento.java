@@ -38,10 +38,6 @@ public class Lancamento {
 	@JoinColumn(name = "idPlanilha", nullable = false)
 	private Planilha planilha;
 
-	@ManyToOne(optional = true)
-	@JoinColumn(name = "idCategoria", nullable = true)
-	private Categoria categoria;
-
 	@Column(name = "data", nullable = false)
 	private Date data;
 
@@ -61,7 +57,7 @@ public class Lancamento {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo", length = 50)
 	private TipoLancamento tipo;
-	
+
 	private String parcelas;
 
 }

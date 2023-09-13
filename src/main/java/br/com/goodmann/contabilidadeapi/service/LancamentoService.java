@@ -4,14 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.rmi.NoSuchObjectException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +19,7 @@ import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
-import br.com.goodmann.contabilidadeapi.repository.CategoriaRepository;
+import br.com.goodmann.contabilidadeapi.repository.LabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
@@ -34,7 +30,7 @@ public class LancamentoService {
 	private LancamentoRepository lancamentoRepository;
 
 	@Autowired
-	private CategoriaRepository categoriaRepository;
+	private LabelRepository categoriaRepository;
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
@@ -84,18 +80,6 @@ public class LancamentoService {
 	public void fixo(List<Integer> ids) {
 		this.lancamentoRepository.findAllById(ids).forEach(lancamento -> {
 			lancamento.setFixo(true);
-			this.lancamentoRepository.save(lancamento);
-		});
-	}
-
-	public void categorizar(@NotEmpty List<Integer> ids, @NotNull Integer idCategoria) throws NoSuchObjectException {
-
-		var opt = this.categoriaRepository.findById(idCategoria);
-		if (!opt.isPresent())
-			throw new NoSuchObjectException("The idCategoria was not found: " + idCategoria);
-
-		this.lancamentoRepository.findAllById(ids).forEach(lancamento -> {
-			lancamento.setCategoria(opt.get());
 			this.lancamentoRepository.save(lancamento);
 		});
 	}

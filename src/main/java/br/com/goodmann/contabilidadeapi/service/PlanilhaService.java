@@ -31,10 +31,8 @@ import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
-import br.com.goodmann.contabilidadeapi.model.LimiteGastos;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
-import br.com.goodmann.contabilidadeapi.repository.LimiteGastosRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
@@ -52,13 +50,8 @@ public class PlanilhaService {
 	@Autowired
 	private LancamentoService lancamentoService;
 
-	@Autowired
-	private LimiteGastosRepository gastosRepository;
-
 	@Transactional
 	public void delete(Integer idPlanilha) {
-		this.gastosRepository.deleteAll(
-				this.gastosRepository.findAllByPlanilha(this.planilhaRepository.findById(idPlanilha).orElseThrow()));
 		this.lancamentoRepository.deleteAll(this.lancamentoRepository.findAllByIdPlanilha(idPlanilha));
 		this.planilhaRepository.deleteById(idPlanilha);
 	}
@@ -120,9 +113,7 @@ public class PlanilhaService {
 			ExtratoDTO contaDTO = new ExtratoDTO();
 			BeanUtils.copyProperties(conta, contaDTO);
 			lancamentos.forEach(lancamento -> {
-				String categoria = lancamento.getCategoria() == null ? null : lancamento.getCategoria().getDescricao();
 				LancamentoDTO lancamentoDTO = new LancamentoDTO();
-				lancamentoDTO.setCategoria(categoria);
 				lancamentoDTO.setConcluido(lancamento.getConcluido());
 				lancamentoDTO.setData(lancamento.getData());
 				lancamentoDTO.setDescricao(lancamento.getDescricao());
@@ -170,25 +161,12 @@ public class PlanilhaService {
 			}
 		});
 
-		// duplica os limites de gastos para categorias
-		this.duplicarLimites(atual, proxima);
-
 		// atualiza o lançamento saldoAnterior
 		contas.stream().filter(o -> TipoConta.CC.equals(o.getTipo())).forEach(conta -> {
 			this.lancamentoService.atualizaSaldo(atual, conta);
 		});
 
 		return proxima;
-	}
-
-	private void duplicarLimites(Planilha atual, Planilha proxima) {
-		this.gastosRepository.findAllByPlanilha(atual).forEach(limite -> {
-			LimiteGastos model = new LimiteGastos();
-			model.setCategoria(limite.getCategoria());
-			model.setLimite(limite.getLimite());
-			model.setPlanilha(proxima);
-			this.gastosRepository.save(model);
-		});
 	}
 
 	@Transactional
@@ -199,7 +177,6 @@ public class PlanilhaService {
 		String data = sdf.format(hoje);
 
 		this.lancamentoRepository.deleteLancamentosByCriacaoPlanilha(data);
-		this.gastosRepository.deleteLimiteGastosCriacaoPlanilha(data);
 		this.planilhaRepository.deletePlanilhaByCriacaoPlanilha(data);
 
 		String ano = data.substring(0, 4);

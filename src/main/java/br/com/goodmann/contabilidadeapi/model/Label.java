@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Categoria {
+public class Label {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

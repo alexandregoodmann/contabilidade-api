@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 public class LancamentoDTO {
 	private Integer id;
-	private String categoria;
 	private Date data;
 	private String descricao;
 	private BigDecimal valor;

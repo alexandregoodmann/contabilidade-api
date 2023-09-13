@@ -1,7 +1,6 @@
 package br.com.goodmann.contabilidadeapi.controller;
 
 import java.io.IOException;
-import java.rmi.NoSuchObjectException;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.goodmann.contabilidadeapi.dto.CategorizarDTO;
 import br.com.goodmann.contabilidadeapi.dto.ListDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.service.ArquivoService;
@@ -75,11 +73,6 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 	@PostMapping("/fixo")
 	public void fixo(@RequestBody ListDTO<Integer> dto) {
 		this.lancamentoService.fixo(dto.getList());
-	}
-
-	@PostMapping("/categorizar")
-	public void categorizar(@RequestBody CategorizarDTO dto) throws NoSuchObjectException {
-		this.lancamentoService.categorizar(dto.getList(), dto.getIdCategoria());
 	}
 
 }
