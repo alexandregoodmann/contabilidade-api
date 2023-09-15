@@ -19,7 +19,6 @@ import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
-import br.com.goodmann.contabilidadeapi.repository.LabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
@@ -30,13 +29,14 @@ public class LancamentoService {
 	private LancamentoRepository lancamentoRepository;
 
 	@Autowired
-	private LabelRepository categoriaRepository;
+	private PlanilhaRepository planilhaRepository;
 
 	@Autowired
-	private PlanilhaRepository planilhaRepository;
+	private LabelService labelService;
 
 	@Transactional
 	public Lancamento save(Lancamento model) {
+		this.labelService.saveAll(model.getLabels());
 		this.lancamentoRepository.save(model);
 		this.atualizaSaldo(model.getPlanilha(), model.getConta());
 		return model;
