@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,6 +35,12 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 
 	@Autowired
 	private LancamentoService lancamentoService;
+
+	@Override
+	@GetMapping("/{id}")
+	public ResponseEntity<Lancamento> findById(@PathVariable("id") Integer id) {
+		return new ResponseEntity<Lancamento>(this.lancamentoService.findById(id), HttpStatus.OK);
+	}
 
 	@Override
 	@PostMapping

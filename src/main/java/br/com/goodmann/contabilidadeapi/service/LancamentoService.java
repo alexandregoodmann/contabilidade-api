@@ -17,8 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
+import br.com.goodmann.contabilidadeapi.model.Label;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
+import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
@@ -32,14 +35,31 @@ public class LancamentoService {
 	private PlanilhaRepository planilhaRepository;
 
 	@Autowired
+	private LancamentoLabelRepository lancamentoLabelRepository;
+
+	@Autowired
 	private LabelService labelService;
 
+	public Lancamento findById(Integer id) {
+		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
+		List<String> labels = this.lancamentoLabelRepository.findAllByLancamento(lancamento).stream()
+				.map(o -> o.getLabel().getDescricao()).collect(Collectors.toList());
+		lancamento.setLabels(labels);
+		return lancamento;
+	}
+
 	@Transactional
-	public Lancamento save(Lancamento model) {
-		this.labelService.saveAll(model.getLabels());
-		this.lancamentoRepository.save(model);
-		this.atualizaSaldo(model.getPlanilha(), model.getConta());
-		return model;
+	public Lancamento save(Lancamento lancamento) {
+		List<Label> labels = this.labelService.createAll(lancamento.getLabels());
+		this.lancamentoRepository.save(lancamento);
+		labels.forEach(label -> {
+			LancamentoLabel lanlabel = new LancamentoLabel();
+			lanlabel.setLabel(label);
+			lanlabel.setLancamento(lancamento);
+			this.lancamentoLabelRepository.save(lanlabel);
+		});
+		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
+		return lancamento;
 	}
 
 	@Transactional
@@ -64,9 +84,16 @@ public class LancamentoService {
 	}
 
 	public void deleteAllById(List<Integer> ids) {
+
 		List<Lancamento> lancamentos = this.lancamentoRepository.findAllById(ids).stream()
 				.filter(o -> !TipoLancamento.SALDO.equals(o.getTipo()) && !TipoLancamento.FATURA.equals(o.getTipo()))
 				.collect(Collectors.toList());
+
+		lancamentos.forEach(lancamento -> {
+			List<LancamentoLabel> list = this.lancamentoLabelRepository.findAllByLancamento(lancamento);
+			this.lancamentoLabelRepository.deleteAll(list);
+		});
+
 		this.lancamentoRepository.deleteAll(lancamentos);
 	}
 

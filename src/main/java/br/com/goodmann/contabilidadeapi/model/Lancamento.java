@@ -59,6 +59,6 @@ public class Lancamento {
 	private String parcelas;
 
 	@Transient
-	private List<Label> labels;
+	private List<String> labels;
 
 }

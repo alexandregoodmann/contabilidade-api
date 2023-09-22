@@ -2,6 +2,7 @@ package br.com.goodmann.contabilidadeapi.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,4 +16,5 @@ public class LancamentoDTO {
 	private BigDecimal valor;
 	private Boolean concluido;
 	private Boolean fixo;
+	private List<String> labels;
 }

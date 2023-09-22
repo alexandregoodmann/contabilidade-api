@@ -32,6 +32,7 @@ import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
@@ -49,6 +50,9 @@ public class PlanilhaService {
 
 	@Autowired
 	private LancamentoService lancamentoService;
+
+	@Autowired
+	private LancamentoLabelRepository lancamentoLabelRepository;
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
@@ -113,7 +117,10 @@ public class PlanilhaService {
 			ExtratoDTO contaDTO = new ExtratoDTO();
 			BeanUtils.copyProperties(conta, contaDTO);
 			lancamentos.forEach(lancamento -> {
+				List<String> labels = this.lancamentoLabelRepository.findAllByLancamento(lancamento).stream()
+						.map(o -> o.getLabel().getDescricao()).collect(Collectors.toList());
 				LancamentoDTO lancamentoDTO = new LancamentoDTO();
+				lancamentoDTO.setLabels(labels);
 				lancamentoDTO.setConcluido(lancamento.getConcluido());
 				lancamentoDTO.setData(lancamento.getData());
 				lancamentoDTO.setDescricao(lancamento.getDescricao());
