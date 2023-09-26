@@ -15,9 +15,11 @@ CREATE TABLE `lancamento_label` (
 
 INSERT INTO `contabilidade-label`.lancamento_label (id_lancamento, id_label) select id, id_categoria from lancamento where id_categoria is not null;
 
-alter table lancamento  drop foreign key FK76mkkwgp6pceuxc8c7p5e3ve0;
+alter table lancamento  drop foreign key FKr651pitjvnxinfpcgbd9g71sf;
 
 alter table lancamento drop id_categoria;
+
+alter table lancamento  drop foreign key FK76mkkwgp6pceuxc8c7p5e3ve0;
 
 alter table lancamento drop id_conta_cartao;
 
