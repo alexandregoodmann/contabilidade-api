@@ -50,14 +50,24 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento lancamento) {
+		
+		boolean edit = (lancamento.getId() != null);
+
 		List<Label> labels = this.labelService.createAll(lancamento.getLabels());
 		this.lancamentoRepository.save(lancamento);
+
+		if (edit) {
+			List<LancamentoLabel> apagar = this.lancamentoLabelRepository.findAllByLancamento(lancamento);
+			this.lancamentoLabelRepository.deleteAll(apagar);
+		}
+
 		labels.forEach(label -> {
 			LancamentoLabel lanlabel = new LancamentoLabel();
 			lanlabel.setLabel(label);
 			lanlabel.setLancamento(lancamento);
 			this.lancamentoLabelRepository.save(lanlabel);
 		});
+
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 		return lancamento;
 	}
@@ -67,6 +77,12 @@ public class LancamentoService {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
 		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
 			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
+		
+		Lancamento lan = new Lancamento();
+		lan.setId(id);
+		List<LancamentoLabel> apagar = this.lancamentoLabelRepository.findAllByLancamento(lan);
+		this.lancamentoLabelRepository.deleteAll(apagar);
+		
 		this.lancamentoRepository.deleteById(id);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}
