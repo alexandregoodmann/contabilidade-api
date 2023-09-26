@@ -19,10 +19,6 @@ public interface AnaliseDTO {
 
 	public String getTipoLancamento();
 
-	public String getCategoria();
-
-	public Boolean getAnalisar();
-
 	public Date getData();
 
 	public String getDescricao();
