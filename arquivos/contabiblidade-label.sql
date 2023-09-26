@@ -13,7 +13,7 @@ CREATE TABLE `lancamento_label` (
   CONSTRAINT `fk_lancamento_label_lancamento` FOREIGN KEY (`id_lancamento`) REFERENCES `lancamento` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8212 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `contabilidade-label`.lancamento_label (id_lancamento, id_label) select id, id_categoria from lancamento where id_categoria is not null;
+INSERT INTO lancamento_label (id_lancamento, id_label) select id, id_categoria from lancamento where id_categoria is not null;
 
 alter table lancamento  drop foreign key FKr651pitjvnxinfpcgbd9g71sf;
 
@@ -24,4 +24,3 @@ alter table lancamento  drop foreign key FK76mkkwgp6pceuxc8c7p5e3ve0;
 alter table lancamento drop id_conta_cartao;
 
 drop table limite_gastos ;
-
