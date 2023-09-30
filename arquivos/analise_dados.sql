@@ -1,24 +1,17 @@
-select * from planilha p ;
+SELECT l.descricao, l2.descricao, l.valor  FROM lancamento l inner join planilha p on l.id_planilha = p.id
+inner join lancamento_label ll on ll.id_lancamento = l.id 
+inner join label l2 on l2.id = ll.id_label 
+where p.ano = 2023 
+and p.mes = 9 
+and l2.analisar = true 
+and l.valor < 0 
+order by l2.descricao;
 
-select * from lancamento l ;
-
-update categoria set analisar = 1 where id in (2, 139,142,174,175,176,177);
-
-alter table categoria add column analisar bit(1) null;
-
-select * from categoria c ;
-
--- somente para um mes
-select c.descricao, count(*) as qtd, sum(l.valor)*(-1) as valor 
-	from lancamento l join categoria c on l.id_categoria = c.id 
-	where l.id_planilha = 1 
-	and c.analisar = 1 
-	group by c.descricao order by valor;
-	
--- para o ano inteiro
-select p.mes, c.descricao, count(*) as qtd, sum(l.valor)*(-1) as valor from lancamento l 
-	join categoria c on l.id_categoria = c.id
-	inner join planilha p on p.id = l.id_planilha  
-	and c.analisar = 1 
-	group by p.mes, c.descricao 
-	order by p.mes, c.descricao;
+SELECT l2.descricao, sum(cast(l.valor * (-1) as signed)) as soma FROM lancamento l inner join planilha p on l.id_planilha = p.id
+inner join lancamento_label ll on ll.id_lancamento = l.id 
+inner join label l2 on l2.id = ll.id_label 
+where p.ano = 2023 
+and p.mes = 9 
+and l2.analisar = true 
+and l.valor < 0 
+GROUP by l2.descricao order by soma ;
