@@ -50,7 +50,7 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento save(Lancamento lancamento) {
-		
+
 		boolean edit = (lancamento.getId() != null);
 
 		List<Label> labels = this.labelService.createAll(lancamento.getLabels());
@@ -75,14 +75,14 @@ public class LancamentoService {
 	@Transactional
 	public void delete(Integer id) {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
-		if (TipoLancamento.SALDO.equals(lancamento.getTipo()) || TipoLancamento.FATURA.equals(lancamento.getTipo()))
-			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO ou FATURA");
-		
+		if (TipoLancamento.SALDO.equals(lancamento.getTipo()))
+			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO");
+
 		Lancamento lan = new Lancamento();
 		lan.setId(id);
 		List<LancamentoLabel> apagar = this.lancamentoLabelRepository.findAllByLancamento(lan);
 		this.lancamentoLabelRepository.deleteAll(apagar);
-		
+
 		this.lancamentoRepository.deleteById(id);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 	}

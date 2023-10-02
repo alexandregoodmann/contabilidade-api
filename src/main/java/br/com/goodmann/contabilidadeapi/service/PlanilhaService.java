@@ -31,6 +31,7 @@ import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
+import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
@@ -56,7 +57,11 @@ public class PlanilhaService {
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
-		this.lancamentoRepository.deleteAll(this.lancamentoRepository.findAllByIdPlanilha(idPlanilha));
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByIdPlanilha(idPlanilha);
+		lancamentos.forEach(p -> {
+			this.lancamentoLabelRepository.deleteAll(this.lancamentoLabelRepository.findAllByLancamento(p));
+		});
+		this.lancamentoRepository.deleteAll(lancamentos);
 		this.planilhaRepository.deleteById(idPlanilha);
 	}
 
@@ -164,7 +169,14 @@ public class PlanilhaService {
 				model.setConcluido(false);
 				Date d = DateUtils.addMonths(model.getData(), 1);
 				model.setData(d);
-				this.lancamentoRepository.save(model);
+				Lancamento novoLancamento = this.lancamentoRepository.save(model);
+
+				this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(lancamentoLabel -> {
+					LancamentoLabel novolancamentoLabel = new LancamentoLabel();
+					novolancamentoLabel.setLabel(lancamentoLabel.getLabel());
+					novolancamentoLabel.setLancamento(novoLancamento);
+					this.lancamentoLabelRepository.save(novolancamentoLabel);
+				});
 			}
 		});
 
