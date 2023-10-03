@@ -45,13 +45,13 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 	@Override
 	@PostMapping
 	public ResponseEntity<Lancamento> create(@RequestBody Lancamento model) {
-		return new ResponseEntity<Lancamento>(this.lancamentoService.save(model), HttpStatus.CREATED);
+		return new ResponseEntity<Lancamento>(this.lancamentoService.create(model), HttpStatus.CREATED);
 	}
 
 	@Override
 	@PutMapping
 	public ResponseEntity<Lancamento> update(@RequestBody Lancamento model) {
-		return new ResponseEntity<Lancamento>(this.lancamentoService.save(model), HttpStatus.OK);
+		return new ResponseEntity<Lancamento>(this.lancamentoService.update(model), HttpStatus.OK);
 	}
 
 	@Override

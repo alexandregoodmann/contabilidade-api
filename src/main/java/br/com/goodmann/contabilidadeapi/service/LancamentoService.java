@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
-import br.com.goodmann.contabilidadeapi.model.Label;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
@@ -49,27 +48,25 @@ public class LancamentoService {
 	}
 
 	@Transactional
-	public Lancamento save(Lancamento lancamento) {
-
-		boolean edit = (lancamento.getId() != null);
-
-		List<Label> labels = this.labelService.createAll(lancamento.getLabels());
+	public Lancamento create(Lancamento lancamento) {
 		this.lancamentoRepository.save(lancamento);
-
-		if (edit) {
-			List<LancamentoLabel> apagar = this.lancamentoLabelRepository.findAllByLancamento(lancamento);
-			this.lancamentoLabelRepository.deleteAll(apagar);
-		}
-
-		labels.forEach(label -> {
-			LancamentoLabel lanlabel = new LancamentoLabel();
-			lanlabel.setLabel(label);
-			lanlabel.setLancamento(lancamento);
-			this.lancamentoLabelRepository.save(lanlabel);
-		});
-
+		this.labelService.createLabels(lancamento);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
 		return lancamento;
+	}
+
+	@Transactional
+	public Lancamento update(Lancamento novo) {
+
+		// atualiza saldo se houve mudanca de valor
+		Lancamento original = this.lancamentoRepository.findById(novo.getId()).get();
+
+		if (original.getValor().compareTo(novo.getValor()) != 0) {
+			this.atualizaSaldo(novo.getPlanilha(), novo.getConta());
+		}
+
+		this.labelService.updateLabels(novo, original);
+		return this.lancamentoRepository.save(novo);
 	}
 
 	@Transactional
