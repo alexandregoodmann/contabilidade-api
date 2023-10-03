@@ -113,20 +113,6 @@ public class LancamentoService {
 		this.lancamentoRepository.deleteAll(lancamentos);
 	}
 
-	public void concluir(List<Integer> ids) {
-		this.lancamentoRepository.findAllById(ids).forEach(lancamento -> {
-			lancamento.setConcluido(true);
-			this.lancamentoRepository.save(lancamento);
-		});
-	}
-
-	public void fixo(List<Integer> ids) {
-		this.lancamentoRepository.findAllById(ids).forEach(lancamento -> {
-			lancamento.setFixo(true);
-			this.lancamentoRepository.save(lancamento);
-		});
-	}
-
 	private List<Planilha> getPlanilhaAtualAndFuturas(Planilha planilha) {
 		List<Planilha> planilhas = this.planilhaRepository.getPlanilhasFuturas(planilha.getAno());
 		planilhas.forEach(p -> {

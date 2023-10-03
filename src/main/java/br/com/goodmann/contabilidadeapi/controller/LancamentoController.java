@@ -72,14 +72,4 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 		this.lancamentoService.deleteAllById(dto.getList());
 	}
 
-	@PostMapping("/concluir")
-	public void concluir(@RequestBody ListDTO<Integer> dto) {
-		this.lancamentoService.concluir(dto.getList());
-	}
-
-	@PostMapping("/fixo")
-	public void fixo(@RequestBody ListDTO<Integer> dto) {
-		this.lancamentoService.fixo(dto.getList());
-	}
-
 }
