@@ -45,7 +45,7 @@ public class Lancamento {
 	@Column(name = "valor", nullable = false)
 	private BigDecimal valor;
 
-	private Boolean fixo;
+	private String fixo;
 
 	private Boolean concluido;
 

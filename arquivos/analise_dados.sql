@@ -15,3 +15,12 @@ and p.mes = 9
 and l2.analisar = true 
 and l.valor < 0 
 GROUP by l2.descricao order by soma ;
+
+select l.* from lancamento l join planilha p on p.id = l.id_planilha where ano = 2023 and mes = 10 order by descricao ;
+update lancamento set fixo = null where id_planilha = 7674;
+
+alter table lancamento alter column fixo varchar(255);
+
+33a4a8c2-faa3-4644-873a-a0d3b82e5f9e
+
+02877d5b-7db2-43ed-8b90-eee299e672a8

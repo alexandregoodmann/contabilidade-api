@@ -15,6 +15,6 @@ public class LancamentoDTO {
 	private String descricao;
 	private BigDecimal valor;
 	private Boolean concluido;
-	private Boolean fixo;
+	private String fixo;
 	private List<String> labels;
 }

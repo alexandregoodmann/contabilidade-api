@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,13 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento create(Lancamento lancamento) {
+
+		if ("true".equalsIgnoreCase(lancamento.getFixo())) {
+			lancamento.setFixo(UUID.randomUUID().toString());
+		} else if ("false".equalsIgnoreCase(lancamento.getFixo())) {
+			lancamento.setFixo(null);
+		}
+
 		this.lancamentoRepository.save(lancamento);
 		this.labelService.createLabels(lancamento);
 		this.atualizaSaldo(lancamento.getPlanilha(), lancamento.getConta());
@@ -57,6 +65,12 @@ public class LancamentoService {
 
 	@Transactional
 	public Lancamento update(Lancamento novo) {
+
+		if ("true".equalsIgnoreCase(novo.getFixo())) {
+			novo.setFixo(UUID.randomUUID().toString());
+		} else if ("false".equalsIgnoreCase(novo.getFixo())) {
+			novo.setFixo(null);
+		}
 
 		// atualiza saldo se houve mudanca de valor
 		Lancamento original = this.lancamentoRepository.findById(novo.getId()).get();

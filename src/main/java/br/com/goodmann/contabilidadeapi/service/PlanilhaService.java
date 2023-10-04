@@ -160,8 +160,9 @@ public class PlanilhaService {
 
 		// duplica os lançamentos
 		this.lancamentoRepository.findAllByIdPlanilha(idPlanilha).forEach(lancamento -> {
-			if (Boolean.TRUE.equals(lancamento.getFixo()) || TipoLancamento.SALDO.equals(lancamento.getTipo())
+			if (lancamento.getFixo() != null || TipoLancamento.SALDO.equals(lancamento.getTipo())
 					|| TipoLancamento.FATURA.equals(lancamento.getTipo())) {
+
 				contas.add(lancamento.getConta());
 				Lancamento model = new Lancamento();
 				BeanUtils.copyProperties(lancamento, model, "id");
