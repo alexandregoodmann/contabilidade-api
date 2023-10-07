@@ -21,5 +21,7 @@ public class Label {
 	@Column(length = 50, nullable = false)
 	private String descricao;
 	
+	private String chaves;
+	
 	private Boolean analisar;
 }

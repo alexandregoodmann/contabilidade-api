@@ -62,4 +62,22 @@ public class LabelService {
 		return list;
 	}
 
+	public void processLabel(List<Lancamento> lancamentos) {
+		this.labelRepository.findAll().forEach(label -> {
+			String[] chaves = label.getChaves().split(";");
+			if (chaves.length > 0) {
+				for (String chave : chaves) {
+					lancamentos.forEach(lancamento -> {
+						if (lancamento.getDescricao().toLowerCase().indexOf(chave.toLowerCase()) >= 0) {
+							LancamentoLabel lancamentoLabel = new LancamentoLabel();
+							lancamentoLabel.setLabel(label);
+							lancamentoLabel.setLancamento(lancamento);
+							this.lancamentoLabelRepository.save(lancamentoLabel);
+						}
+					});
+				}
+			}
+		});
+	}
+
 }
