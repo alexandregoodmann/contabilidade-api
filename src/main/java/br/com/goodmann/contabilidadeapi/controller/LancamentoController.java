@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.goodmann.contabilidadeapi.dto.ListDTO;
+import br.com.goodmann.contabilidadeapi.dto.ProcessaLabelDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.service.ArquivoService;
 import br.com.goodmann.contabilidadeapi.service.LancamentoService;
@@ -72,4 +73,8 @@ public class LancamentoController extends BaseController<Lancamento, Integer> {
 		this.lancamentoService.deleteAllById(dto.getList());
 	}
 
+	@PostMapping("/processarLabels")
+	public void processarLabels(@RequestBody ProcessaLabelDTO dto) {
+		this.lancamentoService.processarLabels(dto.getIdPlanilha(), dto.getIdConta());
+	}
 }
