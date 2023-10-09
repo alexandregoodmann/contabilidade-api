@@ -1,7 +1,10 @@
 package br.com.goodmann.contabilidadeapi.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,29 @@ public class LabelService {
 			});
 		});
 		return list;
+	}
+
+	public void processLabel(List<Lancamento> lancamentos) {
+		this.labelRepository.findAll().forEach(label -> {
+			String[] chaves = label.getChaves().toLowerCase().split(";");
+			for (String chave : chaves) {
+				lancamentos.forEach(lancamento -> {
+					if (this.contain(lancamento.getDescricao(), chave)) {
+						LancamentoLabel lancamentoLabel = new LancamentoLabel();
+						lancamentoLabel.setLabel(label);
+						lancamentoLabel.setLancamento(lancamento);
+						this.lancamentoLabelRepository.save(lancamentoLabel);
+					}
+				});
+			}
+		});
+	}
+
+	private boolean contain(String text, String word) {
+		String[] words = text.toLowerCase().split(" ");
+		Set<String> mySet = new HashSet<String>(Arrays.asList(words));
+		mySet.remove("");
+		return ("".equals(words)) ? false : mySet.contains(word);
 	}
 
 }

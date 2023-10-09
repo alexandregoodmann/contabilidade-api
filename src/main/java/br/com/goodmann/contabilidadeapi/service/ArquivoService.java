@@ -25,6 +25,7 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
+import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import javassist.NotFoundException;
@@ -49,6 +50,12 @@ public class ArquivoService {
 
 	@Autowired
 	private BradescoService bradescoService;
+
+	@Autowired
+	private LabelService labelService;
+
+	@Autowired
+	private LancamentoLabelRepository lancamentoLabelRepository;
 
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
@@ -100,14 +107,18 @@ public class ArquivoService {
 		l.setConta(conta);
 		l.setPlanilha(planilha);
 		Example<Lancamento> example = Example.of(l);
-		List<Lancamento> list = this.lancamentoRepository.findAll(example);
-		this.lancamentoRepository.deleteAll(list);
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAll(example);
+		lancamentos.forEach(lancamento -> {
+			this.lancamentoLabelRepository.deleteAll(this.lancamentoLabelRepository.findAllByLancamento(lancamento));
+		});
+		this.lancamentoRepository.deleteAll(lancamentos);
 	}
 
 	private Map<String, Object> cargaArquivoC6(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
 		List<String> lines = this.readLines(multipartFile);
+		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
 
 		for (int i = 1; i < lines.size(); i++) {
 			String[] vet = lines.get(i).split(";");
@@ -125,7 +136,10 @@ public class ArquivoService {
 			}
 
 			this.lancamentoRepository.save(lancamento);
+			lancamentos.add(lancamento);
 		}
+
+		this.labelService.processLabel(lancamentos);
 
 		Map<String, Object> mapa = new HashMap<String, Object>();
 		mapa.put("idConta", conta.getId());
