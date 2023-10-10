@@ -1,6 +1,7 @@
 package br.com.goodmann.contabilidadeapi.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import lombok.Data;
@@ -60,5 +63,9 @@ public class Lancamento {
 
 	@Transient
 	private List<String> labels;
+
+	@JsonIgnore
+	@Transient
+	private List<Label> listLabels = new ArrayList<Label>();
 
 }

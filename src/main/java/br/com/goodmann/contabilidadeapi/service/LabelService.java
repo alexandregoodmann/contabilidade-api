@@ -70,11 +70,13 @@ public class LabelService {
 			String[] chaves = label.getChaves().toLowerCase().split(";");
 			for (String chave : chaves) {
 				lancamentos.forEach(lancamento -> {
-					if (this.contain(lancamento.getDescricao(), chave)) {
-						LancamentoLabel lancamentoLabel = new LancamentoLabel();
-						lancamentoLabel.setLabel(label);
-						lancamentoLabel.setLancamento(lancamento);
-						this.lancamentoLabelRepository.save(lancamentoLabel);
+					if (!lancamento.getListLabels().contains(label)) {
+						if (this.contain(lancamento.getDescricao(), chave)) {
+							LancamentoLabel lancamentoLabel = new LancamentoLabel();
+							lancamentoLabel.setLabel(label);
+							lancamentoLabel.setLancamento(lancamento);
+							this.lancamentoLabelRepository.save(lancamentoLabel);
+						}
 					}
 				});
 			}

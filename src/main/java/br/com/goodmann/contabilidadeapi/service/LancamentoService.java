@@ -39,7 +39,7 @@ public class LancamentoService {
 
 	@Autowired
 	private LabelService labelService;
-	
+
 	public Lancamento findById(Integer id) {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
 		List<String> labels = this.lancamentoLabelRepository.findAllByLancamento(lancamento).stream()
@@ -164,15 +164,20 @@ public class LancamentoService {
 			}
 		}
 	}
-	
+
 	public void processarLabels(Integer idPlanilha, Integer idConta) {
-		
-		Planilha p = new Planilha(); 
+
+		Planilha p = new Planilha();
 		p.setId(idPlanilha);
 		Conta c = new Conta();
 		c.setId(idConta);
-		
+
 		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaAndConta(p, c);
+		lancamentos.forEach(lancamento -> {
+			lancamento.setListLabels(this.lancamentoLabelRepository.findAllByLancamento(lancamento).stream()
+					.map(o -> o.getLabel()).collect(Collectors.toList()));
+		});
+		
 		this.labelService.processLabel(lancamentos);
 	}
 
