@@ -74,7 +74,7 @@ public class BradescoService extends ArquivoService {
 				Double valor = Double
 						.valueOf(sValor.replaceAll("\\.", "").replaceAll("\\,", "\\.").replaceAll("\\\"", ""));
 				lancamento.setValor(BigDecimal.valueOf(valor));
-
+				lancamento.setConcluido(true);
 				lancamento.setData(data);
 				lancamento.setNumeroBradesco(vet[2]);
 

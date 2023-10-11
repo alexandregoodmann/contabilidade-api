@@ -127,6 +127,7 @@ public class ArquivoService {
 			lancamento.setPlanilha(planilha);
 			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(vet[8]) * (-1)));
 			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
+			lancamento.setConcluido(true);
 
 			if (!"Única".equalsIgnoreCase(vet[5])) {
 				lancamento.setDescricao(vet[4] + " " + vet[5]);
@@ -176,6 +177,7 @@ public class ArquivoService {
 				lancamento.setDescricao(vet[1]);
 				lancamento.setPlanilha(planilha);
 				lancamento.setValor(BigDecimal.valueOf(Double.valueOf(valor)));
+				lancamento.setConcluido(true);
 
 				if (lancamentos.stream().filter(o -> o.getData().compareTo(lancamento.getData()) == 0
 						&& o.getValor().compareTo(lancamento.getValor()) == 0).count() == 0) {
