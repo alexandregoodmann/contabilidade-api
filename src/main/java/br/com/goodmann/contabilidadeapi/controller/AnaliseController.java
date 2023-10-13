@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.goodmann.contabilidadeapi.dto.AnaliseCategoriaDTO;
+import br.com.goodmann.contabilidadeapi.dto.ResumoExtratoDTO;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @CrossOrigin
@@ -26,4 +27,9 @@ public class AnaliseController {
 		return this.planilhaRepository.analiseCategoria(ano, mes);
 	}
 
+	@GetMapping("/resumoextrato/{ano}/{mes}")
+	public List<ResumoExtratoDTO> getResumoExtrato(@PathVariable(name = "ano") Integer ano,
+			@PathVariable(name = "mes") Integer mes) {
+		return this.planilhaRepository.resumoExtrato(ano, mes);
+	}
 }

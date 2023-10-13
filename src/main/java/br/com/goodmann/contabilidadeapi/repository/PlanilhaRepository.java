@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.com.goodmann.contabilidadeapi.dto.AnaliseCategoriaDTO;
+import br.com.goodmann.contabilidadeapi.dto.ResumoExtratoDTO;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 
 public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
@@ -16,6 +17,10 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 			+ " inner join lancamento_label ll on ll.id_lancamento = l.id "
 			+ " inner join label l2 on l2.id = ll.id_label where p.ano=:ano and p.mes=:mes "
 			+ " and l2.analisar = true and l.valor < 0 GROUP by l2.descricao order by soma";
+
+	static final String RESUMO_EXTRATO = "select c.descricao as conta, l.descricao as lancamento, l.valor from lancamento l "
+			+ "join planilha p on p.id = l.id_planilha " + "join conta c on c.id = l.id_conta "
+			+ "where p.ano=:ano and p.mes=:mes and c.tipo = 'CC' order by l.valor ; ";
 
 	@Query("from Planilha p order by p.ano, p.mes")
 	List<Planilha> findAll();
@@ -31,5 +36,8 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 
 	@Query(value = ANALISE_CATEGORIA, nativeQuery = true)
 	List<AnaliseCategoriaDTO> analiseCategoria(@Param("ano") Integer ano, @Param("mes") Integer mes);
+
+	@Query(value = RESUMO_EXTRATO, nativeQuery = true)
+	List<ResumoExtratoDTO> resumoExtrato(@Param("ano") Integer ano, @Param("mes") Integer mes);
 
 }
