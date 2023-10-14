@@ -6,5 +6,8 @@ public interface ResumoExtratoDTO {
 
 	String getLancamento();
 
-	String getValor();
+	Number getValor();
+
+	String getFixo();
+
 }

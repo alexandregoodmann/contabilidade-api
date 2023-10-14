@@ -18,7 +18,7 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 			+ " inner join label l2 on l2.id = ll.id_label where p.ano=:ano and p.mes=:mes "
 			+ " and l2.analisar = true and l.valor < 0 GROUP by l2.descricao order by soma";
 
-	static final String RESUMO_EXTRATO = "select c.descricao as conta, l.descricao as lancamento, l.valor from lancamento l "
+	static final String RESUMO_EXTRATO = "select c.descricao as conta, l.descricao as lancamento, l.valor, l.fixo from lancamento l "
 			+ "join planilha p on p.id = l.id_planilha " + "join conta c on c.id = l.id_conta "
 			+ "where p.ano=:ano and p.mes=:mes and c.tipo = 'CC' order by l.valor ; ";
 
