@@ -62,7 +62,7 @@ public class Lancamento {
 	private String parcelas;
 
 	@Transient
-	private List<String> labels;
+	private List<String> labels = new ArrayList<String>();
 
 	@JsonIgnore
 	@Transient

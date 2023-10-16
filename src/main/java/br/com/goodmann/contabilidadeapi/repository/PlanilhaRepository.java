@@ -19,8 +19,8 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 			+ " and l2.analisar = true and l.valor < 0 GROUP by l2.descricao order by soma";
 
 	static final String RESUMO_EXTRATO = "select c.descricao as conta, l.descricao as lancamento, l.valor, l.fixo from lancamento l "
-			+ "join planilha p on p.id = l.id_planilha " + "join conta c on c.id = l.id_conta "
-			+ "where p.ano=:ano and p.mes=:mes and c.tipo = 'CC' order by l.valor ; ";
+			+ "join planilha p on p.id = l.id_planilha join conta c on c.id = l.id_conta "
+			+ "where p.ano=:ano and p.mes=:mes and c.tipo = 'CC' order by l.valor";
 
 	@Query("from Planilha p order by p.ano, p.mes")
 	List<Planilha> findAll();

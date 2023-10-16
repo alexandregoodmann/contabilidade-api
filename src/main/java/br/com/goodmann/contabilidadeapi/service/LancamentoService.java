@@ -177,8 +177,17 @@ public class LancamentoService {
 			lancamento.setListLabels(this.lancamentoLabelRepository.findAllByLancamento(lancamento).stream()
 					.map(o -> o.getLabel()).collect(Collectors.toList()));
 		});
-		
+
 		this.labelService.processLabel(lancamentos);
 	}
 
+	public List<Lancamento> findAllByPlanilha(Planilha planilha) {
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilha(planilha);
+		lancamentos.forEach(lancamento -> {
+			this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(labelLancamento -> {
+				lancamento.getLabels().add(labelLancamento.getLabel().getDescricao());
+			});
+		});
+		return lancamentos;
+	}
 }
