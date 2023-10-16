@@ -14,11 +14,13 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
 @Entity
 @ToString
+@NoArgsConstructor
 public class Planilha {
 
 	@Id
@@ -42,5 +44,9 @@ public class Planilha {
 
 	@JsonIgnore
 	private LocalDate criacao;
-	
+
+	public Planilha(Integer id) {
+		this.id = id;
+	}
+
 }

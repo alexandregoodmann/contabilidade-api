@@ -1,27 +1,24 @@
 package br.com.goodmann.contabilidadeapi.dto;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import br.com.goodmann.contabilidadeapi.enums.TipoConta;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class ExtratoDTO {
-	private Integer id;
-	private String banco;
+	private Integer idLancamento;
+	private Date data;
 	private String descricao;
-	private Boolean marcado;
-	private TipoConta tipo;
-	private BigDecimal saldoPrevisto = BigDecimal.ZERO;
-	private BigDecimal saldoEfetivado = BigDecimal.ZERO;
-	private List<LancamentoDTO> lancamentos = new ArrayList<LancamentoDTO>();
-
+	private Double valor;
+	private String fixo;
+	private Boolean concluido;
+	private String numero_bradesco;
+	private String tipo;
+	private String parcelas;
+	private Integer idConta;
+	private String conta;
+	private String tipoconta;
+	private List<String> labels = new ArrayList<String>();
 }

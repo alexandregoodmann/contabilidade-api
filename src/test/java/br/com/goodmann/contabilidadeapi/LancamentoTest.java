@@ -11,12 +11,16 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @SpringBootTest
 public class LancamentoTest {
 
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
+
+	@Autowired
+	private PlanilhaRepository planilhaRepository;
 
 	public void criarSaldoAnterior() {
 
@@ -37,7 +41,6 @@ public class LancamentoTest {
 		this.lancamentoRepository.save(model);
 	}
 
-	// @Test
 	public void criarFatura() {
 
 		Planilha planilha = new Planilha();

@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.goodmann.contabilidadeapi.dto.ExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.service.LancamentoService;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
 @CrossOrigin
@@ -28,6 +28,9 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 	@Autowired
 	private PlanilhaService planilhaService;
 
+	@Autowired
+	private LancamentoService lancamentoService;
+
 	@Override
 	@GetMapping
 	public ResponseEntity<List<Planilha>> findAll() {
@@ -36,24 +39,8 @@ public class PlanilhaController extends BaseController<Planilha, Integer> {
 
 	@GetMapping("/{id}/lancamentos")
 	public ResponseEntity<List<Lancamento>> getLancamentos(@PathVariable(required = true, name = "id") Integer id) {
-		return new ResponseEntity<List<Lancamento>>(this.planilhaService.getLancamentos(id), HttpStatus.OK);
-	}
-
-	@GetMapping("/{ano}/{mes}")
-	public ResponseEntity<Planilha> findByAnoAndMes(@PathVariable(required = true, name = "ano") Short ano,
-			@PathVariable(required = true, name = "mes") Short mes) {
-
-		Planilha planilha = this.planilhaService.findByAnoAndMes(ano, mes);
-
-		if (planilha == null)
-			return new ResponseEntity<Planilha>(new Planilha(), HttpStatus.OK);
-		else
-			return new ResponseEntity<Planilha>(planilha, HttpStatus.OK);
-	}
-
-	@GetMapping("/{id}/extrato")
-	public List<ExtratoDTO> getExtrato(@PathVariable(required = true, name = "id") Integer id) {
-		return this.planilhaService.getExtrato(id);
+		return new ResponseEntity<List<Lancamento>>(this.lancamentoService.findAllByPlanilha(new Planilha(id)),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/mapa")
