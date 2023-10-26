@@ -53,7 +53,7 @@ public class PlanilhaService {
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
-		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilha(new Planilha(idPlanilha));
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaOrderByData(new Planilha(idPlanilha));
 		lancamentos.forEach(p -> {
 			this.lancamentoLabelRepository.deleteAll(this.lancamentoLabelRepository.findAllByLancamento(p));
 		});
@@ -100,7 +100,7 @@ public class PlanilhaService {
 		Set<Conta> contas = new HashSet<Conta>();
 
 		// duplica os lançamentos
-		this.lancamentoRepository.findAllByPlanilha(new Planilha(idPlanilha)).forEach(lancamento -> {
+		this.lancamentoRepository.findAllByPlanilhaOrderByData(new Planilha(idPlanilha)).forEach(lancamento -> {
 			if (lancamento.getFixo() != null || TipoLancamento.SALDO.equals(lancamento.getTipo())
 					|| TipoLancamento.FATURA.equals(lancamento.getTipo())) {
 
