@@ -13,7 +13,7 @@ import br.com.goodmann.contabilidadeapi.model.Planilha;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Integer> {
 
-	List<Lancamento> findAllByPlanilha(Planilha planilha);
+	List<Lancamento> findAllByPlanilhaOrderByData(Planilha planilha);
 
 	List<Lancamento> findAllByPlanilhaAndConta(Planilha planilha, Conta conta);
 

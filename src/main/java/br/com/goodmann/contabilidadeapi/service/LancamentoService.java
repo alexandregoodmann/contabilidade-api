@@ -182,7 +182,7 @@ public class LancamentoService {
 	}
 
 	public List<Lancamento> findAllByPlanilha(Planilha planilha) {
-		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilha(planilha);
+		List<Lancamento> lancamentos = this.lancamentoRepository.findAllByPlanilhaOrderByData(planilha);
 		lancamentos.forEach(lancamento -> {
 			this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(labelLancamento -> {
 				lancamento.getLabels().add(labelLancamento.getLabel().getDescricao());
