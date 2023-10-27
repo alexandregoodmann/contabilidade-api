@@ -53,7 +53,7 @@ public class BradescoService extends ArquivoService {
 		List<String> lines = this.montarLinhas(multipartFile);
 
 		for (String line : lines) {
-			System.out.println(line);
+			
 			String[] vet = line.split(";");
 			if (!bradesco.contains(vet[2])) {
 
