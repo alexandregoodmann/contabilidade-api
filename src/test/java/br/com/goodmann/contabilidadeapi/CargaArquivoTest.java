@@ -19,6 +19,7 @@ import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.ContaRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.ArquivoService;
+import br.com.goodmann.contabilidadeapi.service.SodexoService;
 import javassist.NotFoundException;
 
 @SpringBootTest
@@ -32,6 +33,9 @@ public class CargaArquivoTest {
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
+
+	@Autowired
+	private SodexoService sodexoService;
 
 	// @Test
 	public void cargaArquivoC6Test() throws IOException, ParseException, NotFoundException {
@@ -63,7 +67,7 @@ public class CargaArquivoTest {
 		 */
 	}
 
-	@Test
+	// @Test
 	public void cargaArquivoBradescoTest() throws IOException, ParseException, NotFoundException {
 
 		File file = new File(
@@ -92,6 +96,24 @@ public class CargaArquivoTest {
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
 		this.arquivoService.cargaArquivo(343, 4747, mFile);
+	}
+
+	@Test
+	public void cargaSodexoTest() throws IOException, ParseException {
+
+		File file = new File("/home/alexandre/projetos/contabilidade-api/arquivos/sodexo.csv");
+		InputStream stream;
+		stream = new FileInputStream(file);
+		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+
+		Conta conta = new Conta();
+		conta.setId(5081);
+
+		Planilha planilha = new Planilha(8171);
+		planilha.setAno(Short.valueOf("2023"));
+		planilha.setMes(Short.valueOf("10"));
+
+		this.sodexoService.cargaArquivoSodexo(conta, planilha, mFile);
 	}
 
 }

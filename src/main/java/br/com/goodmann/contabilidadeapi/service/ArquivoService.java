@@ -57,6 +57,9 @@ public class ArquivoService {
 	@Autowired
 	private LancamentoLabelRepository lancamentoLabelRepository;
 
+	@Autowired
+	private SodexoService sodexoService;
+
 	public List<String> readLines(MultipartFile multipartFile) throws IOException {
 		InputStream inputStream = multipartFile.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -99,10 +102,15 @@ public class ArquivoService {
 			mapa = this.cargaArquivoItau(conta.get(), planilha.get(), multipartFile);
 		}
 
+		// sodexo
+		if (conta.get().getBanco().getId() == 4) {
+			mapa = this.sodexoService.cargaArquivoSodexo(conta.get(), planilha.get(), multipartFile);
+		}
+
 		return mapa;
 	}
 
-	private void deleteAllLancamentos(Conta conta, Planilha planilha) {
+	protected void deleteAllLancamentos(Conta conta, Planilha planilha) {
 		Lancamento l = new Lancamento();
 		l.setConta(conta);
 		l.setPlanilha(planilha);
