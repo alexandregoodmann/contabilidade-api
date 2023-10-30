@@ -1,21 +1,13 @@
 select
-	l.id as idlancamento,
-	l.data,
-	l.descricao,
-	l.valor,
-	l.fixo,
-	l.concluido,
-	l.numero_bradesco ,
-	l.tipo ,
-	l.parcelas,
-	c.id as idconta,
-	c.descricao as conta,
+	l.id as idlancamento,	l.data,
+	l.descricao,	l.valor,	l.fixo,	l.concluido,
+	l.numero_bradesco ,	l.tipo ,	l.parcelas,
+	c.id as idconta,	c.descricao as conta,
 	c.tipo as tipoconta
 from
-	lancamento l
-join planilha p on
-	p.id = l.id_planilha
-join conta c on
-	 c.id = l.id_conta
+	lancamento l join planilha p on 	p.id = l.id_planilha
+join conta c on 	 c.id = l.id_conta
 where
-	p.id = 8171;
+	p.id = 8171 and l.id_conta  = 8711;
+	
+select * from conta;
