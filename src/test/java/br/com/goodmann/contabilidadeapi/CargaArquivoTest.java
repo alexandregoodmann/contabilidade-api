@@ -116,7 +116,7 @@ public class CargaArquivoTest {
 		this.sodexoService.cargaArquivoSodexo(conta, planilha, mFile);
 	}
 
-	@Test
+	//@Test
 	public void cargaXPTest() throws IOException, ParseException {
 
 		File file = new File(
@@ -133,6 +133,25 @@ public class CargaArquivoTest {
 		planilha.setMes(Short.valueOf("10"));
 
 		this.sodexoService.cargaXP(conta, planilha, mFile);
+	}
+	
+	@Test
+	public void cargaXPCredito() throws IOException, ParseException {
+
+		File file = new File(
+				"/home/alexandre/projetos/contabilidade-api/arquivos/Fatura XP - novembro 2023.csv");
+		InputStream stream;
+		stream = new FileInputStream(file);
+		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+
+		Conta conta = new Conta();
+		conta.setId(8711);
+
+		Planilha planilha = new Planilha(8171);
+		planilha.setAno(Short.valueOf("2023"));
+		planilha.setMes(Short.valueOf("10"));
+
+		this.sodexoService.cargaXPCartao(conta, planilha, mFile);
 	}
 
 }

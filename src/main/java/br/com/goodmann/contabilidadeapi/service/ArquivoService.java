@@ -82,9 +82,6 @@ public class ArquivoService {
 		if (!planilha.isPresent())
 			throw new NotFoundException("The id planilha was not found: " + idPlanilha);
 
-		if (!conta.get().getBanco().getCarga())
-			throw new NotFoundException("Este banco não possui carga de arquivo");
-
 		// carga c6
 		if ("336".equals(conta.get().getBanco().getCodigo())) {
 			this.deleteAllLancamentos(conta.get(), planilha.get());
@@ -105,6 +102,17 @@ public class ArquivoService {
 		// sodexo
 		if (conta.get().getBanco().getId() == 4) {
 			mapa = this.sodexoService.cargaArquivoSodexo(conta.get(), planilha.get(), multipartFile);
+		}
+
+		// xp
+		if (conta.get().getId() == 8710) {
+			mapa = this.sodexoService.cargaXP(conta.get(), planilha.get(), multipartFile);
+		}
+
+		// xp cartao
+		if (conta.get().getId() == 8711) {
+			this.deleteAllLancamentos(conta.get(), planilha.get());
+			mapa = this.sodexoService.cargaXPCartao(conta.get(), planilha.get(), multipartFile);
 		}
 
 		return mapa;
@@ -243,4 +251,47 @@ public class ArquivoService {
 
 	}
 
+	public Map<String, Object> cargaXPCartao(Conta conta, Planilha planilha, MultipartFile multipartFile)
+			throws ParseException, IOException {
+
+		List<String> lines = this.readLines(multipartFile);
+		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
+
+		for (int i = 1; i < lines.size(); i++) {
+
+			String[] vet = lines.get(i).split(";");
+
+			Lancamento lancamento = new Lancamento();
+			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
+			lancamento.setDescricao(vet[1]);
+
+			String sValor = vet[3];
+			sValor = sValor.replaceAll("R\\$ ", "").replaceAll("\\.", "").replaceAll("\\,", ".").trim();
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(sValor) * (-1)));
+			lancamento.setConta(conta);
+			lancamento.setPlanilha(planilha);
+			lancamento.setConcluido(true);
+			String parcela = ("-".equals(vet[4])) ? null : vet[4].replaceAll("\\ de ", "/");
+			lancamento.setParcelas(parcela);
+
+			this.lancamentoRepository.save(lancamento);
+			lancamentos.add(lancamento);
+
+		}
+
+		this.labelService.processLabel(lancamentos);
+
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("idConta", conta.getId());
+		mapa.put("idPlanilha", planilha.getId());
+		mapa.put("qtdLancamentos", lines.size());
+
+		return mapa;
+
+	}
+
+	public static void main(String[] args) {
+		String p = "-";
+		System.out.println(p.replaceAll("\\ de ", ""));
+	}
 }
