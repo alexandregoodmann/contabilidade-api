@@ -205,4 +205,42 @@ public class ArquivoService {
 
 	}
 
+	public Map<String, Object> cargaXP(Conta conta, Planilha planilha, MultipartFile multipartFile)
+			throws ParseException, IOException {
+
+		List<String> lines = this.readLines(multipartFile);
+		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
+
+		for (int i = 1; i < lines.size(); i++) {
+
+			String[] vet = lines.get(i).split(";");
+
+			Lancamento lancamento = new Lancamento();
+			lancamento.setData(DateUtils.parseDate(vet[0].substring(0, 10), "dd/MM/yyyy"));
+			lancamento.setDescricao(vet[1]);
+
+			String sValor = vet[2];
+			sValor = sValor.replaceAll("R\\$ ", "").replaceAll("\\.", "").replaceAll("\\,", ".").trim();
+			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(sValor)));
+
+			lancamento.setConta(conta);
+			lancamento.setPlanilha(planilha);
+			lancamento.setConcluido(true);
+
+			this.lancamentoRepository.save(lancamento);
+			lancamentos.add(lancamento);
+
+		}
+
+		this.labelService.processLabel(lancamentos);
+
+		Map<String, Object> mapa = new HashMap<String, Object>();
+		mapa.put("idConta", conta.getId());
+		mapa.put("idPlanilha", planilha.getId());
+		mapa.put("qtdLancamentos", lines.size());
+
+		return mapa;
+
+	}
+
 }
