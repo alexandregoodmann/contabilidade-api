@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,18 +68,20 @@ public class LabelService {
 
 	public void processLabel(List<Lancamento> lancamentos) {
 		this.labelRepository.findAll().forEach(label -> {
-			String[] chaves = label.getChaves().toLowerCase().split(";");
-			for (String chave : chaves) {
-				lancamentos.forEach(lancamento -> {
-					if (!lancamento.getListLabels().contains(label)) {
-						if (this.contain(lancamento.getDescricao(), chave)) {
-							LancamentoLabel lancamentoLabel = new LancamentoLabel();
-							lancamentoLabel.setLabel(label);
-							lancamentoLabel.setLancamento(lancamento);
-							this.lancamentoLabelRepository.save(lancamentoLabel);
+			if (!StringUtils.isEmpty(label.getChaves())) {
+				String[] chaves = label.getChaves().toLowerCase().split(";");
+				for (String chave : chaves) {
+					lancamentos.forEach(lancamento -> {
+						if (!lancamento.getListLabels().contains(label)) {
+							if (this.contain(lancamento.getDescricao(), chave)) {
+								LancamentoLabel lancamentoLabel = new LancamentoLabel();
+								lancamentoLabel.setLabel(label);
+								lancamentoLabel.setLancamento(lancamento);
+								this.lancamentoLabelRepository.save(lancamentoLabel);
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 		});
 	}
