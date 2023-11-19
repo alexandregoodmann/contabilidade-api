@@ -1,5 +1,7 @@
 package br.com.goodmann.contabilidadeapi.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,8 +22,13 @@ public class Label {
 	@NotNull
 	@Column(length = 50, nullable = false)
 	private String descricao;
-	
+
 	private String chaves;
-	
+
 	private Boolean analisar;
+
+	@Column(name = "valor_limite", nullable = false)
+	private BigDecimal valorLimite;
+
+	private String cor;
 }
