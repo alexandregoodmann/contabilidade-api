@@ -5,4 +5,6 @@ public interface AnaliseCategoriaDTO {
 	String getDescricao();
 
 	Integer getSoma();
+	
+	Integer getLimite();	
 }
