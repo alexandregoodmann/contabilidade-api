@@ -1,16 +1,6 @@
-
-
-delete from lancamento where id in (8708
-,8709,8746,8751,8753
-,8756,8757,8758,8770
-,8811,8812,8813,8814
-,8815,8816,8817,8818);
-
-select l.id from lancamento l join planilha p on 	p.id = l.id_planilha join conta c on 	 c.id = l.id_conta where c.id = 8710
-
-select * from lancamento_label ll ;
-delete from lancamento_label where id_lancamento in (8708
-,8709,8746,8751,8753
-,8756,8757,8758,8770
-,8811,8812,8813,8814
-,8815,8816,8817,8818);
+SELECT l2.descricao, sum(cast(l.valor * (-1) as signed)) as soma, (select valor_limite from label where descricao = l2.descricao) as limite
+FROM lancamento l 
+inner join planilha p on l.id_planilha = p.id
+inner join lancamento_label ll on ll.id_lancamento = l.id 
+inner join label l2 on l2.id = ll.id_label where p.ano=2023 and p.mes=11
+and l2.analisar = true and l.valor < 0 GROUP by l2.descricao order by soma

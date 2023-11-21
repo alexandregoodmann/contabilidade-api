@@ -290,8 +290,4 @@ public class ArquivoService {
 
 	}
 
-	public static void main(String[] args) {
-		String p = "-";
-		System.out.println(p.replaceAll("\\ de ", ""));
-	}
 }
