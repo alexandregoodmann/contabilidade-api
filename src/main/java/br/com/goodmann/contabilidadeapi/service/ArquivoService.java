@@ -216,6 +216,8 @@ public class ArquivoService {
 	public Map<String, Object> cargaXP(Conta conta, Planilha planilha, MultipartFile multipartFile)
 			throws ParseException, IOException {
 
+		List<Lancamento> list = this.lancamentoRepository.findAllByPlanilhaAndConta(planilha, conta);
+
 		List<String> lines = this.readLines(multipartFile);
 		List<Lancamento> lancamentos = new ArrayList<Lancamento>();
 
@@ -224,7 +226,7 @@ public class ArquivoService {
 			String[] vet = lines.get(i).split(";");
 
 			Lancamento lancamento = new Lancamento();
-			lancamento.setData(DateUtils.parseDate(vet[0].substring(0, 10), "dd/MM/yyyy"));
+			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy HH:mm"));
 			lancamento.setDescricao(vet[1]);
 
 			String sValor = vet[2];
@@ -235,9 +237,11 @@ public class ArquivoService {
 			lancamento.setPlanilha(planilha);
 			lancamento.setConcluido(true);
 
-			this.lancamentoRepository.save(lancamento);
-			lancamentos.add(lancamento);
-
+			if (list.stream().filter(p -> p.getData().compareTo(lancamento.getData()) == 0
+					&& p.getValor().compareTo(lancamento.getValor()) == 0).toArray().length == 0) {
+				this.lancamentoRepository.save(lancamento);
+				lancamentos.add(lancamento);
+			}
 		}
 
 		this.labelService.processLabel(lancamentos);
