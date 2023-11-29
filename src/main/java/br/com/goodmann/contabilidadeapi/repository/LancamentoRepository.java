@@ -28,5 +28,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Integer>
 	@Modifying
 	@Query(value = "delete from lancamento l where l.id_planilha in (select id from planilha where criacao > date(?1))", nativeQuery = true)
 	void deleteLancamentosByCriacaoPlanilha(String data);
+	
+	@Query("from Lancamento l where l.fixo is not null and l.planilha=:planilha")
+	List<Lancamento> findAllFixos(Planilha planilha);
 
 }
