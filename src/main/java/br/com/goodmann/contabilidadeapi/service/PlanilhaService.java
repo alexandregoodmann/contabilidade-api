@@ -24,7 +24,6 @@ import org.springframework.util.StringUtils;
 import br.com.goodmann.contabilidadeapi.dto.PlanilhasAnoDTO;
 import br.com.goodmann.contabilidadeapi.enums.MesesEnum;
 import br.com.goodmann.contabilidadeapi.enums.TipoConta;
-import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
@@ -100,26 +99,22 @@ public class PlanilhaService {
 		Set<Conta> contas = new HashSet<Conta>();
 
 		// duplica os lançamentos
-		this.lancamentoRepository.findAllByPlanilhaOrderByData(new Planilha(idPlanilha)).forEach(lancamento -> {
-			if (lancamento.getFixo() != null || TipoLancamento.SALDO.equals(lancamento.getTipo())
-					|| TipoLancamento.FATURA.equals(lancamento.getTipo())) {
+		this.lancamentoRepository.findAllFixos(new Planilha(idPlanilha)).forEach(lancamento -> {
+			contas.add(lancamento.getConta());
+			Lancamento model = new Lancamento();
+			BeanUtils.copyProperties(lancamento, model, "id");
+			model.setPlanilha(proxima);
+			model.setConcluido(false);
+			Date d = DateUtils.addMonths(model.getData(), 1);
+			model.setData(d);
+			Lancamento novoLancamento = this.lancamentoRepository.save(model);
 
-				contas.add(lancamento.getConta());
-				Lancamento model = new Lancamento();
-				BeanUtils.copyProperties(lancamento, model, "id");
-				model.setPlanilha(proxima);
-				model.setConcluido(false);
-				Date d = DateUtils.addMonths(model.getData(), 1);
-				model.setData(d);
-				Lancamento novoLancamento = this.lancamentoRepository.save(model);
-
-				this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(lancamentoLabel -> {
-					LancamentoLabel novolancamentoLabel = new LancamentoLabel();
-					novolancamentoLabel.setLabel(lancamentoLabel.getLabel());
-					novolancamentoLabel.setLancamento(novoLancamento);
-					this.lancamentoLabelRepository.save(novolancamentoLabel);
-				});
-			}
+			this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(lancamentoLabel -> {
+				LancamentoLabel novolancamentoLabel = new LancamentoLabel();
+				novolancamentoLabel.setLabel(lancamentoLabel.getLabel());
+				novolancamentoLabel.setLancamento(novoLancamento);
+				this.lancamentoLabelRepository.save(novolancamentoLabel);
+			});
 		});
 
 		// atualiza o lançamento saldoAnterior
