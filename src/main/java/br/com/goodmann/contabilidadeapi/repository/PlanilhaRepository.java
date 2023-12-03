@@ -25,9 +25,10 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 			+ "join planilha p on p.id = l.id_planilha join conta c on c.id = l.id_conta "
 			+ "where p.ano=:ano and p.mes=:mes and c.tipo = 'CC' order by l.valor";
 
-	static final String SALDO_CONTAS = "select c.descricao as conta, sum(l.valor) as saldo from lancamento l "
-			+ "inner join planilha p on l.id_planilha = p.id " + "inner join conta c on c.id  = l.id_conta "
-			+ "where p.ano=:ano and p.mes=:mes group by c.descricao order by saldo";
+	static final String SALDO_CONTAS = "	select descricao as conta,"
+			+ "	(select sum(valor) from lancamento l where l.id_conta = c.id and l.id_planilha=:idPlanilha and l.concluido = 1) as saldo,"
+			+ "	(select sum(valor) from lancamento l where l.id_conta = c.id and l.id_planilha=:idPlanilha) as previsto"
+			+ "	from conta c order by saldo";
 
 	@Query("from Planilha p order by p.ano, p.mes")
 	List<Planilha> findAll();
@@ -48,6 +49,6 @@ public interface PlanilhaRepository extends JpaRepository<Planilha, Integer> {
 	List<ResumoExtratoDTO> resumoExtrato(@Param("ano") Integer ano, @Param("mes") Integer mes);
 
 	@Query(value = SALDO_CONTAS, nativeQuery = true)
-	List<SaldoContas> getSaldoContas(@Param("ano") Integer ano, @Param("mes") Integer mes);
+	List<SaldoContas> getSaldoContas(@Param("idPlanilha") Integer idPlanilha);
 
 }

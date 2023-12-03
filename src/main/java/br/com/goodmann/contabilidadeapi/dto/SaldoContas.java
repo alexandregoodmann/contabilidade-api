@@ -5,5 +5,7 @@ public interface SaldoContas {
 	String getConta();
 
 	Number getSaldo();
+	
+	Number getPrevisto();
 
 }
