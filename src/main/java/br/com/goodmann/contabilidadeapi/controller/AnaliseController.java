@@ -34,9 +34,8 @@ public class AnaliseController {
 		return this.planilhaRepository.resumoExtrato(ano, mes);
 	}
 
-	@GetMapping("/saldocontas/{ano}/{mes}")
-	public List<SaldoContas> getSaldoContas(@PathVariable(name = "ano") Integer ano,
-			@PathVariable(name = "mes") Integer mes) {
-		return this.planilhaRepository.getSaldoContas(ano, mes);
+	@GetMapping("/saldocontas/{idPlanilha}")
+	public List<SaldoContas> getSaldoContas(@PathVariable(name = "idPlanilha") Integer idPlanilha) {
+		return this.planilhaRepository.getSaldoContas(idPlanilha);
 	}
 }
