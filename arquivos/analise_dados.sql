@@ -1,6 +1,33 @@
-SELECT l2.descricao, sum(cast(l.valor * (-1) as signed)) as soma, (select valor_limite from label where descricao = l2.descricao) as limite
-FROM lancamento l 
-inner join planilha p on l.id_planilha = p.id
-inner join lancamento_label ll on ll.id_lancamento = l.id 
-inner join label l2 on l2.id = ll.id_label where p.ano=2023 and p.mes=11
-and l2.analisar = true and l.valor < 0 GROUP by l2.descricao order by soma
+select * from planilha p ;
+
+select * from lancamento l where l.id_planilha = 9455;
+
+select * from lancamento l where l.id_planilha = 9455 and l.concluido = 1;
+
+-- entradas previstas
+select c.id, c.descricao, l.descricao, l.valor from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and l.valor > 0;
+select sum(l.valor) from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and l.valor > 0;
+
+-- entradas concluidas
+select sum(l.valor) from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and l.valor > 0 and l.concluido = 1;
+select c.id, c.descricao, l.descricao, l.valor from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and l.valor > 0 and l.concluido = 1;
+
+-- saidas previstas
+select c.id, c.descricao, c.tipo ,l.descricao, l.valor from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and c.tipo = 'CC' and l.valor < 0 order by c.id;
+select sum(l.valor) from lancamento l join conta c on c.id = l.id_conta where l.id_planilha = 9455 and c.id <> 7760 and c.tipo = 'CC' and l.valor < 0 order by c.id;
+
+-- saidas concluidas
+select c.id, c.descricao, c.tipo ,l.descricao, l.valor from lancamento l join conta c on c.id = l.id_conta 
+	where l.id_planilha = 9455 and c.id <> 7760 and c.tipo = 'CC' and l.valor < 0 and l.concluido = 1 order by c.id;
+select sum(l.valor) from lancamento l join conta c on c.id = l.id_conta 
+	where l.id_planilha = 9455 and c.id <> 7760 and c.tipo = 'CC' and l.valor < 0 and l.concluido = 1 order by c.id;
+	
+select 
+	c.id,
+	c.descricao,
+	(select sum(valor) from lancamento l where l.id_planilha = 9455 and l.id_conta = c.id and l.valor > 0) as entradaprevista,
+	(select sum(valor) from lancamento l where l.id_planilha = 9455 and l.id_conta = c.id and l.valor > 0 and concluido = 1) as entradaconcluida,
+	(select sum(l.valor) from lancamento l where l.id_planilha = 9455 and l.id_conta = c.id and l.valor < 0) as saidaprevista,
+	(select sum(l.valor) from lancamento l where l.id_planilha = 9455 and l.id_conta = c.id and l.valor < 0 and concluido = 1) as saidaconcluida
+from conta c where c.id <> 7760 and c.tipo = 'CC';
+
