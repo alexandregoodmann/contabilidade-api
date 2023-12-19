@@ -31,3 +31,11 @@ select
 	(select sum(l.valor) from lancamento l where l.id_planilha = 9455 and l.id_conta = c.id and l.valor < 0 and concluido = 1) as saidaconcluida
 from conta c where c.id <> 7760 and c.tipo = 'CC';
 
+select c.descricao, l.data, l.descricao , l.valor from lancamento l inner join conta c on c.id  = l.id_conta inner join planilha p on p.id = l.id_planilha where p.ano = 2023 and p.mes = 12;
+select * from conta;
+select * from planilha_2024;
+
+insert into planilha_2024(conta, data, descricao, valor_1) select c.descricao, l.data, l.descricao , l.valor from lancamento l 
+	inner join conta c on c.id  = l.id_conta 
+	inner join planilha p on p.id = l.id_planilha where p.ano = 2023 and p.mes = 12;
+
