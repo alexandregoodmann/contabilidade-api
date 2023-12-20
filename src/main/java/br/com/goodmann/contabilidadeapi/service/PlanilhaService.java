@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +29,7 @@ import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
@@ -49,6 +49,9 @@ public class PlanilhaService {
 
 	@Autowired
 	private LancamentoLabelRepository lancamentoLabelRepository;
+
+	@Autowired
+	private PlanilhaAnualRepository planilhaAnualRepository;
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
@@ -147,8 +150,29 @@ public class PlanilhaService {
 		}
 	}
 
-	public static void main(String[] args) {
-		System.out.println(Calendar.getInstance().get(Calendar.YEAR));
-		System.out.println(Calendar.getInstance().get(Calendar.MONTH + 1));
+	@Transactional
+	public void processarPlanilhaAnual() {
+		this.planilhaAnualRepository.deleteAll();
+		this.planilhaAnualRepository.insertBase();
+		this.planilhaAnualRepository.findAll().forEach(lancamento -> {
+
+			if (lancamento.getParcelas() != null) {
+				String[] parc = lancamento.getParcelas().split("/");
+
+			} else if (lancamento.getFixo() != null) {
+				lancamento.setValor2(lancamento.getValor1());
+				lancamento.setValor3(lancamento.getValor1());
+				lancamento.setValor4(lancamento.getValor1());
+				lancamento.setValor5(lancamento.getValor1());
+				lancamento.setValor6(lancamento.getValor1());
+				lancamento.setValor7(lancamento.getValor1());
+				lancamento.setValor8(lancamento.getValor1());
+				lancamento.setValor9(lancamento.getValor1());
+				lancamento.setValor10(lancamento.getValor1());
+				lancamento.setValor11(lancamento.getValor1());
+				lancamento.setValor12(lancamento.getValor1());
+				this.planilhaAnualRepository.save(lancamento);
+			}
+		});
 	}
 }

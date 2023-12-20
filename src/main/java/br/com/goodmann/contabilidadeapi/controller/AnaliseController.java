@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import br.com.goodmann.contabilidadeapi.dto.SaldoContas;
 import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
+import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
 @CrossOrigin
 @RestController
@@ -26,6 +28,9 @@ public class AnaliseController {
 	
 	@Autowired
 	private PlanilhaAnualRepository planilhaAnualRepository;
+	
+	@Autowired
+	private PlanilhaService planilhaService;
 
 	@GetMapping("/categoria/{ano}/{mes}")
 	public List<AnaliseCategoriaDTO> getAnalise(@PathVariable(name = "ano") Integer ano,
@@ -48,5 +53,10 @@ public class AnaliseController {
 	@GetMapping("/planilhaanual")
 	public List<PlanilhaAnual> getPlanilhaAnual(){
 		return this.planilhaAnualRepository.findAll();
+	}
+	
+	@PostMapping("/processarPlanilhaAnual")
+	public void processarPlanilhaAnual() {
+		this.planilhaService.processarPlanilhaAnual();
 	}
 }
