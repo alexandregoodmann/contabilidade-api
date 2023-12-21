@@ -8,9 +8,9 @@ import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
 
 public interface PlanilhaAnualRepository extends JpaRepository<PlanilhaAnual, Integer> {
 
-	static final String INSERT_BASE = "insert into planilha2024(id, conta, data, descricao, fixo, parcelas, valor1) "
-			+ "	select l.id, c.descricao, l.data, l.descricao , l.fixo, l.parcelas, l.valor from lancamento l "
-			+ "	inner join conta c on c.id  = l.id_conta "
+	static final String INSERT_BASE = "insert into planilha2024(id, data, conta, descricao, fixo, parcelas, valor) "
+			+ "	            select l.id, l.data, c.descricao,  l.descricao , l.fixo, l.parcelas, l.valor"
+			+ "	from lancamento l inner join conta c on c.id  = l.id_conta "
 			+ "	inner join planilha p on p.id = l.id_planilha where p.ano = 2023 and p.mes = 12";
 
 	@Modifying

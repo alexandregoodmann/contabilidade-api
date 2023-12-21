@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -152,27 +153,30 @@ public class PlanilhaService {
 
 	@Transactional
 	public void processarPlanilhaAnual() {
+
 		this.planilhaAnualRepository.deleteAll();
 		this.planilhaAnualRepository.insertBase();
 		this.planilhaAnualRepository.findAll().forEach(lancamento -> {
 
+			StringJoiner joiner = new StringJoiner(";");
 			if (lancamento.getParcelas() != null) {
 				String[] parc = lancamento.getParcelas().split("/");
-
+				int x = Integer.parseInt(parc[1]) - Integer.parseInt(parc[0]);
+				if (x > 0) {
+					for (int i = 0; i <= x; i++) {
+						joiner.add(lancamento.getValor().toString());
+					}
+					lancamento.setValores(joiner.toString());
+					planilhaAnualRepository.save(lancamento);
+				}
 			} else if (lancamento.getFixo() != null) {
-				lancamento.setValor2(lancamento.getValor1());
-				lancamento.setValor3(lancamento.getValor1());
-				lancamento.setValor4(lancamento.getValor1());
-				lancamento.setValor5(lancamento.getValor1());
-				lancamento.setValor6(lancamento.getValor1());
-				lancamento.setValor7(lancamento.getValor1());
-				lancamento.setValor8(lancamento.getValor1());
-				lancamento.setValor9(lancamento.getValor1());
-				lancamento.setValor10(lancamento.getValor1());
-				lancamento.setValor11(lancamento.getValor1());
-				lancamento.setValor12(lancamento.getValor1());
-				this.planilhaAnualRepository.save(lancamento);
+				for (int i = 0; i < 12; i++) {
+					joiner.add(lancamento.getValor().toString());
+				}
+				lancamento.setValores(joiner.toString());
+				planilhaAnualRepository.save(lancamento);
 			}
 		});
 	}
+
 }

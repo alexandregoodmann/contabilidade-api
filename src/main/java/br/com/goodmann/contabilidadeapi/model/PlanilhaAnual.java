@@ -21,17 +21,6 @@ public class PlanilhaAnual {
 	private String descricao;
 	private String fixo;
 	private String parcelas;
-	private BigDecimal valor1;
-	private BigDecimal valor2;
-	private BigDecimal valor3;
-	private BigDecimal valor4;
-	private BigDecimal valor5;
-	private BigDecimal valor6;
-	private BigDecimal valor7;
-	private BigDecimal valor8;
-	private BigDecimal valor9;
-	private BigDecimal valor10;
-	private BigDecimal valor11;
-	private BigDecimal valor12;
-
+	private BigDecimal valor;
+	private String valores;
 }
