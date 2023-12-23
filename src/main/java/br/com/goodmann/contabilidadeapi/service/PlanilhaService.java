@@ -1,5 +1,6 @@
 package br.com.goodmann.contabilidadeapi.service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
+import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
@@ -152,31 +154,44 @@ public class PlanilhaService {
 	}
 
 	@Transactional
-	public void processarPlanilhaAnual() {
+	public List<PlanilhaAnual> processarPlanilhaAnual() {
 
 		this.planilhaAnualRepository.deleteAll();
 		this.planilhaAnualRepository.insertBase();
-		this.planilhaAnualRepository.findAll().forEach(lancamento -> {
 
-			StringJoiner joiner = new StringJoiner(";");
+		List<PlanilhaAnual> planilha = this.planilhaAnualRepository.findAll();
+		planilha.forEach(lancamento -> {
+
+			// se for valor parcelado
 			if (lancamento.getParcelas() != null) {
 				String[] parc = lancamento.getParcelas().split("/");
 				int x = Integer.parseInt(parc[1]) - Integer.parseInt(parc[0]);
 				if (x > 0) {
-					for (int i = 0; i <= x; i++) {
-						joiner.add(lancamento.getValor().toString());
-					}
-					lancamento.setValores(joiner.toString());
-					planilhaAnualRepository.save(lancamento);
+					this.salvaValores(lancamento, x);
 				}
-			} else if (lancamento.getFixo() != null) {
-				for (int i = 0; i < 12; i++) {
-					joiner.add(lancamento.getValor().toString());
-				}
-				lancamento.setValores(joiner.toString());
-				planilhaAnualRepository.save(lancamento);
 			}
+
+			// Se for lancamento fixo
+			if (lancamento.getFixo() != null) {
+				this.salvaValores(lancamento, 12);
+			}
+
 		});
+
+		return planilha;
+	}
+
+	private void salvaValores(PlanilhaAnual item, int tamanho) {
+		
+		List<BigDecimal> list = new ArrayList<BigDecimal>();
+		for (int i = 0; i < tamanho; i++) {
+			list.add(item.getValor());
+		}
+
+		String valores = list.stream().map(o -> String.valueOf(o)).collect(Collectors.joining(";"));
+		item.setValores(valores);
+		item.setListValores(list);
+		planilhaAnualRepository.save(item);
 	}
 
 }

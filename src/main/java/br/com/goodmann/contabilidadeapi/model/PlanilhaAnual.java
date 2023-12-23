@@ -2,10 +2,12 @@ package br.com.goodmann.contabilidadeapi.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.Data;
 
@@ -23,4 +25,7 @@ public class PlanilhaAnual {
 	private String parcelas;
 	private BigDecimal valor;
 	private String valores;
+
+	@Transient
+	private List<BigDecimal> listValores;
 }

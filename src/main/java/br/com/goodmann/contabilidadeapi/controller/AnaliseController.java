@@ -14,7 +14,6 @@ import br.com.goodmann.contabilidadeapi.dto.AnaliseCategoriaDTO;
 import br.com.goodmann.contabilidadeapi.dto.ResumoExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.SaldoContas;
 import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
-import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
@@ -25,10 +24,7 @@ public class AnaliseController {
 
 	@Autowired
 	private PlanilhaRepository planilhaRepository;
-	
-	@Autowired
-	private PlanilhaAnualRepository planilhaAnualRepository;
-	
+
 	@Autowired
 	private PlanilhaService planilhaService;
 
@@ -48,15 +44,9 @@ public class AnaliseController {
 	public List<SaldoContas> getSaldoContas(@PathVariable(name = "idPlanilha") Integer idPlanilha) {
 		return this.planilhaRepository.getSaldoContas(idPlanilha);
 	}
-	
-	
-	@GetMapping("/planilhaanual")
-	public List<PlanilhaAnual> getPlanilhaAnual(){
-		return this.planilhaAnualRepository.findAll();
-	}
-	
+
 	@PostMapping("/processarPlanilhaAnual")
-	public void processarPlanilhaAnual() {
-		this.planilhaService.processarPlanilhaAnual();
+	public List<PlanilhaAnual> processarPlanilhaAnual() {
+		return this.planilhaService.processarPlanilhaAnual();
 	}
 }
