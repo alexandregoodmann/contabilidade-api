@@ -5,11 +5,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -160,38 +160,40 @@ public class PlanilhaService {
 		this.planilhaAnualRepository.insertBase();
 
 		List<PlanilhaAnual> planilha = this.planilhaAnualRepository.findAll();
-		planilha.forEach(lancamento -> {
+		planilha.forEach(item -> {
 
-			// se for valor parcelado
-			if (lancamento.getParcelas() != null) {
-				String[] parc = lancamento.getParcelas().split("/");
+			BigDecimal[] vet = this.criarListaValores(item);
+
+			// lancamento unico
+			if (item.getFixo() == null && item.getParcelas() == null) {
+				vet[0] = item.getValor();
+			}
+
+			// parcelado
+			if (item.getParcelas() != null && item.getFixo() == null) {
+				String[] parc = item.getParcelas().split("/");
 				int x = Integer.parseInt(parc[1]) - Integer.parseInt(parc[0]);
-				if (x > 0) {
-					this.salvaValores(lancamento, x);
+				for (int i = 0; i <= x; i++) {
+					vet[i] = item.getValor();
 				}
 			}
 
-			// Se for lancamento fixo
-			if (lancamento.getFixo() != null) {
-				this.salvaValores(lancamento, 12);
-			}
-
+			item.setListValores(Arrays.asList(vet));
+			this.planilhaAnualRepository.save(item);
 		});
 
 		return planilha;
 	}
 
-	private void salvaValores(PlanilhaAnual item, int tamanho) {
-		
-		List<BigDecimal> list = new ArrayList<BigDecimal>();
-		for (int i = 0; i < tamanho; i++) {
-			list.add(item.getValor());
+	private BigDecimal[] criarListaValores(PlanilhaAnual item) {
+		BigDecimal[] vet = new BigDecimal[12];
+		for (int i = 0; i < 12; i++) {
+			if (item.getFixo() != null)
+				vet[i] = item.getValor();
+			else
+				vet[i] = BigDecimal.ZERO;
 		}
-
-		String valores = list.stream().map(o -> String.valueOf(o)).collect(Collectors.joining(";"));
-		item.setValores(valores);
-		item.setListValores(list);
-		planilhaAnualRepository.save(item);
+		return vet;
 	}
 
 }

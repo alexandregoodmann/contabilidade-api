@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
@@ -23,7 +25,11 @@ public class PlanilhaAnual {
 	private String descricao;
 	private String fixo;
 	private String parcelas;
+
+	@JsonIgnore
 	private BigDecimal valor;
+
+	@JsonIgnore
 	private String valores;
 
 	@Transient

@@ -22,5 +22,12 @@ insert into planilha2024(id, data, conta, descricao, fixo, parcelas, valor)
 	from lancamento l inner join conta c on c.id  = l.id_conta 
 	inner join planilha p on p.id = l.id_planilha where p.ano = 2023 and p.mes = 12;
 
+select * from lancamento   where parcelas is not NULL and fixo is null;
+
+update lancamento set fixo = null where parcelas  is not null;
+
+select * from lancamento l ;
+
+select * from planilha2024 p order by conta;
 
 
