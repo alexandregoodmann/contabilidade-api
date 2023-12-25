@@ -4,13 +4,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.goodmann.contabilidadeapi.enums.TipoConta;
+import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import lombok.Data;
 
 @Data
@@ -25,6 +31,16 @@ public class PlanilhaAnual {
 	private String descricao;
 	private String fixo;
 	private String parcelas;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "tipo_conta", length = 50, nullable = false)
+	private TipoConta tipoConta;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "tipo_lancamento", length = 50, nullable = false)
+	private TipoLancamento tipoLancamento;
 
 	@JsonIgnore
 	private BigDecimal valor;

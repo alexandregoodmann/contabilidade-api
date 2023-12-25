@@ -190,8 +190,6 @@ public class PlanilhaService {
 		for (int i = 0; i < 12; i++) {
 			if (item.getFixo() != null)
 				vet[i] = item.getValor();
-			else
-				vet[i] = BigDecimal.ZERO;
 		}
 		return vet;
 	}
