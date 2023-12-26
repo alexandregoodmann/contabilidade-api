@@ -30,6 +30,18 @@ update lancamento set fixo = null where parcelas  is not null;
 
 select * from lancamento l ;
 
-select * from planilha2024 p order by conta;
+select * from planilha2024 p order by p.tipo_lancamento ;
 
+-- remover fixo de saldo anterior
+select * from planilha p where id = 9455;
+
+select l.* from lancamento l 
+	join lancamento_label ll on ll.id_lancamento = l.id 
+	join label l2 on l2.id = ll.id_label 
+	where l.id_planilha = 9455 and l2.descricao = 'fatura';
+
+UPDATE lancamento l set fixo = null where l.id_planilha = 9455 and tipo = 'saldo';
+update lancamento set fixo = null, tipo = 'FATURA' where id in (9530, 9529, 9474);
+
+select distinct(tipo) from lancamento l;
 
