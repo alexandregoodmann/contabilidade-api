@@ -33,7 +33,7 @@ select * from lancamento l ;
 select * from planilha2024 p order by p.tipo_lancamento ;
 
 -- remover fixo de saldo anterior
-select * from planilha p where id = 9455;
+select * from planilha p;-- where id = 9455;
 
 select l.* from lancamento l 
 	join lancamento_label ll on ll.id_lancamento = l.id 
@@ -43,5 +43,13 @@ select l.* from lancamento l
 UPDATE lancamento l set fixo = null where l.id_planilha = 9455 and tipo = 'saldo';
 update lancamento set fixo = null, tipo = 'FATURA' where id in (9530, 9529, 9474);
 
-select distinct(tipo) from lancamento l;
+select * from lancamento l where l.id_planilha  = 9455 and l.id_conta = 8710;
+select * from conta;
+select id from lancamento l where l.id_planilha  = 9455 and l.id_conta = 8710;
+
+delete from lancamento l where l.id_planilha  = 9455 and l.id_conta = 8710;
+
+delete from lancamento_label where id_lancamento in (select id from lancamento l where l.id_planilha  = 9455 and l.id_conta = 8710);
+
+
 
