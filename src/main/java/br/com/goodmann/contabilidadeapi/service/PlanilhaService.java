@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -153,22 +154,26 @@ public class PlanilhaService {
 		}
 	}
 
+	public List<PlanilhaAnual> findPlanilhaAnualByTitulo(String titulo) {
+		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
+		list.forEach(item -> {
+			if (item.getValores() != null) {
+				item.setListValores(this.parseVetString2ListBigDecimal(item.getValores()));
+			}
+		});
+		return list;
+	}
+
 	@Transactional
-	public List<PlanilhaAnual> processarPlanilhaAnual() {
-
-		this.planilhaAnualRepository.deleteAll();
-		this.planilhaAnualRepository.insertBase();
-
-		List<PlanilhaAnual> planilha = this.planilhaAnualRepository.findAll();
-		planilha.forEach(item -> {
-
+	public void criarPlanilhaAnual(Integer idPlanilha, String titulo) {
+		this.planilhaAnualRepository.criarPlanilhaAnual(idPlanilha, titulo);
+		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
+		list.forEach(item -> {
 			BigDecimal[] vet = this.criarListaValores(item);
-
 			// lancamento unico
 			if (item.getFixo() == null && item.getParcelas() == null) {
 				vet[0] = item.getValor();
 			}
-
 			// parcelado
 			if (item.getParcelas() != null && item.getFixo() == null) {
 				String[] parc = item.getParcelas().split("/");
@@ -178,11 +183,14 @@ public class PlanilhaService {
 				}
 			}
 
-			item.setListValores(Arrays.asList(vet));
+			StringJoiner join = new StringJoiner(";");
+			for (int i = 0; i < vet.length; i++) {
+				join.add((vet[i] == null ? "" : vet[i].toString()));
+			}
+			item.setValores(join.toString());
+
 			this.planilhaAnualRepository.save(item);
 		});
-
-		return planilha;
 	}
 
 	private BigDecimal[] criarListaValores(PlanilhaAnual item) {
@@ -192,6 +200,15 @@ public class PlanilhaService {
 				vet[i] = item.getValor();
 		}
 		return vet;
+	}
+
+	private List<BigDecimal> parseVetString2ListBigDecimal(String vetString) {
+		String[] vet = vetString.split(";");
+		BigDecimal[] vetValor = new BigDecimal[vet.length];
+		for (int i = 0; i < vet.length; i++) {
+			vetValor[i] = new BigDecimal(vet[i]);
+		}
+		return Arrays.asList(vetValor);
 	}
 
 }

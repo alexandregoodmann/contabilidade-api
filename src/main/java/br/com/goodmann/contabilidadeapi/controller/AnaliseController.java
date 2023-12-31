@@ -14,6 +14,7 @@ import br.com.goodmann.contabilidadeapi.dto.AnaliseCategoriaDTO;
 import br.com.goodmann.contabilidadeapi.dto.ResumoExtratoDTO;
 import br.com.goodmann.contabilidadeapi.dto.SaldoContas;
 import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaService;
 
@@ -27,6 +28,9 @@ public class AnaliseController {
 
 	@Autowired
 	private PlanilhaService planilhaService;
+
+	@Autowired
+	private PlanilhaAnualRepository planilhaAnualRepository;
 
 	@GetMapping("/categoria/{ano}/{mes}")
 	public List<AnaliseCategoriaDTO> getAnalise(@PathVariable(name = "ano") Integer ano,
@@ -45,8 +49,19 @@ public class AnaliseController {
 		return this.planilhaRepository.getSaldoContas(idPlanilha);
 	}
 
-	@PostMapping("/processarPlanilhaAnual")
-	public List<PlanilhaAnual> processarPlanilhaAnual() {
-		return this.planilhaService.processarPlanilhaAnual();
+	@PostMapping("/planilhaanual/processar/{idPlanilha}/{titulo}")
+	public void processarPlanilhaAnual(@PathVariable(name = "idPlanilha") Integer idPlanilha,
+			@PathVariable(name = "titulo") String titulo) {
+		this.planilhaService.criarPlanilhaAnual(idPlanilha, titulo);
+	}
+
+	@GetMapping("/planilhaanual")
+	public List<String> processarPlanilhaAnual() {
+		return this.planilhaAnualRepository.getPlanilhas();
+	}
+
+	@GetMapping("/planilhaanual/{titulo}")
+	public List<PlanilhaAnual> processarPlanilhaAnual(@PathVariable(name = "titulo") String titulo) {
+		return this.planilhaService.findPlanilhaAnualByTitulo(titulo);
 	}
 }

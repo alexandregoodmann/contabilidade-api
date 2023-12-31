@@ -21,11 +21,12 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "planilha2024")
+@Table(name = "planilha_anual")
 public class PlanilhaAnual {
 
 	@Id
 	private Integer id;
+	private String titulo;
 	private Date data;
 	private String conta;
 	private String descricao;
@@ -37,9 +38,8 @@ public class PlanilhaAnual {
 	@Column(name = "tipo_conta", length = 50, nullable = false)
 	private TipoConta tipoConta;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(name = "tipo_lancamento", length = 50, nullable = false)
+	@Column(name = "tipo_lancamento", length = 50)
 	private TipoLancamento tipoLancamento;
 
 	@JsonIgnore
