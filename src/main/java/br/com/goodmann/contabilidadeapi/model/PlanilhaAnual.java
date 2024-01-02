@@ -26,6 +26,9 @@ public class PlanilhaAnual {
 
 	@Id
 	private Integer id;
+	
+	@Column(name = "id_lancamento")
+	private Integer idLancamento;
 	private String titulo;
 	private Date data;
 	private String conta;

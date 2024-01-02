@@ -1,16 +1,13 @@
 package br.com.goodmann.contabilidadeapi.service;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -30,10 +27,8 @@ import br.com.goodmann.contabilidadeapi.model.Conta;
 import br.com.goodmann.contabilidadeapi.model.Lancamento;
 import br.com.goodmann.contabilidadeapi.model.LancamentoLabel;
 import br.com.goodmann.contabilidadeapi.model.Planilha;
-import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoLabelRepository;
 import br.com.goodmann.contabilidadeapi.repository.LancamentoRepository;
-import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
@@ -53,9 +48,6 @@ public class PlanilhaService {
 
 	@Autowired
 	private LancamentoLabelRepository lancamentoLabelRepository;
-
-	@Autowired
-	private PlanilhaAnualRepository planilhaAnualRepository;
 
 	@Transactional
 	public void delete(Integer idPlanilha) {
@@ -152,63 +144,6 @@ public class PlanilhaService {
 			Planilha proxima = duplicarPlanilha(idAtual);
 			idAtual = proxima.getId();
 		}
-	}
-
-	public List<PlanilhaAnual> findPlanilhaAnualByTitulo(String titulo) {
-		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
-		list.forEach(item -> {
-			if (item.getValores() != null) {
-				item.setListValores(this.parseVetString2ListBigDecimal(item.getValores()));
-			}
-		});
-		return list;
-	}
-
-	@Transactional
-	public void criarPlanilhaAnual(Integer idPlanilha, String titulo) {
-		this.planilhaAnualRepository.criarPlanilhaAnual(idPlanilha, titulo);
-		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
-		list.forEach(item -> {
-			BigDecimal[] vet = this.criarListaValores(item);
-			// lancamento unico
-			if (item.getFixo() == null && item.getParcelas() == null) {
-				vet[0] = item.getValor();
-			}
-			// parcelado
-			if (item.getParcelas() != null && item.getFixo() == null) {
-				String[] parc = item.getParcelas().split("/");
-				int x = Integer.parseInt(parc[1]) - Integer.parseInt(parc[0]);
-				for (int i = 0; i <= x; i++) {
-					vet[i] = item.getValor();
-				}
-			}
-
-			StringJoiner join = new StringJoiner(";");
-			for (int i = 0; i < vet.length; i++) {
-				join.add((vet[i] == null ? "" : vet[i].toString()));
-			}
-			item.setValores(join.toString());
-
-			this.planilhaAnualRepository.save(item);
-		});
-	}
-
-	private BigDecimal[] criarListaValores(PlanilhaAnual item) {
-		BigDecimal[] vet = new BigDecimal[12];
-		for (int i = 0; i < 12; i++) {
-			if (item.getFixo() != null)
-				vet[i] = item.getValor();
-		}
-		return vet;
-	}
-
-	private List<BigDecimal> parseVetString2ListBigDecimal(String vetString) {
-		String[] vet = vetString.split(";");
-		BigDecimal[] vetValor = new BigDecimal[vet.length];
-		for (int i = 0; i < vet.length; i++) {
-			vetValor[i] = new BigDecimal(vet[i]);
-		}
-		return Arrays.asList(vetValor);
 	}
 
 }
