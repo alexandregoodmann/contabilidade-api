@@ -86,8 +86,6 @@ public class LancamentoService {
 	@Transactional
 	public void delete(Integer id) {
 		Lancamento lancamento = this.lancamentoRepository.findById(id).get();
-		if (TipoLancamento.SALDO.equals(lancamento.getTipo()))
-			throw new RuntimeException("Não é possível excluir um lançamento do tipo SALDO");
 
 		Lancamento lan = new Lancamento();
 		lan.setId(id);
