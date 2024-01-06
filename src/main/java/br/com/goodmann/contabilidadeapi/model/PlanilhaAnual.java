@@ -26,7 +26,7 @@ public class PlanilhaAnual {
 
 	@Id
 	private Integer id;
-	
+
 	@Column(name = "id_lancamento")
 	private Integer idLancamento;
 	private String titulo;
@@ -45,7 +45,6 @@ public class PlanilhaAnual {
 	@Column(name = "tipo_lancamento", length = 50)
 	private TipoLancamento tipoLancamento;
 
-	@JsonIgnore
 	private BigDecimal valor;
 
 	@JsonIgnore
