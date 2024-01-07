@@ -14,6 +14,13 @@ CREATE  TABLE `contabilidade-dev`.planilha_anual (
 	valores varchar(255)
 );
 
+CREATE  TABLE `contabilidade-dev`.amortizacao (
+	id int primary key not null AUTO_INCREMENT,
+	data DATETIME(6)  NULL,
+	valor numeric(11,2) not null,
+	pago boolean not null
+);
+select * from amortizacao ;
 select * from planilha_anual;
 truncate table `contabilidade-dev`.planilha_anual;
 

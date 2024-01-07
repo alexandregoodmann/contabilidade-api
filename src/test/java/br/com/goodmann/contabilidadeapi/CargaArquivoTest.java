@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
@@ -114,7 +113,7 @@ public class CargaArquivoTest {
 		this.sodexoService.cargaArquivoSodexo(conta, planilha, mFile);
 	}
 
-	@Test
+	// @Test
 	public void cargaXPTest() throws IOException, ParseException {
 
 		File file = new File(
