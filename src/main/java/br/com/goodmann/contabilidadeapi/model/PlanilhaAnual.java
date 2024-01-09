@@ -8,10 +8,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -25,6 +26,7 @@ import lombok.Data;
 public class PlanilhaAnual {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@Column(name = "id_lancamento")
@@ -36,7 +38,6 @@ public class PlanilhaAnual {
 	private String fixo;
 	private String parcelas;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo_conta", length = 50, nullable = false)
 	private TipoConta tipoConta;

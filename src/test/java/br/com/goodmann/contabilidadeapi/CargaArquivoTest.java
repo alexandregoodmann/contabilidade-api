@@ -145,7 +145,7 @@ public class CargaArquivoTest {
 		planilha.setAno(Short.valueOf("2023"));
 		planilha.setMes(Short.valueOf("10"));
 
-		this.sodexoService.cargaXPCartao(conta, planilha, mFile);
+		this.arquivoService.cargaXPCartao(conta, planilha, mFile);
 	}
 
 }

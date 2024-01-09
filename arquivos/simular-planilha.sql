@@ -1,12 +1,13 @@
-drop  TABLE `contabilidade-dev`.planilha2024;
+drop  TABLE `contabilidade-dev`.planilha_anual;
 
 CREATE  TABLE `contabilidade-dev`.planilha_anual (
-	id int primary key not null,
+	id int primary key not null auto_increment,
+	id_lancamento int,
 	titulo varchar(255) not null,
-	data DATETIME(6)  NULL,
-	conta varchar(255),
+	data DATETIME(6) not NULL,
+	conta varchar(255) not null,
 	tipo_conta varchar(255),
-	descricao varchar(255) null,
+	descricao varchar(255) not null,
 	tipo_lancamento varchar(255),
 	fixo varchar(255),
 	parcelas varchar(50),
