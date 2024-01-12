@@ -34,7 +34,7 @@ public class PlanilhaAnualTest {
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		this.service.cargaXPCartao("Janeiro 2024", mFile);
+		this.service.cargaXPCartao("Janeiro 2024", 0, mFile);
 	}
 
 }

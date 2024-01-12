@@ -19,10 +19,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import br.com.goodmann.contabilidadeapi.enums.TipoConta;
 import br.com.goodmann.contabilidadeapi.enums.TipoLancamento;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "planilha_anual")
+@ToString
 public class PlanilhaAnual {
 
 	@Id

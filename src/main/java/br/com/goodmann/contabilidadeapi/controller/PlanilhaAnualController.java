@@ -1,5 +1,7 @@
 package br.com.goodmann.contabilidadeapi.controller;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.goodmann.contabilidadeapi.dto.PlanilhaAnualDTO;
 import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
@@ -56,5 +60,11 @@ public class PlanilhaAnualController {
 	@DeleteMapping("/{planilha}")
 	public void delete(@PathVariable(name = "planilha") String planilha) {
 		this.planilhaAnualService.delete(planilha);
+	}
+
+	@PostMapping("/uploadFile")
+	public void uploadFile(@RequestParam("titulo") String titulo, @RequestParam("mes") Integer mes, @RequestParam("file") MultipartFile file)
+			throws IOException, ParseException {
+		this.planilhaAnualService.cargaXPCartao(titulo, mes, file);
 	}
 }

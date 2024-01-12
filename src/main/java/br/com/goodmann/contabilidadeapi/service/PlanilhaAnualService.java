@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,13 +54,14 @@ public class PlanilhaAnualService {
 		this.planilhaAnualRepository.criarPlanilhaAnual(idPlanilha, titulo);
 		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
 		list.forEach(item -> {
-			BigDecimal[] vetValores = this.criaVetorValores(item.getParcelas(), item);
+			BigDecimal[] vetValores = this.criaVetorValores(1, item.getParcelas(), item);
 			item.setValores(this.parseVetBigDecimal2String(vetValores));
 			this.planilhaAnualRepository.save(item);
 		});
 	}
 
-	public void cargaXPCartao(String titulo, MultipartFile multipartFile) throws IOException, ParseException {
+	public void cargaXPCartao(String titulo, Integer mes, MultipartFile multipartFile)
+			throws IOException, ParseException {
 
 		List<String> lines = this.arquivoService.readLines(multipartFile);
 
@@ -80,7 +82,7 @@ public class PlanilhaAnualService {
 			String parcela = ("-".equals(vet[4])) ? null : vet[4].replaceAll("\\ de ", "/");
 			item.setParcelas(parcela);
 
-			BigDecimal[] vetValores = this.criaVetorValores(parcela, item);
+			BigDecimal[] vetValores = this.criaVetorValores(mes, parcela, item);
 			item.setValores(this.parseVetBigDecimal2String(vetValores));
 
 			this.planilhaAnualRepository.save(item);
@@ -94,13 +96,14 @@ public class PlanilhaAnualService {
 	 * @param item
 	 * @return
 	 */
-	private BigDecimal[] criaVetorValores(String parcelas, PlanilhaAnual item) {
+	private BigDecimal[] criaVetorValores(Integer mes, String parcelas, PlanilhaAnual item) {
 
 		BigDecimal[] vet = new BigDecimal[12];
-
+		int posicao = mes - 1;
+		
 		// fixo
 		if (item.getFixo() != null) {
-			for (int i = 0; i < 12; i++) {
+			for (int i = posicao; i < 12; i++) {
 				if (item.getFixo() != null)
 					vet[i] = item.getValor();
 			}
@@ -109,16 +112,16 @@ public class PlanilhaAnualService {
 
 		// parcelado
 		if (parcelas != null) {
-			String[] parc = item.getParcelas().split("/");
-			int x = Integer.parseInt(parc[1]) - Integer.parseInt(parc[0]);
-			for (int i = 0; i <= x; i++) {
+			String[] vetParcelas = item.getParcelas().split("/");
+			int nParcelas = Integer.parseInt(vetParcelas[1]) - Integer.parseInt(vetParcelas[0]) + posicao;
+			for (int i = posicao; i <= nParcelas; i++) {
 				vet[i] = item.getValor();
 			}
 			return vet;
 		}
 
 		// unico
-		vet[0] = item.getValor();
+		vet[posicao] = item.getValor();
 
 		return vet;
 	}
@@ -130,11 +133,14 @@ public class PlanilhaAnualService {
 	 * @param item
 	 */
 	private void parseVetString2ListBigDecimal(PlanilhaAnual item) {
+		System.out.println(item);
 		if (item.getValores() != null) {
 			String[] vet = item.getValores().split(";");
 			BigDecimal[] vetValor = new BigDecimal[vet.length];
 			for (int i = 0; i < vet.length; i++) {
-				vetValor[i] = new BigDecimal(vet[i]);
+				if (!StringUtils.isBlank(vet[i])) {
+					vetValor[i] = new BigDecimal(vet[i]);
+				}
 			}
 			item.setListValores(Arrays.asList(vetValor));
 		}
