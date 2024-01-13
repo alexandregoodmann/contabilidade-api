@@ -45,5 +45,8 @@ select l.* from lancamento l
 
 select * from planilha; --9455
 
-
+select distinct(conta) from planilha_anual pa ;
+select * from planilha_anual pa where conta = 'XP Cartão' and parcelas is not null;
+select * from planilha_anual pa where id_lancamento is null;
+-- delete from planilha_anual where id_lancamento is not null;
 

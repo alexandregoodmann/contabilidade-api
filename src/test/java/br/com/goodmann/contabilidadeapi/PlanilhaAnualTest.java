@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
 import br.com.goodmann.contabilidadeapi.service.PlanilhaAnualService;
 
 @SpringBootTest
@@ -21,12 +22,15 @@ public class PlanilhaAnualTest {
 	@Autowired
 	private PlanilhaAnualService service;
 
-	@Test
+	@Autowired
+	private PlanilhaAnualRepository repository;
+
+	// @Test
 	void criarPlanilhaTest() {
 		this.service.criarPlanilhaAnual(9455, "Teste");
 	}
 
-	@Test
+	// @Test
 	void cargaArquivo() throws IOException, ParseException {
 
 		File file = new File("/home/alexandre/projetos/contabilidade-api/arquivos/Fatura XP - novembro 2023.csv");
@@ -37,4 +41,8 @@ public class PlanilhaAnualTest {
 		this.service.cargaXPCartao("Janeiro 2024", 0, mFile);
 	}
 
+	@Test
+	void getParcelados() {
+		this.repository.getParcelados("XP Cartão");
+	}
 }

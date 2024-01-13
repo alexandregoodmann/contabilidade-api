@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.ToString;
 
 @Data
-@Entity
+@Entity(name = "planilhaAnual")
 @Table(name = "planilha_anual")
 @ToString
 public class PlanilhaAnual {

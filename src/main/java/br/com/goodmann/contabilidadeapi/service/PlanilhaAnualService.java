@@ -64,29 +64,39 @@ public class PlanilhaAnualService {
 			throws IOException, ParseException {
 
 		List<String> lines = this.arquivoService.readLines(multipartFile);
+		List<PlanilhaAnual> parcelados = this.planilhaAnualRepository.getParcelados("XP Cartão");
 
 		for (int i = 1; i < lines.size(); i++) {
-
-			String[] vet = lines.get(i).split(";");
-
-			PlanilhaAnual item = new PlanilhaAnual();
-			item.setTitulo(titulo);
-			item.setConta("XP Cartão");
-			item.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
-			item.setDescricao(vet[1]);
-
-			String sValor = vet[3];
-			sValor = sValor.replaceAll("R\\$ ", "").replaceAll("\\.", "").replaceAll("\\,", ".").trim();
-			item.setValor(BigDecimal.valueOf(Double.valueOf(sValor) * (-1)));
-
-			String parcela = ("-".equals(vet[4])) ? null : vet[4].replaceAll("\\ de ", "/");
-			item.setParcelas(parcela);
-
-			BigDecimal[] vetValores = this.criaVetorValores(mes, parcela, item);
-			item.setValores(this.parseVetBigDecimal2String(vetValores));
-
-			this.planilhaAnualRepository.save(item);
+			PlanilhaAnual item = this.parseString2Object(titulo, mes, lines.get(i));
+			parcelados.forEach(parc -> {
+				if (!(item.getData().compareTo(parc.getData()) == 0
+						&& item.getDescricao().equalsIgnoreCase(parc.getDescricao()))) {
+					this.planilhaAnualRepository.save(item);
+				}
+			});
 		}
+	}
+
+	private PlanilhaAnual parseString2Object(String titulo, Integer mes, String linha) throws ParseException {
+		String[] vet = linha.split(";");
+
+		PlanilhaAnual item = new PlanilhaAnual();
+		item.setTitulo(titulo);
+		item.setConta("XP Cartão");
+		item.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy"));
+		item.setDescricao(vet[1]);
+
+		String sValor = vet[3];
+		sValor = sValor.replaceAll("R\\$ ", "").replaceAll("\\.", "").replaceAll("\\,", ".").trim();
+		item.setValor(BigDecimal.valueOf(Double.valueOf(sValor) * (-1)));
+
+		String parcela = ("-".equals(vet[4])) ? null : vet[4].replaceAll("\\ de ", "/");
+		item.setParcelas(parcela);
+
+		BigDecimal[] vetValores = this.criaVetorValores(mes, parcela, item);
+		item.setValores(this.parseVetBigDecimal2String(vetValores));
+
+		return item;
 	}
 
 	/**
@@ -100,7 +110,7 @@ public class PlanilhaAnualService {
 
 		BigDecimal[] vet = new BigDecimal[12];
 		int posicao = mes - 1;
-		
+
 		// fixo
 		if (item.getFixo() != null) {
 			for (int i = posicao; i < 12; i++) {

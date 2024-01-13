@@ -38,4 +38,7 @@ public interface PlanilhaAnualRepository extends JpaRepository<PlanilhaAnual, In
 	@Query(value = "update planilha_anual set titulo=?1 where titulo=?2", nativeQuery = true)
 	void rename(String novo, String velho);
 
+	@Query("from planilhaAnual p where p.conta=:conta and p.parcelas is not null")
+	List<PlanilhaAnual> getParcelados(String conta);
+
 }
