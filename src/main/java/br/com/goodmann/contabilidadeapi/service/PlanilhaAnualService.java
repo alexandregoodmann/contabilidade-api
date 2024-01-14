@@ -143,7 +143,6 @@ public class PlanilhaAnualService {
 	 * @param item
 	 */
 	private void parseVetString2ListBigDecimal(PlanilhaAnual item) {
-		System.out.println(item);
 		if (item.getValores() != null) {
 			String[] vet = item.getValores().split(";");
 			BigDecimal[] vetValor = new BigDecimal[vet.length];
@@ -162,5 +161,11 @@ public class PlanilhaAnualService {
 			join.add((vet[i] == null ? "" : vet[i].toString()));
 		}
 		return join.toString();
+	}
+
+	public PlanilhaAnual criarLancamento(PlanilhaAnual model) {
+		BigDecimal[] vetValoes = this.criaVetorValores(model.getData().getMonth() + 1, model.getParcelas(), model);
+		model.setValores(this.parseVetBigDecimal2String(vetValoes));
+		return this.planilhaAnualRepository.save(model);
 	}
 }

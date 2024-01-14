@@ -55,4 +55,5 @@ public class PlanilhaAnual {
 
 	@Transient
 	private List<BigDecimal> listValores;
+
 }
