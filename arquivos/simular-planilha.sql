@@ -1,13 +1,13 @@
-drop  TABLE `contabilidade-prod`.planilha2024;
+drop  TABLE `contabilidade-dev`.planilha_anual;
 
-CREATE  TABLE `contabilidade-prod`.planilha_anual (
-	id int primary key not null AUTO_INCREMENT, 
-	id_lancamento int not null,
+CREATE  TABLE `contabilidade-dev`.planilha_anual (
+	id int primary key not null auto_increment,
+	id_lancamento int,
 	titulo varchar(255) not null,
-	data DATETIME(6)  NULL,
-	conta varchar(255),
+	data DATETIME(6) not NULL,
+	conta varchar(255) not null,
 	tipo_conta varchar(255),
-	descricao varchar(255) null,
+	descricao varchar(255) not null,
 	tipo_lancamento varchar(255),
 	fixo varchar(255),
 	parcelas varchar(50),
@@ -15,6 +15,13 @@ CREATE  TABLE `contabilidade-prod`.planilha_anual (
 	valores varchar(255)
 );
 
+CREATE  TABLE `contabilidade-dev`.amortizacao (
+	id int primary key not null AUTO_INCREMENT,
+	data DATETIME(6)  NULL,
+	valor numeric(11,2) not null,
+	pago boolean not null
+);
+select * from amortizacao ;
 select * from planilha_anual;
 truncate table `contabilidade-dev`.planilha_anual;
 
@@ -38,5 +45,8 @@ select l.* from lancamento l
 
 select * from planilha; --9455
 
-
+select distinct(conta) from planilha_anual pa ;
+select * from planilha_anual pa where conta = 'XP Cartão' and parcelas is not null;
+select * from planilha_anual pa where id_lancamento is null;
+-- delete from planilha_anual where id_lancamento is not null;
 
