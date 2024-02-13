@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
@@ -83,7 +84,7 @@ public class CargaArquivoTest {
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		this.arquivoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+		this.arquivoService.cargaArquivo(false, conta.getId(), planilha.getId(), mFile);
 	}
 
 	// @Test
@@ -94,7 +95,7 @@ public class CargaArquivoTest {
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		this.arquivoService.cargaArquivo(343, 4747, mFile);
+		this.arquivoService.cargaArquivo(false, 343, 4747, mFile);
 	}
 
 	// @Test
@@ -113,21 +114,17 @@ public class CargaArquivoTest {
 		this.sodexoService.cargaArquivoSodexo(conta, planilha, mFile);
 	}
 
-	// @Test
-	public void cargaXPTest() throws IOException, ParseException {
+	@Test
+	public void cargaXPTest() throws IOException, ParseException, NotFoundException {
 
-		File file = new File(
-				"/home/alexandre/projetos/contabilidade-api/arquivos/extrato_de_01-11-2023_ate_24-11-2023.csv");
+		File file = new File("/home/alexandre/Downloads/extrato_de_01-01-2024_ate_31-01-2024.csv");
 		InputStream stream;
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		Conta conta = new Conta();
-		conta.setId(8710);
+		Planilha planilha = this.planilhaRepository.findByAnoAndMes(Short.valueOf("2024"), Short.valueOf("1"));
 
-		Planilha planilha = this.planilhaRepository.findByAnoAndMes(Short.valueOf("2023"), Short.valueOf("11"));
-
-		this.sodexoService.cargaXP(conta, planilha, mFile);
+		this.arquivoService.cargaArquivo(true, 8710, planilha.getId(), mFile);
 	}
 
 	// @Test

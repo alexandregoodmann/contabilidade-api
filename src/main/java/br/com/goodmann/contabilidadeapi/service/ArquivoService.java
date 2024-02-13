@@ -68,8 +68,8 @@ public class ArquivoService {
 		return lista;
 	}
 
-	public Map<String, Object> cargaArquivo(Integer idConta, Integer idPlanilha, MultipartFile multipartFile)
-			throws NotFoundException, ParseException, IOException {
+	public Map<String, Object> cargaArquivo(Boolean limpar, Integer idConta, Integer idPlanilha,
+			MultipartFile multipartFile) throws NotFoundException, ParseException, IOException {
 
 		Map<String, Object> mapa = null;
 
@@ -90,22 +90,31 @@ public class ArquivoService {
 
 		// bradesco
 		if ("237".equals(conta.get().getBanco().getCodigo())) {
+			if (limpar)
+				this.deleteAllLancamentos(conta.get(), planilha.get());
+
 			mapa = this.bradescoService.cargaArquivoBradesco(conta.get(), planilha.get(), multipartFile);
 			this.lancamentoService.atualizaSaldo(planilha.get(), conta.get());
 		}
 
 		// itau
 		if ("479".equals(conta.get().getBanco().getCodigo())) {
+			if (limpar)
+				this.deleteAllLancamentos(conta.get(), planilha.get());
 			mapa = this.cargaArquivoItau(conta.get(), planilha.get(), multipartFile);
 		}
 
 		// sodexo
 		if (conta.get().getBanco().getId() == 4) {
+			if (limpar)
+				this.deleteAllLancamentos(conta.get(), planilha.get());
 			mapa = this.sodexoService.cargaArquivoSodexo(conta.get(), planilha.get(), multipartFile);
 		}
 
 		// xp
 		if (conta.get().getId() == 8710) {
+			if (limpar)
+				this.deleteAllLancamentos(conta.get(), planilha.get());
 			mapa = this.sodexoService.cargaXP(conta.get(), planilha.get(), multipartFile);
 		}
 
@@ -226,7 +235,8 @@ public class ArquivoService {
 			String[] vet = lines.get(i).split(";");
 
 			Lancamento lancamento = new Lancamento();
-			lancamento.setData(DateUtils.parseDate(vet[0], "dd/MM/yyyy HH:mm"));
+			String sData = vet[0].substring(0, 8) + " " + vet[0].substring(12, 20);
+			lancamento.setData(DateUtils.parseDate(sData, "dd/MM/yy HH:mm:ss"));
 			lancamento.setDescricao(vet[1]);
 
 			String sValor = vet[2];
