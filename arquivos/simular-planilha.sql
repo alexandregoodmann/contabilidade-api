@@ -1,5 +1,7 @@
 drop  TABLE `contabilidade-dev`.planilha_anual;
 
+select distinct(tipo) from lancamento l ;
+
 CREATE  TABLE `contabilidade-dev`.planilha_anual (
 	id int primary key not null auto_increment,
 	id_lancamento int,

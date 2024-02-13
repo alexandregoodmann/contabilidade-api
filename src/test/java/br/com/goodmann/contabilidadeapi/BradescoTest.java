@@ -65,7 +65,7 @@ public class BradescoTest {
 		Example<Planilha> pExample = Example.of(planilha);
 		planilha = this.planilhaRepository.findOne(pExample).get();
 
-		Map<String, Object> mp = this.bradescoService.cargaArquivo(conta.getId(), planilha.getId(), mFile);
+		Map<String, Object> mp = this.bradescoService.cargaArquivo(false, conta.getId(), planilha.getId(), mFile);
 		System.out.println(mp.get("qtdLancamentos"));
 	}
 

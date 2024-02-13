@@ -33,7 +33,7 @@ public class CargaC6Test {
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
 
-		Map<String, Object> mapa = this.arquivoService.cargaArquivo(340, 7367, mFile);
+		Map<String, Object> mapa = this.arquivoService.cargaArquivo(false, 340, 7367, mFile);
 
 		int qtd = (int) mapa.get("qtdLancamentos");
 		assertTrue(qtd == 22);
