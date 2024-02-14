@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.goodmann.contabilidadeapi.model.Planilha;
 import br.com.goodmann.contabilidadeapi.model.PlanilhaAnual;
 import br.com.goodmann.contabilidadeapi.repository.PlanilhaAnualRepository;
+import br.com.goodmann.contabilidadeapi.repository.PlanilhaRepository;
 
 @Service
 public class PlanilhaAnualService {
@@ -25,6 +28,9 @@ public class PlanilhaAnualService {
 
 	@Autowired
 	private ArquivoService arquivoService;
+
+	@Autowired
+	private PlanilhaRepository planilhaRepository;
 
 	@Transactional
 	public void rename(String novo, String velho) {
@@ -51,10 +57,12 @@ public class PlanilhaAnualService {
 
 	@Transactional
 	public void criarPlanilhaAnual(Integer idPlanilha, String titulo) {
+		Optional<Planilha> planilha = this.planilhaRepository.findById(idPlanilha);
 		this.planilhaAnualRepository.criarPlanilhaAnual(idPlanilha, titulo);
 		List<PlanilhaAnual> list = this.planilhaAnualRepository.findAllByTitulo(titulo);
 		list.forEach(item -> {
-			BigDecimal[] vetValores = this.criaVetorValores(1, item.getParcelas(), item);
+			BigDecimal[] vetValores = this.criaVetorValores(Integer.valueOf(planilha.get().getMes()),
+					item.getParcelas(), item);
 			item.setValores(this.parseVetBigDecimal2String(vetValores));
 			this.planilhaAnualRepository.save(item);
 		});
