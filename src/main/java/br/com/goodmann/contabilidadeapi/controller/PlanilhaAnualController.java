@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,7 +53,13 @@ public class PlanilhaAnualController extends BaseController<PlanilhaAnual, Integ
 	@Override
 	@PostMapping
 	public ResponseEntity<PlanilhaAnual> create(@RequestBody PlanilhaAnual model) {
-		return new ResponseEntity<PlanilhaAnual>(this.planilhaAnualService.criarLancamento(model), HttpStatus.CREATED);
+		return new ResponseEntity<PlanilhaAnual>(this.planilhaAnualService.savarLancamento(model), HttpStatus.CREATED);
+	}
+	
+	@PutMapping
+	@Override
+	public ResponseEntity<PlanilhaAnual> update(@RequestBody PlanilhaAnual model) {
+		return new ResponseEntity<PlanilhaAnual>(this.planilhaAnualService.savarLancamento(model), HttpStatus.OK);
 	}
 
 	@PostMapping("/rename")
@@ -75,4 +82,5 @@ public class PlanilhaAnualController extends BaseController<PlanilhaAnual, Integ
 			@RequestParam("file") MultipartFile file) throws IOException, ParseException {
 		this.planilhaAnualService.cargaXPCartao(titulo, mes, file);
 	}
+
 }
