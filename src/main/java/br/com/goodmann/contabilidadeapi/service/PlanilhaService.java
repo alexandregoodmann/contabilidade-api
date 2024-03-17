@@ -98,22 +98,27 @@ public class PlanilhaService {
 		Set<Conta> contas = new HashSet<Conta>();
 
 		// duplica os lançamentos
-		this.lancamentoRepository.findAllFixos(new Planilha(idPlanilha)).forEach(lancamento -> {
-			contas.add(lancamento.getConta());
-			Lancamento model = new Lancamento();
-			BeanUtils.copyProperties(lancamento, model, "id");
-			model.setPlanilha(proxima);
-			model.setConcluido(false);
-			Date d = DateUtils.addMonths(model.getData(), 1);
-			model.setData(d);
-			Lancamento novoLancamento = this.lancamentoRepository.save(model);
+		this.lancamentoRepository.findAllByPlanilhaOrderByData(new Planilha(idPlanilha)).forEach(lancamento -> {
 
-			this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(lancamentoLabel -> {
-				LancamentoLabel novolancamentoLabel = new LancamentoLabel();
-				novolancamentoLabel.setLabel(lancamentoLabel.getLabel());
-				novolancamentoLabel.setLancamento(novoLancamento);
-				this.lancamentoLabelRepository.save(novolancamentoLabel);
-			});
+			// se for lancamento fixo ou parcelado
+			if (!StringUtils.isEmpty(lancamento.getFixo()) || this.clonarParcelado(lancamento)) {
+
+				contas.add(lancamento.getConta());
+				Lancamento model = new Lancamento();
+				BeanUtils.copyProperties(lancamento, model, "id");
+				model.setPlanilha(proxima);
+				model.setConcluido(false);
+				Date d = DateUtils.addMonths(model.getData(), 1);
+				model.setData(d);
+				Lancamento novoLancamento = this.lancamentoRepository.save(model);
+
+				this.lancamentoLabelRepository.findAllByLancamento(lancamento).forEach(lancamentoLabel -> {
+					LancamentoLabel novolancamentoLabel = new LancamentoLabel();
+					novolancamentoLabel.setLabel(lancamentoLabel.getLabel());
+					novolancamentoLabel.setLancamento(novoLancamento);
+					this.lancamentoLabelRepository.save(novolancamentoLabel);
+				});
+			}
 		});
 
 		// atualiza o lançamento saldoAnterior
@@ -122,6 +127,16 @@ public class PlanilhaService {
 		});
 
 		return proxima;
+	}
+
+	private boolean clonarParcelado(Lancamento lancamento) {
+		if (!StringUtils.isEmpty(lancamento.getParcelas())) {
+			String[] vet = lancamento.getParcelas().split("/");
+			if (!vet[0].equals(vet[1])) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Transactional
