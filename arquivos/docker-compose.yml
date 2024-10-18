@@ -1,80 +1,26 @@
-version: '3.1'
-
 services:
   db:
-    image: mysql
+    image: mysql:8.0.40-debian
     container_name: mysql-db
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.5
-                     
+
   adminer:
     image: adminer
     container_name: mysql-adminer
     restart: always
     ports:
       - 8080:8080
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.6
-              
+
   backendserver:
     image: alexandregoodmann/contabilidade-api
     container_name: contabilidade-api
+    links:
+      - "db"
     build: ./contabilidade-api/
     ports:
-     - 8081:8081
+      - 8081:8081
     depends_on:
-           - "db"
+      - "db"
     restart: always
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.7
-        
-  frontend:
-    image: alexandregoodmann/contabilidade-web
-    container_name: contabilidade-web
-    build: ./contabilidade-web2
-    ports: 
-      - "80:80"
-    depends_on:
-      - "backendserver"
-    restart: always
-    
-  wordcard-api:
-    image: alexandregoodmann/wordcard-api
-    container_name: wordcard-api
-    build: ./wordcard-api/
-    ports:
-       - "8082:8082"
-    depends_on:
-           - "db"
-    restart: always
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.8    
-
-  wordcard-web:
-    image: alexandregoodmann/wordcard-web
-    container_name: wordcard-web
-    build: ./wordcard
-    ports: 
-      - "8084:8084"
-    depends_on:
-      - "wordcard-api"
-    restart: always
-          
-volumes:
-  my-datavolume:      
-  
-networks:
-  vpcbr:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 10.5.0.0/16
-         gateway: 10.5.0.1
