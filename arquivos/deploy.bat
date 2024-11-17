@@ -1,5 +1,10 @@
+@echo off
+cls
 cd contabilidade-api
-mvn clean package -DskipTests=true
+call mvn clean package -DskipTests=true
 cd ..
-docker-compose down
-docker-compose up --build
+cd contabilidade-web2
+call ng build
+cd ..
+call docker-compose stop
+call docker-compose up --build &
