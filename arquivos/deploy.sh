@@ -15,4 +15,4 @@ cd wordcard
 sudo ng build
 sleep 7
 cd ..
-sudo docker-compose up --build
+sudo docker-compose up -d
