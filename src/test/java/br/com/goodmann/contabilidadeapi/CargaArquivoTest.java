@@ -117,7 +117,7 @@ public class CargaArquivoTest {
 	@Test
 	public void cargaXPTest() throws IOException, ParseException, NotFoundException {
 
-		File file = new File("/home/alexandre/Downloads/extrato_de_01-01-2024_ate_31-01-2024.csv");
+		File file = new File("C:\\projetos\\contabilidade-api\\arquivos\\extrato_de_01-01-2026_ate_19-01-2026.csv");
 		InputStream stream;
 		stream = new FileInputStream(file);
 		MultipartFile mFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);

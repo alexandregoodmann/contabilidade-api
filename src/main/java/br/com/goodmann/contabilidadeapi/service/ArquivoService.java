@@ -235,11 +235,11 @@ public class ArquivoService {
 			String[] vet = lines.get(i).split(";");
 
 			Lancamento lancamento = new Lancamento();
-			String sData = vet[0].substring(0, 8) + " " + vet[0].substring(12, 20);
+			String sData = vet[0].substring(0, 8) + " " + vet[1].substring(0, 8);
 			lancamento.setData(DateUtils.parseDate(sData, "dd/MM/yy HH:mm:ss"));
-			lancamento.setDescricao(vet[1]);
+			lancamento.setDescricao(vet[2]);
 
-			String sValor = vet[2];
+			String sValor = vet[3];
 			sValor = sValor.replaceAll("R\\$ ", "").replaceAll("\\.", "").replaceAll("\\,", ".").trim();
 			lancamento.setValor(BigDecimal.valueOf(Double.valueOf(sValor)));
 
